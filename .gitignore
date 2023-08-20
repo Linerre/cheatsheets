@@ -1,0 +1,10 @@
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.dvi
+*.log
+*.pdf
+*.xml
+*_latexmk
+auto/

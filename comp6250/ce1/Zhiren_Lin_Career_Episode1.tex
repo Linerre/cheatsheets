@@ -1,0 +1,52 @@
+\documentclass[12pt,a4paper]{article}
+% Preamble
+\usepackage[
+backend=biber,
+sorting=nyt,
+style=ext-authoryear,
+articlein=false,
+block=space,                    % add space after each block
+date=year,                      % use only date in reference entry
+isbn=false,                     % suppress ISBN block in reference entry
+]{biblatex}
+
+\DeclareFieldFormat[article]{volume}{vol.\addnbspace #1}
+\DeclareFieldFormat[article]{number}{no.\addnbspace #1}
+\DeclareFieldFormat[article]{journaltitle}{\emph{#1}}
+
+% TODO: Why the below line doesnt work?
+% \DeclareDelimFormat[bib]{nameyeardelim}{\addcomma\addnbspace}
+
+% TODO:
+% 1. Change period after year to comma in biblist
+% 2. Move [accessed day-month-year] to entry end
+% 3. Add a comma and a space after journal title
+\renewcommand*{\nameyeardelim}{\addcomma\space}
+\renewcommand*{\volnumdelim}{\addcomma\space}
+\addbibresource{ce1.bib}
+
+% Document body
+\begin{document}
+% \bibliographystyle{agsm}
+
+In early 2020, the unexpected outbreak of COVID-19 seriously disrupted in-person access to the library I was working at. As a result, the library collections suddenly became inaccessible. Yet as the spring semester approached, the library received an overwhelming number of queries from the students and faculty concerning the access to the library materials, particularly those only in print.
+
+
+As a library staffer, one the one hand, I cannot promise the students and faculty (the main stakeholders) that all the physical copies will be made available online in those trying times. Not only because this would seriously breach copyright laws, harming the authors – another stakeholder of the library, but also because this would unnecessarily entail a great amount of human effort. Think about how much time and effort it will take for library staff to manually scan 100 physical books of which each has over 200 pages.
+
+
+On the other hand, since many requests are relevant to course materials, as the course reserve coordinator, I should at least think about ways to mitigate their anxieties. After all, the reason the library stands there is to support its users. When they email the library, chances are that they expect something that only the library can possibly provide: how to access library physical resources during the lockdown. If I think of copyright as something vague and general, I may very well appear careless and therefore make the users disappointed.
+
+
+To move any further to address this pressing problem, I did need some guidelines to balance both sides: the copyright owners and the library users. Fortunately, my supervisor, Head of Access Team, had been working on a similar issue for a while and she introduced me to the project she decided to initiate and the key guidelines: Regarding scanning a small portion from a physical copy, I can provide either two chapters or no more than 20\% of the whole book, whichever comes first, plus one more important policy which constrains the load period to 4 hours for course reserves \parencite{NYUSHLIB}.
+
+
+The second one threw the team a big challenge: how could we make sure the digital materials on loan can be withdrawn in 4 hours? Without it, I could simply share any digital copy with one single requester using Google Drive and limit the requester’s privileges to not being able to download/print/share the materials. I discussed this with my supervisor and IT colleague. In the end we agreed to try a simple implementation of the concept called “Controlled Digital Lending (CDL)” \parencite{controlled}, that is, lending a digitized copy to a single borrower at a time, just as the way a physical one is usually loaded. The implementation turned out to be quite successful and well accepted. The whole work \parencite{cdl} was published in the International Journal of Librarianship. According to my supervisor, she also received queries about the implementation from librarians of other libraries, as she is the first contact.
+
+
+Inspired by the guidelines used in the CDL project, I applied to the project one more guideline: Arch Linux’s definition for simplicity, that is, “[simplicity] means without unnecessary additions or modifications” \parencite{Archwiki}. While testing the first version of this implementation, I noticed it took a fair amount of time for staff to prepare the materials before they could loan it out using the implementation. I then devoted a few weeks to simplify the workflow. I finally managed to reduce the lending process to three simple steps \parencite{Linerre2023}. The original processing steps were part of the library’s internal staff manual, which unfortunately I no longer have access to.
+In retrospect, the most impressive point I learned is that clear guidelines can lead to decisive and prompt responses in tricky situations. At best, it might produce a fruitful result in the end.
+
+\printbibliography
+% \bibliography{ce1}
+\end{document}
