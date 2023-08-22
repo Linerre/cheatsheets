@@ -1,0 +1,73 @@
+#+TITLE: Notes for COMP6240 Relational Database
+#+AUTOR: <u7753813@anu.edu.au>
+
+* Week 1
+
+* Week 2
+
+* Week 3
+
+* Week 4
+
+* Week 5: Functional Dependencies
+** Part 1
+*** Properties of well-designed database
+1. *Complete*: containing all relevant info
+2. *Free of redundancy*: exactly the needed info (if possible)
+3. *Consistent*: meaning of ~NULL~ clear
+4. *Performance*
+   /Note/: Redundancy may lead to inconsistency
+
+*** Normalization (Week 6)
+ The process of breaking down a big table into smaller ones
+
+
+** Part 2
+*** Query languages created by Codd
+- Relational Calculus: not covered in this course
+- Relational Algebra: the mathematical foundation of SQL; covered in future lectures
+
+*** Reasons
+1. Need *formal way* to analyze database schema
+2. FDs are designed to define *goodness* and *badness* of (relational database design)
+   1. Top down: from schema + FD to smaller  schema
+   2. Bottom up: from attributes + FD to schema (not popular)
+*** Informal Description
+#+BEGIN_EXAMPLE
+{A, B, C} -> {D, E}
+
+If two tuples have the same values for A, B, and C,
+then they must also have the same values for D and E
+#+END_EXAMPLE
+*determinant*: ABC
+*dependent*: DB
+
+*** Formal Definition
+See pp6 of [[file:~/Documents/anucomputing/6240_relational_database/lectures/online/week5_Functional Dependencies (Part 2).pdf][lecture slides]]
+**** Trivial
+#+BEGIN_EXAMPLE
+{A,B,C} -> {C}
+{A,B.C} -> {B,C}
+#+END_EXAMPLE
+
+*** Identify FDs in general
+1. Analyze data requirements
+2. Analyze sample data (may be risky because of sample data quality)
+
+
+** Part 3
+*** Keys
+- superkey: *attributes* that uniquely determine a tuple
+- candidate: minimal set of superkey
+- primary key: keys chosen from candidate keys
+
+*** Implied functional dependencies
+See pp4-7 of [[file:~/Documents/anucomputing/6240_relational_database/lectures/online/week5_Functional Dependencies (Part 3).pdf][lecture slides]]
+
+*** Finding keys
+See pp8-10 of lecture slides
+- *prime attr*: attr that occurs in a key
+- *non-prime attr*: that which is /not/ a prime attr
+
+*** Tricks
+See slides
