@@ -1,14 +1,90 @@
+% --------------------- a ---------------------
 \subsection{a}
-Proof \((p \lor q) \land (\neg p \land \neg q) \equiv T\)
+\textbf{Solution}
 
-Expand the right-hand side \(T
-\) as follows
+Assume that
 \begin{equation}
 \label{eq:1}
-\begin{split}
-  T & \equiv (p \lor \neg p) \\
-    & \equiv (p \lor \neg p) \lor (q \land \neg q) \\
-    & \equiv ((p \lor \neg p) \lor q) \land ((p \lor \neg p) \lor \neg q) \\
-    & \equiv ((p \lor q) \lor \neg p) \land ((\neg p \lor \neg q) \lor p)
-\end{split}
+  A = (p \lor q)
 \end{equation}
+\begin{align*}
+  LHS
+  & \equiv A \lor (\neg p \land \neg q)
+  && \text{by \eqref{eq:1}} \\
+  & \equiv (A \lor \neg p) \land (A \lor \neg q)
+  && \text{Associativity} \\
+  & \equiv ((p \lor q) \lor \neg p) \land ((p \lor q) \lor \neg q)
+  && \text{by \eqref{eq:1}} \\
+  & \equiv ((p \lor \neg p) \lor q) \land (p \lor (q \lor \neg q))
+  && \text{Associativity, Commutativity} \\
+  & \equiv (T \lor q) \land (p \lor T)
+  && \text{Complements}
+\end{align*}
+
+Using truth table, it is easy to prove that whatever the truth value of \(p\) is, \(p \lor T\) always equals \(T\).
+
+\begin{center}
+\begin{tabular}{|l|l|c|}
+  \hline
+  \(p\) & \(T\) & \(p \lor T\) \\
+  \hline
+  T & T & T  \\
+  F & T & T  \\
+  \hline
+\end{tabular}
+\end{center}
+
+The same also goes for \(T \lor q\) regardless of \(q\)'s truth value. Thus, we have:
+\begin{align*}
+  LHS
+  & \equiv (T \lor q) \land (p \lor T) \\
+  & \equiv T \land T \\
+  & \equiv T \\
+  & \equiv RHS
+\end{align*}
+
+% --------------------- b ---------------------
+\subsection{b}
+\textbf{Solution}
+Similarly, assume that
+\begin{equation}
+\label{eq:2}
+  A = (p \lor q)
+\end{equation}
+\begin{align*}
+  LHS
+  & \equiv A \land (\neg p \land \neg q)
+  && \text{by \eqref{eq:2}} \\
+  & \equiv (A \land \neg p) \land \neg q
+  && \text{Associativity} \\
+  & \equiv (\neg p \land (p \lor q)) \land \neg q
+  && \text{by \eqref{eq:2}, Commutativity} \\
+  & \equiv ((p \land \neg p) \lor (\neg p \land q)) \land \neg q
+  && \text{Distributivity} \\
+  & \equiv (F \lor (\neg p \land q)) \land \neg q
+  && \text{Complements} \\
+  & \equiv (\neg p \land q) \land \neg q
+  && \text{Identity} \\
+  & \equiv \neg p \land (q \land \neg q)
+  && \text{Associativity}  \\
+  & \equiv \neg p \land F && \text{Complements}
+\end{align*}
+
+Make the truth table for \(\neg p \land F\):
+\begin{center}
+\begin{tabular}{|l|l|l|c|}
+  \hline
+  \(p\) & \(\neg p\) & \(F\) & \(\neg p \land F\) \\
+  \hline
+  T & F & F & F \\
+  F & T & F & F \\
+  \hline
+\end{tabular}
+\end{center}
+Thus, we have:
+\begin{align*}
+  LHS
+  & \equiv \neg p \land F \\
+  & \equiv F \\
+  & \equiv RHS
+\end{align*}
