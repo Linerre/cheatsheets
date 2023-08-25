@@ -1,5 +1,12 @@
 #+TITLE: Notes for COMP6240 Relational Database
+#+BOOK: Database System Concepts
 #+AUTOR: <u7753813@anu.edu.au>
+
+#+NAME: Resources
+| Title                    | Short | Type | Ref     |
+|--------------------------+-------+------+---------|
+| Database System Concepts | DSC   | Book | <<DSC>> |
+|                          |       |      |         |
 
 * Week 1
 
@@ -10,7 +17,18 @@
 * Week 4
 
 * Week 5: Functional Dependencies
-** Part 1
+** Notational Conventions
+A summary can be found on page 309(338) of [[DSC]]
+| Use                 | Repr                         | Example  |
+|---------------------+------------------------------+----------|
+| Greek letter        | sets of attrs                | α        |
+| ROMAN LETTER        | relation schema              | R        |
+| roman letter        | relation                     | r        |
+| /K/                 | superkey                     |          |
+| lowercase name/word | relations                    | /depart/ |
+| /r/(/R/)            | relation /r/ with schema /R/ |          |
+| instance of /r/     | /r/ has a particular value   |          |
+
 ** Properties of well-designed database
 1. *Complete*: containing all relevant info
 2. *Free of redundancy*: exactly the needed info (if possible)
@@ -19,14 +37,27 @@
    /Note/: Redundancy may lead to inconsistency
 
 
-** Normalization (Week 6)
- The process of breaking down a big table into smaller ones
+** Decomposition
+Breaking a big relation into smaller relation schemas. This may lead to:
+1. *lossy* decomposition, where reduandency or loss of information happens
+2. *lossless* decomposition, the conversion of the above (goal to achieve)
+#+BEGIN_QUOTE
+Let R be a relation schema and let R_1 and R_2 form a decomposition of R— that is, viewing R, R_1 , and R_2 as sets of attributes, R = R1 ∪ R2. We say that the decomposition is a lossless decomposition if there is /no/ loss of information by replacing R with two relation
+schemas R_1 and R_2 .
+#+END_QUOTE
+pp307(336) of [[DSC]]
 
+
+** Normalization (Week 6)
+1. Decide if a give relation schema is in good form (/formal form/)
+2. If not, decompose it inot smaller relation schemas
+
+** Legal instance                                                 :important:
+Give a relation /R/, if an instance of it, /r/ *satisifies* all real-world constraints, then /r/ is said to be a /legal instance/.
 
 ** Query languages created by Codd
 - Relational Calculus: not covered in this course
 - Relational Algebra: the mathematical foundation of SQL; covered in future lectures
-
 
 ** Reasons
 1. Need *formal way* to analyze database schema
@@ -36,7 +67,7 @@
 
 ** Informal Description
 #+BEGIN_EXAMPLE
-{A, B, C} -> {D, E}
+{A, B, C} → {D, E}
 
 If two tuples have the same values for A, B, and C,
 then they must also have the same values for D and E
@@ -44,20 +75,27 @@ then they must also have the same values for D and E
 *determinant*: ABC
 *dependent*: DB
 
+
 ** Formal Definition
 See pp6 of [[file:~/Documents/anucomputing/6240_relational_database/lectures/online/week5_Functional Dependencies (Part 2).pdf][lecture slides]]
 
+
 ** Trivial
+#+BEGIN_QUOTE
+A. In general, a functional dependency of the form α → β is trivial if β ⊆ α.
+#+END_QUOTE
+
 #+BEGIN_EXAMPLE
-{A,B,C} -> {C}
-{A,B.C} -> {B,C}
+{A,B,C} → {C}
+{A,B.C} → {B,C}
 #+END_EXAMPLE
 
 ** Identify FDs in general
 1. Analyze data requirements
 2. Analyze sample data (may be risky because of sample data quality)
 
-** Keys
+
+** Keys                                                           :important:
 - superkey: *attributes* that uniquely determine a tuple
 - candidate: minimal set of superkey
 - primary key: a single key chosen from candidate key. Primary keys are special cases of FDs.

@@ -1,0 +1,8 @@
+#+Title: Notes on COMP6260 Foundation of Computing
+#+Author: <u7753813@anu.edu.au>
+
+* Readings:
+
+* Week 1 Propositional Logic
+* Week 2 Natural Deduction
+* Week 3 Predicate

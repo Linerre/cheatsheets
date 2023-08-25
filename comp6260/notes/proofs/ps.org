@@ -1,0 +1,18 @@
+#+TITLE: TUTORIAL NOTES
+
+* Week 5
+** Ex1
+- Usually use "xs" as the main variable
+- List base case: ~[]~ (empty list)
+
+#+BEGIN_SRC haskell
+(++) :: [a] -> [a] -> [a]
+
+#+END_SRC
+
+** Ex2
+#+BEGIN_SRC haskell
+-- Prove: Size :: Mirror :: t == Size :: t
+-- Base case: t :: Tree = Nul
+
+#+END_SRC

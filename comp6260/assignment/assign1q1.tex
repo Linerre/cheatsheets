@@ -1,0 +1,103 @@
+\subsection{a}
+\(M\) will be \(true\) when at least any two (the majority) of \(x\), \(y\), \(z\) evaluate to \(true\). Thus, the truth table for the connective \(M\):
+\begin{center}
+\begin{tabular}{|l|l|l|c|}
+  \hline
+  \(x\) & \(y\) & \(z\) & \(M(x,y,z)\) \\
+  \hline
+  T & T & T & T \\
+  T & T & F & T \\
+  T & F & T & T \\
+  T & F & F & F \\
+  F & T & T & T \\
+  F & T & F & F \\
+  F & F & T & F \\
+  F & F & F & F \\
+  \hline
+\end{tabular}
+\end{center}
+
+\subsection{b}
+According to the above truth table , there are four situations where \(M(x,y,z)\) evaluates to \(true\):
+\begin{enumerate}
+\item \(x \land y \land z\)
+\item \(x \land y \land \neg z\)
+\item \(x \land \neg y \land z\)
+\item \(\neg x \land y \land z\)
+\end{enumerate}
+Therefore, formula \(\phi(x,y,z)\) can be defined as the following:
+
+\[\phi(x,y,z) \equiv (x \land y \land z) \lor (x \land y \land \neg z) \lor (x \land \neg y \land z) \lor (\neg x \land y \land z)\]
+
+The truth table for the above function is shown below:
+
+\begin{center}
+\begin{tabular}{|l|l|l|c|}
+  \hline
+  \(x\) & \(y\) & \(z\) & \(\phi(x,y,z)\) \\
+  \hline
+  T & T & T & T \\
+  T & T & F & T \\
+  T & F & T & T \\
+  T & F & F & F \\
+  F & T & T & T \\
+  F & T & F & F \\
+  F & F & T & F \\
+  F & F & F & F \\
+  \hline
+\end{tabular}
+\end{center}
+
+\subsubsection{c}
+Given a proposition \(a\), the truth table for \(\neg a\) is:
+\begin{center}
+\begin{tabular}{|c|c|}
+  \hline
+  \(a\) & \(\neg a\)  \\
+  \hline
+  T & F  \\
+  F & T  \\
+  \hline
+\end{tabular}
+\end{center}
+
+It is easy to show that connective set \(\{M\}\) always output the same truth value as its input \(a\), thus, not being able to express \(\neg a\):
+\begin{center}
+\begin{tabular}{|l|c|}
+  \hline
+  \(a\) & \(M(a,a,a)\) \\
+  \hline
+  T & T  \\
+  F & F  \\
+  \hline
+\end{tabular}
+\end{center}
+It is clear that this truth table is \emph{not} identical to that of \(\neg a\). Therefore, set \(\{M\}\) cannot express negation and is not expressively complete.
+
+
+% TODO: make authoryear delimiter comma instead of space
+As to set \(\{M, \neg\}\), the following truth table shows that ``every definable truth function [in the set] has an even number of `1' values" \parencite{john2021}.
+
+
+% TODO: Figure out /because and /therefore
+Another approach to this proof is: because \(\neg\) is self-dual, because \(M\) is a majority function, which is also self-dual, and because the set \(\{M, \neg\}\) equals to set \(\{\neg, MAJ(p,q,r)\}\), therefore set \(\{M, \neg\}\) is not functionally complete, according to Emil Post \parencites{wiki:fncomp}{wiki:majf}.
+
+
+Similarly, I think set \(\{M, \neg, T\}\) is \emph{not} expressively complete either, as \(T\) has the same truth table as \(M\).
+
+\begin{center}
+\begin{tabular}{|l|l|l|c|c|c|}
+  \hline
+  \(a\) & \(b\) & \(c\) & \(a \land b \land c\) & \(M(a,b,c)\) & \(\neg M(a,b,c)\) \\
+  \hline
+  T & T & T & T & T & F \\
+  T & T & F & F & T & F \\
+  T & F & T & F & T & F \\
+  T & F & F & F & F & T \\
+  F & T & T & F & T & F \\
+  F & T & F & F & F & T \\
+  F & F & T & F & F & T \\
+  F & F & F & F & F & T \\
+  \hline
+\end{tabular}
+\end{center}
