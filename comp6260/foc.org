@@ -2,7 +2,29 @@
 #+Author: <u7753813@anu.edu.au>
 
 * Readings:
+Listed in the order of importance:
+- Smith, P. (2022, Jan. 31). /Beginning Mathematical Logic: A Study Guide/. URL: https://www.logicmatters.net/tyl/ [Accessed: 2023-08-26 18:45]
+- Smith, P. (2022, Jan. 31). /An Introduction to Formal Logic/. URL: https://www.logicmatters.net/ifl/ [Accessed: 2023-08-26 18:50]
+- Jeremy Avigad, Robert Y. Lewis, and Floris van Doorn. (2017). /Logic and Proof/. URL: https://leanprover.github.io/logic_and_proof/introduction.html [Accessed: 2023-08-26 21:16]
+- "Natural Deduction Systems in Logic" In: /Stanford Encyclopedia of Philosophy/. URL: https://plato.stanford.edu/entries/natural-deduction/
+
+* Proof Assistants/Languages
+** Coq
+** Lean
+- Official Site: https://leanprover.github.io/about/
+- Documentation: https://leanprover.github.io/documentation/
+
+
+Set up the development/learning env using Nix:
+
+
+** Prolog
+
 
 * Week 1 Propositional Logic
+
+
 * Week 2 Natural Deduction
+
+
 * Week 3 Predicate
