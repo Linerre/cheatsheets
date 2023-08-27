@@ -1,7 +1,7 @@
 #+Title: Notes on COMP6260 Foundation of Computing
 #+Author: <u7753813@anu.edu.au>
 
-* Readings:
+* DOING Readings:
 Listed in the order of importance:
 - Smith, P. (2022, Jan. 31). /Beginning Mathematical Logic: A Study Guide/. URL: https://www.logicmatters.net/tyl/ [Accessed: 2023-08-26 18:45]
 - Smith, P. (2022, Jan. 31). /An Introduction to Formal Logic/. URL: https://www.logicmatters.net/ifl/ [Accessed: 2023-08-26 18:50]
@@ -10,6 +10,10 @@ Listed in the order of importance:
 
 * Proof Assistants/Languages
 ** Coq
+- Official Site: https://coq.inria.fr/
+- Documentation: https://coq.inria.fr/documentation
+
+
 ** Lean
 - Official Site: https://leanprover.github.io/about/
 - Documentation: https://leanprover.github.io/documentation/

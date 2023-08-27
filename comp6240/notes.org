@@ -10,9 +10,26 @@
 
 * Week 1
 
-* Week 2
 
-* Week 3
+* Week 2 Relational Data Model
+
+* Week 3 SQL
+** SQL syntax
+#+BEGIN_EXAMPLE
+select-list table-list [qulification]
+#+END_EXAMPLE
+- select-list: list of columns, separated by ~,~, whitespace ignored
+- table-list: list of tables, separated by ~,~
+- qualification: restriction to filter out the selected result from the above steps
+
+
+** =WHERE= vs =HAVING=
+#+BEGIN_QUOTE
+WHERE selects input rows /before/ groups and aggregates are computed (thus, it controls which rows go into the aggregate computation), whereas HAVING selects group rows after groups and aggregates are computed.
+
+Thus, the WHERE clause /must not/ contain aggregate functions; it makes no sense to try to use an aggregate to determine which rows will be inputs to the aggregates.
+#+END_QUOTE
+from: file:///usr/share/doc/postgresql/html/tutorial-agg.html
 
 * Week 4
 

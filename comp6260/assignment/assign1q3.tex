@@ -1,0 +1,47 @@
+\subsection{Rule 1}
+\textbf{Solution}
+\[
+  \begin{nd}
+    \hypo {1} {(p \rightarrow q) \rightarrow p}
+    \open
+    \hypo {2} {\neg q}
+
+    \open
+    \hypo {3} {p}
+
+    \open
+    \hypo {4} {p \rightarrow q}
+    \have {4} {p} \ie{2,3}
+
+    \open
+    \hypo {4} {p \rightarrow q}
+    \have {5} {q} \ie{3,4}
+    \have {6} {F}
+    \close
+
+    \have {7} {\neg (p \rightarrow q)} \ni{4-6}
+    \have {8} {p}
+    \close
+    \have {9} {\neg q \rightarrow p} \ii{2-8}
+    \close
+
+  \end{nd}
+\]
+\subsection{Rule 2}
+\textbf{Solution}
+\[
+  \begin{nd}
+    \hypo {1} {p \lor q \quad p \rightarrow q \quad q \rightarrow p \quad \neg(p \land q)}
+
+    \open
+    \hypo {2} {p}
+    \have {3} {\neg q} \ni{1-2}
+    \have {4} {F}
+    \close
+
+    \have {4} {\neg p} \ne{2-4}
+    \have {5} {q}      \oi{1,4}
+
+    \have {n} {r}
+  \end{nd}
+\]
