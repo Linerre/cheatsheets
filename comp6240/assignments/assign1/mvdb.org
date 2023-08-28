@@ -1,5 +1,7 @@
+#+TITLE: Movie DB schemas
 
-moviedb=> \dt
+* Relation list
+~cmd: \dt~
                 List of relations
  Schema |         Name         | Type  |  Owner
 --------+----------------------+-------+----------
@@ -21,8 +23,8 @@ moviedb=> \dt
  public | writer_award         | table | postgres
 (16 rows)
 
-
-moviedb=> \d+ person
+* =person=
+~cmd: \d+ person~
                                             Table "public.person"
    Column   |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 ------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
@@ -38,7 +40,9 @@ Referenced by:
     TABLE "role" CONSTRAINT "fk_role_2" FOREIGN KEY (id) REFERENCES person(id)
     TABLE "writer" CONSTRAINT "fk_writer_2" FOREIGN KEY (id) REFERENCES person(id)
 
-moviedb=> \d+ movie
+
+* =movie=
+~cmd: \d+ movie~
                                                Table "public.movie"
      Column      |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
@@ -58,7 +62,9 @@ Referenced by:
     TABLE "scene" CONSTRAINT "fk_scene_movie" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
     TABLE "writer" CONSTRAINT "fk_writer_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
 
-moviedb=> \d+ award
+
+* =award=
+~cmd: \d+ award~
                                              Table "public.award"
    Column    |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
@@ -74,7 +80,9 @@ Referenced by:
     TABLE "movie_award" CONSTRAINT "fk_movie_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
     TABLE "writer_award" CONSTRAINT "fk_writer_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
 
-moviedb=> \d+ restriction_category
+
+* =restriction_category=
+~cmd: \d+ restriction_category~
                                      Table "public.restriction_category"
    Column    |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
@@ -85,7 +93,9 @@ Indexes:
 Referenced by:
     TABLE "restriction" CONSTRAINT "fk_restriction_2" FOREIGN KEY (description, country) REFERENCES restriction_category(description, country)
 
-moviedb=> \d+ director
+
+* =director=
+~cmd: \d+ director~
                                              Table "public.director"
      Column      |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
@@ -100,7 +110,9 @@ Foreign-key constraints:
 Referenced by:
     TABLE "director_award" CONSTRAINT "fk_director_award_1" FOREIGN KEY (title, production_year) REFERENCES director(title, production_year)
 
-moviedb=> \d+ writer
+
+* =writer=
+~cmd: \d+ writer~
                                               Table "public.writer"
      Column      |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
@@ -116,7 +128,9 @@ Foreign-key constraints:
 Referenced by:
     TABLE "writer_award" CONSTRAINT "fk_writer_award_1" FOREIGN KEY (id, title, production_year) REFERENCES writer(id, title, production_year)
 
-moviedb=> \d+ crew
+
+* =crew=
+~cmd: \d+ crew~
                                                Table "public.crew"
      Column      |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
@@ -132,7 +146,9 @@ Foreign-key constraints:
 Referenced by:
     TABLE "crew_award" CONSTRAINT "fk_crew_award_1" FOREIGN KEY (id, title, production_year) REFERENCES crew(id, title, production_year)
 
-moviedb=> \d+ scene
+
+* =scene=
+~cmd: \d+ scene~
                                                Table "public.scene"
      Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
@@ -147,7 +163,9 @@ Foreign-key constraints:
 Referenced by:
     TABLE "appearance" CONSTRAINT "fk_appearance_2" FOREIGN KEY (title, production_year, scene_no) REFERENCES scene(title, production_year, scene_no)
 
-moviedb=> \d+ role
+
+* =role=
+~cmd: \d+ role~
                                                 Table "public.role"
      Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
@@ -165,7 +183,9 @@ Referenced by:
     TABLE "actor_award" CONSTRAINT "fk_actor_award_1" FOREIGN KEY (title, production_year, description) REFERENCES role(title, production_year, description)
     TABLE "appearance" CONSTRAINT "fk_appearance_1" FOREIGN KEY (title, production_year, description) REFERENCES role(title, production_year, description)
 
-moviedb=> \d+ restriction
+
+* =restriction=
+~cmd: \d+ restriction~
                                             Table "public.restriction"
      Column      |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
@@ -179,7 +199,9 @@ Foreign-key constraints:
     "fk_restriction_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
     "fk_restriction_2" FOREIGN KEY (description, country) REFERENCES restriction_category(description, country)
 
-moviedb=> \d+ appearance
+
+* =appearance=
+~cmd: \d+ appearance~
                                              Table "public.appearance"
      Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
@@ -193,7 +215,7 @@ Foreign-key constraints:
     "fk_appearance_1" FOREIGN KEY (title, production_year, description) REFERENCES role(title, production_year, description)
     "fk_appearance_2" FOREIGN KEY (title, production_year, scene_no) REFERENCES scene(title, production_year, scene_no)
 
-moviedb=> \d+ movie_award
+~cmd: \d+ movie~_award
                                             Table "public.movie_award"
      Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
@@ -209,7 +231,9 @@ Foreign-key constraints:
     "fk_movie_award_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
     "fk_movie_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
 
-moviedb=> \d+ crew_award
+
+* =crew_award=
+~cmd: \d+ crew_award~
                                              Table "public.crew_award"
      Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
@@ -226,7 +250,9 @@ Foreign-key constraints:
     "fk_crew_award_1" FOREIGN KEY (id, title, production_year) REFERENCES crew(id, title, production_year)
     "fk_crew_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
 
-moviedb=> \d+ director_award
+
+* =director_award=
+~cmd: \d+ director_award~
                                            Table "public.director_award"
      Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
@@ -242,7 +268,9 @@ Foreign-key constraints:
     "fk_director_award_1" FOREIGN KEY (title, production_year) REFERENCES director(title, production_year)
     "fk_director_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
 
-moviedb=> \d+ writer_award
+
+* =writer_award=
+~cmd: \d+ writer_award~
                                             Table "public.writer_award"
      Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
@@ -259,7 +287,10 @@ Foreign-key constraints:
     "fk_writer_award_1" FOREIGN KEY (id, title, production_year) REFERENCES writer(id, title, production_year)
     "fk_writer_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
 
-moviedb=> \d+ actor_award
+
+* =actor_award=
+~cmd: \d+ actor_award~
+
                                             Table "public.actor_award"
      Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
 -----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
