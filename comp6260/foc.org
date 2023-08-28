@@ -8,6 +8,12 @@ Listed in the order of importance:
 - Jeremy Avigad, Robert Y. Lewis, and Floris van Doorn. (2017). /Logic and Proof/. URL: https://leanprover.github.io/logic_and_proof/introduction.html [Accessed: 2023-08-26 21:16]
 - "Natural Deduction Systems in Logic" In: /Stanford Encyclopedia of Philosophy/. URL: https://plato.stanford.edu/entries/natural-deduction/
 
+
+* Similar Courses
+** Logic and Proof (Cambridge University)
+- Website: https://www.cl.cam.ac.uk/teaching/2023/LogicProof/materials.html
+- Materials (lecture notes/slides): https://www.cl.cam.ac.uk/teaching/2023/LogicProof/materials.html
+
 * Proof Assistants/Languages
 ** Coq
 - Official Site: https://coq.inria.fr/
