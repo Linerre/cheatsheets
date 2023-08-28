@@ -31,6 +31,10 @@ Thus, the WHERE clause /must not/ contain aggregate functions; it makes no sense
 #+END_QUOTE
 from: file:///usr/share/doc/postgresql/html/tutorial-agg.html
 
+
+** Alias
+Column alias /cannot/ be used in a ~WHERE~ or ~HAVING~ clause: https://dba.stackexchange.com/a/225883
+
 * Week 4
 
 * Week 5: Functional Dependencies
@@ -52,6 +56,7 @@ A summary can be found on page 309(338) of [[DSC]]
 3. *Consistent*: meaning of ~NULL~ clear
 4. *Performance*
    /Note/: Redundancy may lead to inconsistency
+
 
 
 ** Decomposition

@@ -1,0 +1,277 @@
+
+moviedb=> \dt
+                List of relations
+ Schema |         Name         | Type  |  Owner
+--------+----------------------+-------+----------
+ public | actor_award          | table | postgres
+ public | appearance           | table | postgres
+ public | award                | table | postgres
+ public | crew                 | table | postgres
+ public | crew_award           | table | postgres
+ public | director             | table | postgres
+ public | director_award       | table | postgres
+ public | movie                | table | postgres
+ public | movie_award          | table | postgres
+ public | person               | table | postgres
+ public | restriction          | table | postgres
+ public | restriction_category | table | postgres
+ public | role                 | table | postgres
+ public | scene                | table | postgres
+ public | writer               | table | postgres
+ public | writer_award         | table | postgres
+(16 rows)
+
+
+moviedb=> \d+ person
+                                            Table "public.person"
+   Column   |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
+ id         | character(8)          |           | not null |         | extended |              |
+ first_name | character varying(15) |           | not null |         | extended |              |
+ last_name  | character varying(30) |           | not null |         | extended |              |
+ year_born  | integer               |           |          |         | plain    |              |
+Indexes:
+    "pk_person" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "crew" CONSTRAINT "fk_crew_2" FOREIGN KEY (id) REFERENCES person(id)
+    TABLE "director" CONSTRAINT "fk_director_2" FOREIGN KEY (id) REFERENCES person(id)
+    TABLE "role" CONSTRAINT "fk_role_2" FOREIGN KEY (id) REFERENCES person(id)
+    TABLE "writer" CONSTRAINT "fk_writer_2" FOREIGN KEY (id) REFERENCES person(id)
+
+moviedb=> \d+ movie
+                                               Table "public.movie"
+     Column      |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
+ title           | character varying(40) |           | not null |         | extended |              |
+ production_year | integer               |           | not null |         | plain    |              |
+ country         | character varying(20) |           | not null |         | extended |              |
+ run_time        | integer               |           | not null |         | plain    |              |
+ major_genre     | character varying(15) |           |          |         | extended |              |
+Indexes:
+    "pk_movie" PRIMARY KEY, btree (title, production_year)
+Referenced by:
+    TABLE "crew" CONSTRAINT "fk_crew_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+    TABLE "director" CONSTRAINT "fk_director_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+    TABLE "movie_award" CONSTRAINT "fk_movie_award_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+    TABLE "restriction" CONSTRAINT "fk_restriction_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+    TABLE "role" CONSTRAINT "fk_role_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+    TABLE "scene" CONSTRAINT "fk_scene_movie" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+    TABLE "writer" CONSTRAINT "fk_writer_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+
+moviedb=> \d+ award
+                                             Table "public.award"
+   Column    |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
+ award_name  | character varying(40) |           | not null |         | extended |              |
+ institution | character varying(50) |           | not null |         | extended |              |
+ country     | character varying(20) |           | not null |         | extended |              |
+Indexes:
+    "pk_award" PRIMARY KEY, btree (award_name)
+Referenced by:
+    TABLE "actor_award" CONSTRAINT "fk_actor_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
+    TABLE "crew_award" CONSTRAINT "fk_crew_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
+    TABLE "director_award" CONSTRAINT "fk_director_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
+    TABLE "movie_award" CONSTRAINT "fk_movie_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
+    TABLE "writer_award" CONSTRAINT "fk_writer_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
+
+moviedb=> \d+ restriction_category
+                                     Table "public.restriction_category"
+   Column    |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
+ description | character varying(20) |           | not null |         | extended |              |
+ country     | character varying(20) |           | not null |         | extended |              |
+Indexes:
+    "pk_rc" PRIMARY KEY, btree (description, country)
+Referenced by:
+    TABLE "restriction" CONSTRAINT "fk_restriction_2" FOREIGN KEY (description, country) REFERENCES restriction_category(description, country)
+
+moviedb=> \d+ director
+                                             Table "public.director"
+     Column      |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
+ id              | character(8)          |           | not null |         | extended |              |
+ title           | character varying(40) |           | not null |         | extended |              |
+ production_year | integer               |           | not null |         | plain    |              |
+Indexes:
+    "pk_director" PRIMARY KEY, btree (title, production_year)
+Foreign-key constraints:
+    "fk_director_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+    "fk_director_2" FOREIGN KEY (id) REFERENCES person(id)
+Referenced by:
+    TABLE "director_award" CONSTRAINT "fk_director_award_1" FOREIGN KEY (title, production_year) REFERENCES director(title, production_year)
+
+moviedb=> \d+ writer
+                                              Table "public.writer"
+     Column      |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
+ id              | character(8)          |           | not null |         | extended |              |
+ title           | character varying(40) |           | not null |         | extended |              |
+ production_year | integer               |           | not null |         | plain    |              |
+ credits         | character varying(40) |           |          |         | extended |              |
+Indexes:
+    "pk_writer" PRIMARY KEY, btree (id, title, production_year)
+Foreign-key constraints:
+    "fk_writer_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+    "fk_writer_2" FOREIGN KEY (id) REFERENCES person(id)
+Referenced by:
+    TABLE "writer_award" CONSTRAINT "fk_writer_award_1" FOREIGN KEY (id, title, production_year) REFERENCES writer(id, title, production_year)
+
+moviedb=> \d+ crew
+                                               Table "public.crew"
+     Column      |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
+ id              | character(8)          |           | not null |         | extended |              |
+ title           | character varying(40) |           | not null |         | extended |              |
+ production_year | integer               |           | not null |         | plain    |              |
+ contribution    | character varying(30) |           |          |         | extended |              |
+Indexes:
+    "pk_crew" PRIMARY KEY, btree (id, title, production_year)
+Foreign-key constraints:
+    "fk_crew_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+    "fk_crew_2" FOREIGN KEY (id) REFERENCES person(id)
+Referenced by:
+    TABLE "crew_award" CONSTRAINT "fk_crew_award_1" FOREIGN KEY (id, title, production_year) REFERENCES crew(id, title, production_year)
+
+moviedb=> \d+ scene
+                                               Table "public.scene"
+     Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
+ title           | character varying(40)  |           | not null |         | extended |              |
+ production_year | integer                |           | not null |         | plain    |              |
+ scene_no        | integer                |           | not null |         | plain    |              |
+ description     | character varying(100) |           | not null |         | extended |              |
+Indexes:
+    "pk_scene" PRIMARY KEY, btree (title, production_year, scene_no)
+Foreign-key constraints:
+    "fk_scene_movie" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+Referenced by:
+    TABLE "appearance" CONSTRAINT "fk_appearance_2" FOREIGN KEY (title, production_year, scene_no) REFERENCES scene(title, production_year, scene_no)
+
+moviedb=> \d+ role
+                                                Table "public.role"
+     Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
+ id              | character(8)           |           | not null |         | extended |              |
+ title           | character varying(40)  |           | not null |         | extended |              |
+ production_year | integer                |           | not null |         | plain    |              |
+ description     | character varying(100) |           | not null |         | extended |              |
+ credits         | character varying(40)  |           |          |         | extended |              |
+Indexes:
+    "pk_role" PRIMARY KEY, btree (title, production_year, description)
+Foreign-key constraints:
+    "fk_role_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+    "fk_role_2" FOREIGN KEY (id) REFERENCES person(id)
+Referenced by:
+    TABLE "actor_award" CONSTRAINT "fk_actor_award_1" FOREIGN KEY (title, production_year, description) REFERENCES role(title, production_year, description)
+    TABLE "appearance" CONSTRAINT "fk_appearance_1" FOREIGN KEY (title, production_year, description) REFERENCES role(title, production_year, description)
+
+moviedb=> \d+ restriction
+                                            Table "public.restriction"
+     Column      |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+-----------------------+-----------+----------+---------+----------+--------------+-------------
+ title           | character varying(40) |           | not null |         | extended |              |
+ production_year | integer               |           | not null |         | plain    |              |
+ description     | character varying(20) |           | not null |         | extended |              |
+ country         | character varying(20) |           | not null |         | extended |              |
+Indexes:
+    "pk_restriction" PRIMARY KEY, btree (title, production_year, description, country)
+Foreign-key constraints:
+    "fk_restriction_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+    "fk_restriction_2" FOREIGN KEY (description, country) REFERENCES restriction_category(description, country)
+
+moviedb=> \d+ appearance
+                                             Table "public.appearance"
+     Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
+ title           | character varying(40)  |           | not null |         | extended |              |
+ production_year | integer                |           | not null |         | plain    |              |
+ description     | character varying(100) |           | not null |         | extended |              |
+ scene_no        | integer                |           | not null |         | plain    |              |
+Indexes:
+    "pk_appearance" PRIMARY KEY, btree (title, production_year, description, scene_no)
+Foreign-key constraints:
+    "fk_appearance_1" FOREIGN KEY (title, production_year, description) REFERENCES role(title, production_year, description)
+    "fk_appearance_2" FOREIGN KEY (title, production_year, scene_no) REFERENCES scene(title, production_year, scene_no)
+
+moviedb=> \d+ movie_award
+                                            Table "public.movie_award"
+     Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
+ title           | character varying(40)  |           | not null |         | extended |              |
+ production_year | integer                |           | not null |         | plain    |              |
+ award_name      | character varying(40)  |           | not null |         | extended |              |
+ year_of_award   | integer                |           | not null |         | plain    |              |
+ category        | character varying(100) |           | not null |         | extended |              |
+ result          | character varying(20)  |           |          |         | extended |              |
+Indexes:
+    "pk_movie_award" PRIMARY KEY, btree (title, production_year, award_name, year_of_award, category)
+Foreign-key constraints:
+    "fk_movie_award_1" FOREIGN KEY (title, production_year) REFERENCES movie(title, production_year)
+    "fk_movie_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
+
+moviedb=> \d+ crew_award
+                                             Table "public.crew_award"
+     Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
+ id              | character(8)           |           | not null |         | extended |              |
+ title           | character varying(40)  |           | not null |         | extended |              |
+ production_year | integer                |           | not null |         | plain    |              |
+ award_name      | character varying(40)  |           | not null |         | extended |              |
+ year_of_award   | integer                |           | not null |         | plain    |              |
+ category        | character varying(100) |           | not null |         | extended |              |
+ result          | character varying(20)  |           |          |         | extended |              |
+Indexes:
+    "pk_crew_award" PRIMARY KEY, btree (id, title, production_year, award_name, year_of_award, category)
+Foreign-key constraints:
+    "fk_crew_award_1" FOREIGN KEY (id, title, production_year) REFERENCES crew(id, title, production_year)
+    "fk_crew_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
+
+moviedb=> \d+ director_award
+                                           Table "public.director_award"
+     Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
+ title           | character varying(40)  |           | not null |         | extended |              |
+ production_year | integer                |           | not null |         | plain    |              |
+ award_name      | character varying(40)  |           | not null |         | extended |              |
+ year_of_award   | integer                |           | not null |         | plain    |              |
+ category        | character varying(100) |           | not null |         | extended |              |
+ result          | character varying(20)  |           |          |         | extended |              |
+Indexes:
+    "pk_director_award" PRIMARY KEY, btree (title, production_year, award_name, year_of_award, category)
+Foreign-key constraints:
+    "fk_director_award_1" FOREIGN KEY (title, production_year) REFERENCES director(title, production_year)
+    "fk_director_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
+
+moviedb=> \d+ writer_award
+                                            Table "public.writer_award"
+     Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
+ id              | character(8)           |           | not null |         | extended |              |
+ title           | character varying(40)  |           | not null |         | extended |              |
+ production_year | integer                |           | not null |         | plain    |              |
+ award_name      | character varying(40)  |           | not null |         | extended |              |
+ year_of_award   | integer                |           | not null |         | plain    |              |
+ category        | character varying(100) |           | not null |         | extended |              |
+ result          | character varying(20)  |           |          |         | extended |              |
+Indexes:
+    "pk_writer_award" PRIMARY KEY, btree (id, title, production_year, award_name, year_of_award, category)
+Foreign-key constraints:
+    "fk_writer_award_1" FOREIGN KEY (id, title, production_year) REFERENCES writer(id, title, production_year)
+    "fk_writer_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
+
+moviedb=> \d+ actor_award
+                                            Table "public.actor_award"
+     Column      |          Type          | Collation | Nullable | Default | Storage  | Stats target | Description
+-----------------+------------------------+-----------+----------+---------+----------+--------------+-------------
+ title           | character varying(40)  |           | not null |         | extended |              |
+ production_year | integer                |           | not null |         | plain    |              |
+ description     | character varying(100) |           | not null |         | extended |              |
+ award_name      | character varying(40)  |           | not null |         | extended |              |
+ year_of_award   | integer                |           | not null |         | plain    |              |
+ category        | character varying(100) |           | not null |         | extended |              |
+ result          | character varying(20)  |           |          |         | extended |              |
+Indexes:
+    "pk_actor_award" PRIMARY KEY, btree (title, production_year, description, award_name, year_of_award, category)
+Foreign-key constraints:
+    "fk_actor_award_1" FOREIGN KEY (title, production_year, description) REFERENCES role(title, production_year, description)
+    "fk_actor_award_2" FOREIGN KEY (award_name) REFERENCES award(award_name)
