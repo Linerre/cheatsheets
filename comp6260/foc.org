@@ -32,3 +32,33 @@ Set up the development/learning env using Nix:
 
 
 * Week 3 Predicate
+
+* Week 5 Hoare Logic
+** Partial correctness specification
+Notation: ={P} C {Q}=
+P: pre-condition
+C: code (specified programming language)
+Q: post-condition
+
+As a whole, it is called /partial correctness specification/.
+
+** Total correctness specification
+Notation: =[P] C [Q]=
+
+#+BEGIN_QUOTE
+A total correctness specification [P] C [Q] is true if and only if the following
+conditions apply:
+
+(i) Whenever /C/ is executed in a state satisfying /P/, then execution of /C/ terminates.
+
+(ii) After termination /Q/ holds.
+#+END_QUOTE
+from: https://www.cl.cam.ac.uk/archive/mjcg/Lectures/SpecVer1/Notes/Notes.pdf
+
+** Relationship
+#+BEGIN_SRC markdown
+Total orrectness = Termination + Partial correctness
+#+END_SRC
+
+
+* Week 6 Hoare Logic
