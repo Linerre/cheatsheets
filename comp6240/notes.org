@@ -132,3 +132,17 @@ See pp8-10 of lecture slides
 
 ** Tricks
 See slides
+
+
+
+* Week 6: Formalization
+** Normal Forms (NF)
+|   NF | feature     | dep      |
+|    1 | atomic data | no       |
+|    2 |             | key + FD |
+|    3 |             |          |
+| BCNF |             |          |
+
+** Boyce-Codd normal form (BCNF)
+In FD, X must be a superkey
+** Third normal form (3NF)
