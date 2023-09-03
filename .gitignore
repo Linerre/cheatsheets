@@ -4,6 +4,7 @@
 *.blg
 *.dvi
 *.log
+*.out
 *.pdf
 *.xml
 *.fls
