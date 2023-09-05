@@ -1,0 +1,7 @@
+#+TITLE: Toolkit collected for landing page
+#+AUTHOR: <u7753813@anu.edu.au>
+
+* Resource URLs
+[[https://epc.ac.uk/resources/toolkit/ethics-toolkit/][Engineering Ethics Toolkit]]
+[[https://www.academia.edu/28688097/Engineering_Ethics_by_charles_e_harris_12th_edition][Engineering Ethics by charles e harris 12th edition]]
+[[https://www.scu.edu/ethics-in-technology-practice/ethical-toolkit/][An Ethical Toolkit for Engineering/Design Practice]]

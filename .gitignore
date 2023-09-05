@@ -9,5 +9,6 @@
 *.xml
 *.fls
 *_latexmk
+tlmgr.html
 auto/
 comp6710/

@@ -14,13 +14,6 @@ isbn=false,                     % suppress ISBN block in reference entry
 \DeclareFieldFormat[article]{number}{no.\addnbspace #1}
 \DeclareFieldFormat[article]{journaltitle}{\emph{#1}}
 
-% TODO: Why the below line doesnt work?
-% \DeclareDelimFormat[bib]{nameyeardelim}{\addcomma\addnbspace}
-
-% TODO:
-% 1. Change period after year to comma in biblist
-% 2. Move [accessed day-month-year] to entry end
-% 3. Add a comma and a space after journal title
 \renewcommand*{\nameyeardelim}{\addcomma\space}
 \renewcommand*{\volnumdelim}{\addcomma\space}
 \addbibresource{ce1.bib}

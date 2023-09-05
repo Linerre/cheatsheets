@@ -48,8 +48,8 @@ date=year,                      % use only date in reference entry
 isbn=false,                     % suppress ISBN block in reference entry
 ]{biblatex}
 
-\DeclareFieldFormat[article]{volume}{vol.\addnbspace #1}
-\DeclareFieldFormat[article]{number}{no.\addnbspace #1}
+\DeclareFieldFormat[article]{volume}{\addnbspace vol.\addnbspace #1}
+\DeclareFieldFormat[article]{number}{\addnbspace no.\addnbspace #1}
 \DeclareFieldFormat[article]{journaltitle}{\emph{#1}}
 \DeclareFieldFormat[misc]{subtitle}{\textnormal{#1}}
 \DeclareDelimFormat{nameyeardelim}{%

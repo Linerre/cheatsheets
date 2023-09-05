@@ -1,0 +1,71 @@
+% Template for my Career Episode Piece essays
+% Copy the template for further modification each time
+
+\documentclass[12pt,a4paper]{article}
+
+% --------------- Packages ----------------
+% Layout
+\usepackage[
+  bottom=3cm,
+  left=3.5cm,
+  right=3.5cm,
+  top=1cm,
+]{geometry}
+
+% Colors
+\usepackage[dvipsnames]{xcolor}
+\definecolor{ghblue}{HTML}{0969da}
+
+% Bibliography
+\usepackage[
+  backend=biber,
+  style=bath,
+  block=space,
+  date=year,
+  isbn=false,
+]{biblatex}
+
+% URLs
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=Red,
+  citecolor=Black,
+  filecolor=Cyan,
+  urlcolor=Magenta,
+}
+
+% --------------- Customization ----------------
+
+% --------------- Bib resources ----------------
+% Add one or multiple bib files, each file on a single line
+\addbibresource{refs/wiki.bib}
+\addbibresource{refs/article.bib}
+\addbibresource{refs/website.bib}
+
+% Author, Title, Date
+\title{Career Episode Piece X}  % Replace `X' with the appropriate number
+\author{Zhiren Lin}
+\date{\today}
+
+% No indentation of paragraphs and 10pt vertical space between each
+\setlength\parindent{0pt}
+\setlength\parskip{10pt}
+
+
+% --------------- Document Body ----------------
+\begin{document}
+\maketitle
+This is a template for my career episode pieces assigned by \href{https://programsandcourses.anu.edu.au/2021/course/comp6250}{COMP6250}.
+
+Despite its name, the degree of its `professional' is sometimes not as expected. For example,
+it requires Harvard Referencing yet does \emph{not} clarify which flavor of Harvard References.
+
+This causes confusion for sure, because ``there are many different versions of `Harverd' referencing'', pointed out by \textcite{site:ubathlib}.
+
+Today I read an interesting article on `Game of Life' \parencite{gardner1970}.
+
+According to \textcite{wiki:gol}, blah blah \ldots.
+
+\printbibliography
+\end{document}
