@@ -1,0 +1,41 @@
+\documentclass[10pt,landscape]{article}
+
+\usepackage[top=1cm, bottom=1cm, left=0.5cm, right=0.5cm, landscape]{geometry}
+\usepackage[
+  tiny,                     % text size title
+  compact                   % reduce vertical space before/after title
+]{titlesec}
+% \titlespacing*
+
+\usepackage{multicol}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+
+\begin{document}
+\begin{multicols*}{3}
+\section{Boolean logic}
+
+\section{Natural deduction}
+
+\section{Structure induction}
+
+\section{Hoare logic}
+Preconditions \textbf{strengthening}\\
+\(P_{orig} \rightarrow P_{strong} \)\\
+Post\-conditions \textbf{weakening}\\
+\(Q_{weak} \rightarrow Q_{orig} \)
+
+\subsubsection*{Assignment Rule}
+Usually, given post\-condition and one single assignment, ask for pre\-condition:
+\[
+  \{?\}C\{Q\}
+\]
+For example:
+\[
+  \{?\}\ i := 2 * i \{i < 6\}
+\]
+
+\end{multicols*}
+
+\end{document}
