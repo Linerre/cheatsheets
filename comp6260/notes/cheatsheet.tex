@@ -1,0 +1,107 @@
+\documentclass[10pt,a4paper,landscape]{article}
+
+% -- Layout ----
+\usepackage[top=1cm, bottom=1cm, left=0.5cm, right=0.5cm, landscape]{geometry}
+
+% -- Titles ----
+\usepackage[
+  tiny,                     % text size title
+  compact                   % reduce vertical space before/after title
+]{titlesec}
+% \titlespacing*
+
+% -- Colors ----
+\usepackage[dvipsnames]{xcolor}
+\definecolor{gr}{HTML}{008000}
+\definecolor{bl}{HTML}{2020C0}
+
+% -- Lists -----
+\usepackage[inline]{enumitem}
+\setlist{noitemsep}
+
+% -- Code listing ---
+\usepackage{listings}
+\lstset{
+  aboveskip=3pt,
+  belowskip=3pt,
+  basicstyle=\small\ttfamily,
+  commentstyle=\upshape\ttfamily,
+  frame=single,
+  language=Haskell,
+}
+
+% -- Multi Columns --
+\usepackage{multicol}
+
+% -- Global spacing settings ----
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
+\setlength{\abovedisplayshortskip}{3pt}
+\setlength{\belowdisplayshortskip}{3pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+\begin{document}
+% Suppress page number for all pages
+\pagestyle{empty}
+\begin{multicols*}{3}
+\section{Boolean logic}
+
+\section{Natural deduction}
+
+\section{Structural induction}
+Used to prove that some proposition P(x) holds for$\forall$ll x $\in$ recursively defined structure (e.g. lists, trees).
+
+`\verb|()|' in Haskell changes the precedence (calling order) of functions. Nothing more.
+\subsection*{Induction hypothesis}
+\begin{itemize}
+\item given as the known premise of a proof
+\item ties recursive know in a proof
+\item \textbf{must} be used
+\end{itemize}
+When proving, use only the below:
+\begin{itemize}
+\item the function definitions
+\item the induction hypothesis
+\item basic arithmetic
+\end{itemize}
+Sometimes prove from LHS to RHS; sometimes, from RHS to LHS; still sometimes, meet in the middle!
+\subsection*{List induction rule}
+\begin{displaymath}
+\frac{P([])\qquad \forall x.\; \forall xs.\; P(xs) \rightarrow\; P(x:xs)}{\forall xs P(xs)}
+\end{displaymath}
+\begin{enumerate}
+\item show that base case (empty list) $P([])$ holds
+\item show that for any non-empty list (\verb|(x:xs)|) $P(x:xs)$ holds
+\end{enumerate}
+Step 2 \textbf{needs to use} induction hypothesis.
+
+\subsection*{Choose proper formulation}
+If a proof handles two or more lists, treat the one that remains unchanged in the definition(s) as \textbf{constant}:
+\begin{lstlisting}
+[] ++ ys = ys                       -- ( APP1 )
+( x : xs ) ++ ys = x : ( xs ++ ys ) -- ( APP2 )
+\end{lstlisting}
+Then, choose induction on \texttt{xs} and treat \texttt{ys} as constant.
+\subsection*{Len and map}
+\begin{lstlisting}
+length [] = 0                     -- ( LEN1 )
+length ( x : xs ) = 1 + length xs -- ( LEN2 )
+
+map f [] = []                     -- ( MAP1 )
+map f ( x : xs ) = f x : map f xs -- ( MAP2 )
+\end{lstlisting}
+
+\subsection*{Tree induction rule}
+\begin{displaymath}
+\frac{P(Nul)\qquad \forall l.\; \forall x.\; \forall r.\; P(l) \land P(r) \rightarrow\; P(Node\,l\,x\,r:)}{\forall t.\; P(t)}
+\end{displaymath}
+\begin{enumerate}
+\item show that base case (\verb|Node Nul|) $P(Nul)$ holds
+\item show that $P(Node\;l\,x\,r)$ (\verb|Node lxr|) holds whenever both $P(l)$ and $P(r)$ are true
+\end{enumerate}
+\subsection*{Termination}
+
+\section{Hoare logic}
+%\input{lecs/lec5}
+\end{multicols*}
+\end{document}

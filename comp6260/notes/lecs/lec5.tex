@@ -1,0 +1,98 @@
+\subsection*{Core}
+Find the \textbf{weakest precondition} (most general).\\
+\textcolor{bl}{Weakest} possible: \textcolor{gr}{\texttt{True}} \\
+\textcolor{bl}{Strongest} possible: \textcolor{gr}{\texttt{False}} \\
+\textbf{Strong} pre/post-conditions: more \textbf{specific} (say \emph{\textcolor{bl}{more}}) \\
+\textbf{Weaker} pre/post-conditions: more \textbf{general} (say \emph{\textcolor{bl}{less}})
+
+\subsection*{1/6 Assignment Rule}
+\subsubsection*{Question Type 1}
+Given post-condition \& one single assignment, ask for pre-condition:
+\(\{?\}\,S\,\{Q\}\)
+
+For example: \(\{?\}\ i := 2 * i \{i < 6\}\)
+
+\textbf{Solution}
+\begin{enumerate}
+\item \textcolor{Cyan}{Copy} Q over to P: \(\{i_{post} < 6\}\)
+\item Replace all LHS vars with RHS vars: \(\{2 * i_{orig} < 6\}\)
+\item See if any math/logic equivalence (simplify P if possible): \(\{i_{orig} < 3\}\)
+\end{enumerate}
+
+\subsubsection*{Question Type 2}
+Prove the given Hoare Triple: \(\{P\}\,V := E\,\{Q\}\)
+
+For example: \(\{x > 3\}\;x:=x+2\;\{x>5\}\)
+\textbf{Solution}
+\begin{enumerate}
+\item \textcolor{Cyan}{Copy} Q over to P: \(\{x_{post} > 5\}\)
+\item Replace all LHS vars with RHS vars: \(x_{assign}+2 > 5\}\)
+\item See if any math/logic equivalence (simplify P if possible): \(\{x_{orig} > 3\}\)
+\end{enumerate}
+
+
+
+\subsection*{2/6 Pre-condition Strengthening}
+
+Logic: \(P_{strong} \rightarrow P_{orig} \)
+\begin{displaymath}
+  \frac{P_{strong} \rightarrow P_{weak} \quad \{P_{weak}\}\,S\,\{Q\} } {\{P_{s}\}\,S\,\{Q\}}
+\end{displaymath}
+
+\subsection*{3/6 Post-condition Weakening}
+Logic: \(Q_{orig} \rightarrow Q_{weak} \)
+\begin{displaymath}
+  \frac{Q_{strong}\rightarrow Q_{weak} \quad \{P\}\,S\,\{Q_{strong}\} } {\{P\}\,S\,\{Q_{w}\}}
+\end{displaymath}
+
+\subsection*{4/6 Sequencing}
+\subsubsection*{Question Type}
+{
+  % Reducing vertical spacing
+  \setlength{\abovedisplayskip}{0pt}
+  \setlength{\belowdisplayskip}{3pt}
+  \setlength{\abovedisplayshortskip}{0pt}
+  \setlength{\belowdisplayshortskip}{3pt}
+
+  \[\textbf{Prove:}\quad \{P\}\,S_{1};\,S_{2};\,\ldots ;\,S_{n}\,\{Q\}\]
+}
+\textbf{Solution} Start backwards and use Assignment Rule:
+\begin{enumerate}
+\item\label{step1} \textcolor{Cyan}{Copy} \(Q_{n}\) as \(P_{n}\) for \(S_{n}\)
+\item\label{step2} \textcolor{Cyan}{Use} assignment rule and math equivalence to simplify \(P_{n}\) if possible
+\item \textcolor{Cyan}{Use} \(P_{n}\) as \(P_{n-1}\) for \(S_{n-1}\)
+\item \textcolor{Cyan}{Repeat} \ref{step1} and \ref{step2} until getting \(P_{1}\)
+\item \textcolor{Cyan}{Strengthen} precondition \(\{P\}\rightarrow \{P_{1}\}\)
+\item (Optional) Sometimes need (0th/boolean) logic to simplify compound propositions.
+
+\end{enumerate}
+
+\subsection*{5/6 Conditionals}
+\subsubsection*{Question Type}
+{
+  % Reducing vertical spacing
+  \setlength{\abovedisplayskip}{0pt}
+  \setlength{\belowdisplayskip}{3pt}
+  \setlength{\abovedisplayshortskip}{0pt}
+  \setlength{\belowdisplayshortskip}{3pt}
+
+\[\textbf{Prove:}\quad \{P\}\;if\:b\:then\:S_{1}\:else\:S_{2}\;\{Q\}\]
+}
+\textbf{Solution} Use Conditional Rule to prove both:
+\begin{description}
+\item [premise1] \(\{P \land b\}\:S_{1}\:\{Q\}\)
+\item [premise2] \(\{P \land \neg b\}\:S_{2}\:\{Q\}\)
+\end{description}
+For each premise:
+\begin{enumerate}
+\item\label{step1} \textbf{Use} Assignment rule to get new \(P_{assign}\)
+\item\label{step2} \textbf{Use} Propositional logic, math (precondition equivalence) to \textbf{strengthen} the \(P_{assign}\) for \(P_{s}\) (which is the \(P\) needed in the premise1)
+\end{enumerate}
+Then \textbf{use} Conditional Rule to combine the proved premises.
+
+\subsubsection*{Complete conditionals}
+Conditionals with \texttt{else} branch are \emph{complete}.
+
+\texttt{if b then S} $\Longleftrightarrow$ \texttt{if b then S else (do nothing)}
+
+% TODO: Add `no-else' rule slides pp.41
