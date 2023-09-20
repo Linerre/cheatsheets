@@ -30,6 +30,14 @@
   language=Haskell,
 }
 
+% -- Natural Deduction Tree
+\usepackage{bussproofs}
+% remember to install this package explicitly
+% \usepackage{cancel} use labeling feature offered by bussproofs
+
+% -- Natural Deduction Fitch (local)
+\usepackage{fitch}
+
 % -- Multi Columns --
 \usepackage{multicol}
 
@@ -47,6 +55,40 @@
 \section{Boolean logic}
 
 \section{Natural deduction}
+% TODO: free var and free for var
+\subsection*{General techniques}
+See the symbols in the conclusion:
+\begin{itemize}
+\item if any new (\emph{not} appear in given assumptions): \textbf{Introduction} ($\mathsf{\rightarrow I}$, $\mathsf{\land\,I}$, $\mathsf{\lor\,I}$, etc)
+\item If fewer than given assumptions or no symbols at all: \textbf{Elimination} ($\mathsf{\rightarrow E}$, $\mathsf{\land\,E}$, $\mathsf{\lor\,E}$, etc)
+\item Remember to \emph{cancel} your assumptions by giving line numbers of them
+\end{itemize}
+\subsection*{Creative use of negation}
+\textbf{Prove}: $\mathsf{ \neg A, A \lor B} \rightarrow B \lor C$\\
+\textbf{Solution}
+\begin{prooftree}
+\hskip 10pt
+  \AxiomC{$\mathsf{A \lor B}$}
+
+    \AxiomC{$\mathsf{[A]}^{1}$}
+    \AxiomC{$\mathsf{\neg A}$}
+    \RightLabel{\small{$\mathsf{\land\,I}$}}
+    \BinaryInfC{$\mathsf{A\;\land\;\neg\; A}$}
+    \LeftLabel{\scriptsize creative}
+    \RightLabel{\small{$\mathsf{\neg\,I}$}}
+    \UnaryInfC{$\mathsf{\neg\neg B}$}
+    \RightLabel{\small{$\mathsf{\neg\,E}$}}
+    \UnaryInfC{$\mathsf{B}$}
+
+    \AxiomC{$\mathsf{[B]}^{1}$}
+
+            \RightLabel{\small{$\mathsf{\lor\,E,1}$}}
+
+            \TrinaryInfC{$\mathsf{B}$}
+            \RightLabel{\small{$\mathsf{\lor\,I}$}}
+            \UnaryInfC{$\mathsf{B\,\lor\,C}$}
+\end{prooftree}
+
 
 \section{Structural induction}
 Used to prove that some proposition P(x) holds for$\forall$ll x $\in$ recursively defined structure (e.g. lists, trees).
