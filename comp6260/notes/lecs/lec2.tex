@@ -1,0 +1,82 @@
+\begin{description}
+\item[Is valid] you can make that conclusion
+\item[Is true] the expression has already been concluded or given as a premise
+\item[term] a variable or a constant or a "complex" term built-up from "simpler" terms with a function symbol, like $x+1$
+\item[free] a variable occurs in a formula but \emph{not} in the scope of a quantifier: $\exists\,y\,(y=x+1)$, the occurrence of x
+\item[free for] In $\exists\,y\,(y=x+1)$, var $z$ or term $x=z$ is \emph{free for} $x$ because $\exists\,y\,(y=z+1)$ has no ``capturing'' of $z$. But $y$ is \textbf{not} free for $x$ because $\exists\,y\,(y=y+1)$ changes
+\end{description}
+
+\textbf{Example}: $\forall x_{b}.( x_{b} + y_{f} = y_{f} + x_{b}) \land (\forall x_{b}. \exists y_{b} .\, y_{b} > x_{b} + z_{f})$
+
+\subsection*{General techniques}
+See the symbols in the conclusion:
+\begin{itemize}
+\item if any new (\emph{not} appear in given assumptions): \textbf{Introduction} ($\mathsf{\rightarrow I}$, $\mathsf{\land\,I}$, $\mathsf{\lor\,I}$, etc)
+\item If fewer than given assumptions or no symbols at all: \textbf{Elimination} ($\mathsf{\rightarrow E}$, $\mathsf{\land\,E}$, $\mathsf{\lor\,E}$, etc)
+\item Remember to \emph{cancel} your assumptions by giving line numbers of them
+\end{itemize}
+
+\subsection*{Proof steps}
+\begin{enumerate}
+\item \textbf{Write} assumption/premise on 1st line. If multiple, one by one on each line. Assumptions are LHS stuff.
+\item \textbf{Write} conclusion(s) at the very end of a space where proof is gonna happen
+\item \textbf{Split} conclusion into parts, e.g. $P \rightarrow Q$, then work on $P$ first
+\item \textbf{Use} induction rules combined with premises. This indeed \textbf{cancel} premises, so that conclusion stands without premises!
+\item Each premise starts a new scope. Assumps in Scope$_{inner}$ can access those of Scope$_{outer}$ (or parent scope)
+\item \textbf{Any} assumptions can be made!
+\item Even when inner plus outer makes a contradiction, yet another inner scope can be made! (See below example)
+\item If Multi-assumptions to single conclusion, then show each assumption leads to that conclusion.
+\end{enumerate}
+
+\subsection*{Creative use of negation}
+\textbf{Prove 1} $\frac{(P \rightarrow Q) \rightarrow P}{\neg Q \rightarrow P}$\\
+\begin{displaymath}
+\begin{nd}
+  \hypo {1} {(P \rightarrow Q) \rightarrow P}
+    \open
+    \hypo {2} {\neg Q}
+      \open
+      \hypo {3} {\neg P}
+        \open
+        \hypo {4} {P}
+          \open
+          \hypo {5} {\neg Q}
+          \have {6}{F}  \ne{3,4}
+          \close
+        \have {7} {Q}             \pc{5-6}
+        \close
+      \have {8} {P \rightarrow Q} \ii{4-7}
+      \have {9} {P} \ie{1,8}
+      \have {10} {F} \ne{3,9}
+      \have {11} {P} \pc{3-10}
+      \close
+    \have {12} {\neg Q \rightarrow P} \ii{2-12}
+    \close
+\end{nd}
+\end{displaymath}
+Note how negation is used and how contradictions are made in nested assumption scopes.\\
+\textbf{Proof by contradiction}: assume $\neg p$ and derive a contradiction, then $p$.\\
+
+\textbf{Prove 2}: $\mathsf{ \neg A, A \lor B} \rightarrow B \lor C$\\
+\textbf{Solution}
+\begin{prooftree}
+  \AxiomC{$\mathsf{A \lor B}$}
+
+    \AxiomC{$\mathsf{[A]}^{1}$}
+    \AxiomC{$\mathsf{\neg A}$}
+    \RightLabel{\small{$\mathsf{\land\,I}$}}
+    \BinaryInfC{$\mathsf{A\;\land\;\neg\; A}$}
+    \LeftLabel{\scriptsize creative}
+    \RightLabel{\small{$\mathsf{\neg\,I}$}}
+    \UnaryInfC{$\mathsf{\neg\neg B}$}
+    \RightLabel{\small{$\mathsf{\neg\,E}$}}
+    \UnaryInfC{$\mathsf{B}$}
+
+    \AxiomC{$\mathsf{[B]}^{1}$}
+
+            \RightLabel{\small{$\mathsf{\lor\,E,1}$}}
+
+            \TrinaryInfC{$\mathsf{B}$}
+            \RightLabel{\small{$\mathsf{\lor\,I}$}}
+            \UnaryInfC{$\mathsf{B\,\lor\,C}$}
+\end{prooftree}

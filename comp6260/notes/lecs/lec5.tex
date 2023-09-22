@@ -1,9 +1,8 @@
-\subsection*{Core}
 Find the \textbf{weakest precondition} (most general).\\
-\textcolor{bl}{Weakest} possible: \textcolor{gr}{\texttt{True}} \\
-\textcolor{bl}{Strongest} possible: \textcolor{gr}{\texttt{False}} \\
-\textbf{Strong} pre/post-conditions: more \textbf{specific} (say \emph{\textcolor{bl}{more}}) \\
-\textbf{Weaker} pre/post-conditions: more \textbf{general} (say \emph{\textcolor{bl}{less}})
+\textbf{Weakest} possible: \textbf{\texttt{True}} \\
+\textbf{Strongest} possible: \textbf{\texttt{False}} \\
+\textbf{Strong} pre/post-conditions: more \textbf{specific} (say \emph{more}) \\
+\textbf{Weaker} pre/post-conditions: more \textbf{general} (say \emph{less})
 
 \subsection*{1/6 Assignment Rule}
 \subsubsection*{Question Type 1}
@@ -14,7 +13,7 @@ For example: \(\{?\}\ i := 2 * i \{i < 6\}\)
 
 \textbf{Solution}
 \begin{enumerate}
-\item \textcolor{Cyan}{Copy} Q over to P: \(\{i_{post} < 6\}\)
+\item \textbf{Copy} Q over to P: \(\{i_{post} < 6\}\)
 \item Replace all LHS vars with RHS vars: \(\{2 * i_{orig} < 6\}\)
 \item See if any math/logic equivalence (simplify P if possible): \(\{i_{orig} < 3\}\)
 \end{enumerate}
@@ -25,7 +24,7 @@ Prove the given Hoare Triple: \(\{P\}\,V := E\,\{Q\}\)
 For example: \(\{x > 3\}\;x:=x+2\;\{x>5\}\)
 \textbf{Solution}
 \begin{enumerate}
-\item \textcolor{Cyan}{Copy} Q over to P: \(\{x_{post} > 5\}\)
+\item \textbf{Copy} Q over to P: \(\{x_{post} > 5\}\)
 \item Replace all LHS vars with RHS vars: \(x_{assign}+2 > 5\}\)
 \item See if any math/logic equivalence (simplify P if possible): \(\{x_{orig} > 3\}\)
 \end{enumerate}
@@ -58,11 +57,11 @@ Logic: \(Q_{orig} \rightarrow Q_{weak} \)
 }
 \textbf{Solution} Start backwards and use Assignment Rule:
 \begin{enumerate}
-\item\label{step1} \textcolor{Cyan}{Copy} \(Q_{n}\) as \(P_{n}\) for \(S_{n}\)
-\item\label{step2} \textcolor{Cyan}{Use} assignment rule and math equivalence to simplify \(P_{n}\) if possible
-\item \textcolor{Cyan}{Use} \(P_{n}\) as \(P_{n-1}\) for \(S_{n-1}\)
-\item \textcolor{Cyan}{Repeat} \ref{step1} and \ref{step2} until getting \(P_{1}\)
-\item \textcolor{Cyan}{Strengthen} precondition \(\{P\}\rightarrow \{P_{1}\}\)
+\item\label{step1} \textbf{Copy} \(Q_{n}\) as \(P_{n}\) for \(S_{n}\)
+\item\label{step2} \textbf{Use} assignment rule and math equivalence to simplify \(P_{n}\) if possible
+\item \textbf{Use} \(P_{n}\) as \(P_{n-1}\) for \(S_{n-1}\)
+\item \textbf{Repeat} \ref{step1} and \ref{step2} until getting \(P_{1}\)
+\item \textbf{Strengthen} precondition \(\{P\}\rightarrow \{P_{1}\}\)
 \item (Optional) Sometimes need (0th/boolean) logic to simplify compound propositions.
 
 \end{enumerate}
@@ -94,5 +93,7 @@ Then \textbf{use} Conditional Rule to combine the proved premises.
 Conditionals with \texttt{else} branch are \emph{complete}.
 
 \texttt{if b then S} $\Longleftrightarrow$ \texttt{if b then S else (do nothing)}
-
-% TODO: Add `no-else' rule slides pp.41
+\begin{displaymath}
+  \frac{\{P \land\; b\}\;S\{Q\} \quad \{P \land \;\neg b\}\;\texttt{(do nothing)}\;\{Q\}}{\{P\}\;if\;b\;then\;S\;\{Q\}}
+\end{displaymath}
+\texttt{do nothing} can be \textbf{strengthened} to sth like \verb|x := x|
