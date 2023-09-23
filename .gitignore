@@ -4,8 +4,11 @@
 *.blg
 *.dvi
 *.log
+*.nav
 *.out
 *.pdf
+*.snm
+*.toc
 *.xml
 *.fls
 *_latexmk

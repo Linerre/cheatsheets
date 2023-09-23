@@ -1,37 +1,61 @@
 \documentclass[12pt,a4paper]{article}
-\usepackage[top=2cm]{geometry}
+\usepackage[top=2.5cm,left=2.5cm,right=2.5cm]{geometry}
 \usepackage[inline]{enumitem}
-\title{Late Withdrawal Request}
-\author{Zhiren Lin}
-\date{\today}
-
+\usepackage[]{hyperref}
+\hypersetup{
+colorlinks=true,
+linkcolor=black,
+}
 \begin{document}
-\maketitle
 
 \noindent
 Dear Student Administration and Academic Services,
 
-My name is Zhiren Lin and my UID is u7753813. I am writing to request a late withdrawal of COMP6260 Foundation of Computation of 2023 Semester 2.
+My name is Zhiren Lin and my UID is u7753813, a current student of Master of Computing at CECC, ANU. I am writing to request a late withdrawal of Professional Practice 1 (COMP6250) of 2023 Semester 2.
 
-The reasons for this request are complex but mainly are
-\begin{enumerate*}[label={(\alph*)}, font=\bfseries]
-\item the increasing confusion despite of a great amount of time and effort I have put into it;
-\item other limitations such as my employment and my current economic conditions.
+I will explain the reasons in the rest of this statement.
+
+% TODO: reduce title spacing
+\section{Job}
+I was working full time before starting my study at ANU.  My employer has kindly agreed to retain my job and reduced my workload from 40 hours a week to 12 hours.  In August, I was asked to start working on a series of improvements\footnote{See issue: \url{https://github.com/RACE-Game/race/issues/7}} to one core component of our project.
+
+Such tasks are often good opportunities for me to enhance my programming skills or pick up new ones.  And since this is a small startup team, there has been many such opportunities over the past year. Yet this time things are quite different.
+
+On August 11, the operation manager got poisoned.  Unfortunately, I have no further information about this incident except that he mentioned that day he was in hospital in one partnership chat group.  Considering that he lives in Russia and the current Russia-Ukraine war, anything can happen to him.  As a result, my direct supervisor, also the co-founder of the project, had to take over the operation responsibilities.  My supervisor and I are the only two programmers in the small team.  Having to deal with partnerships, he became too busy to respond to my questions in a timely manner as before, let alone to train me on some rather complicated details of project.  I have to spend more time reading the source code, developing and testing on my own.
+
+My original plan for the two-week break was to
+\begin{enumerate*}[label=(\alph*), font=\bfseries]
+\item get the mentioned task done,
+\item catch up with the schedule of COMP6260 (I missed 2 lectures and 1 tutorial),
+\item prepare for a mid-term exam in week 7 and
+\item finish writing assignment of COMP6250 and labs of COMP6710.
 \end{enumerate*}
-I will explain these reasons in detail in the rest part of this statement.
-
-\section{More time is needed}
-There are three reasons as to why the more I study, the more confused I feel about this topic.
-
-First, COMP6260 is more about logic than math. You might wonder how this is a big deal. I had never been exposed to formal logic study before the course. As a complete beginner, I have to first train my eyes and brain to get used to many symbols used in this field. This takes time. In addition, terms such as ``expressively completeness'', ``formula'', ``free for'', ``quantifier'' (including ``term'' itself) are all new concepts to me, not mention that alternative names are used sometimes, for example, ``boolean function'' is also mentioned as ``truth function'' or ``logical function''. To get familiar with this ecosystem of logic terms also takes time.
+In the end, (a) was only partially done\footnote{See pull request: \url{https://github.com/RACE-Game/race/pull/9}} and I finished writing task (d).  That was all.  It was then, long after the census date, did I really realize the impact of these consequences.
 
 
-Second, the inconsistent uses of symbols and notations cause confusion. For instance, in COMP6260's lectures, ``$\rightarrow$'' is used to indicate ``imply'', but in the various texts it recommends, ``$\Rightarrow$'' and ``$\vdash$'' are used instead. COMP6260 uses ``$F$'' for ``False'' while those texts use the symbol ``$\bot$''. For a beginner like me, anything that looks unfamiliar can cause confusion. In the early weeks, I often found myself searching for ``whats'' and ``whys'' for such inconsistency. This takes time.
+\section{Course}
+Adding to my frustration is also the course Foundations of Computing (COMP6260). I had never been exposed to formal logic study before the course.  As a complete beginner, at first I spent quite some time getting familiar with many strange symbols and abstract concepts.  In the first two weeks, while reviewing the lectures and reading the recommended resources, I often found myself searching for ``whats'' and ``whys'' for many inconsistent uses of symbols and notations.  Yet at that time I thought I could handle it as long as I put more effort into my study. I was wrong.
 
-Before I move on to the last reason, I must admit my failure to notice such time-consuming learning process in the early days of this semester. Back then, the other 3 courses I enrolled in did not stress me out at all because I have been quite familiar with academic writing and programming; I also already have some experience in database operations. I thought at that time I could handle all the above difficulties as I put more effort to it. I was so wrong.
+As I move on, I ran into more unexpected situations.  First of all, nowhere on the course page\footnote{Course page: \url{https://programsandcourses.anu.edu.au/course/COMP6260}} does it mention that the programming language Haskell will be used for introducing structural induction (Week 4, August 14-18).  This is not a problem at all for the undergraduates enrolled in COMP6260, as they are at the same time studying Haskell in COMP1100.  As a post-graduate student, I have no such luck and I do think this unfair assumption\footnote{See: \url{https://comp.anu.edu.au/courses/comp1600/resources/\#supplementary-reading-material}} leaves me at a big disadvantage.  I spent extra time learning some Haskell in order to understand the abstruse syntax in the lecture.
 
-%TODO: a minipage to show three deduction styles (genzten, box, fitch).
+Also in week 4, I found the previous quizzes in Wattle were \emph{not} available for reviewing!  From that week on, I started to take screenshots of each quiz just in case.  It is now impossible to prove my claim because on September 19, just one day before the mid-term exam, the instructor announced that all previous quizzes had been copied for students to practice.  I fail to see how this can be helpful.
+
+COMP6260 released its Assignment 1 in early August but the solutions were uploaded to Wattle on September 19.  Solutions to weekly tutorial questions were often released one week later.  For the math subject, it can be the case that even with solutions at hand, students still need some time to get their head around, let alone acceptable answers are offered so late.  In contrast, the database course (COMP6240) provides sample solutions immediately after each tutorial and upon releasing marks for each assignment.  Thus, my confusions get cleared when the topics in question are still vivid in my memory.
+
+All such unexpected, out-of-my-control situations have made it rather time-consuming and stressful for me to study COMP6260 while balancing other courses and my job.
 
 
-\section{But I have not enough}
+\section{Plan}
+I appreciate my job in that I keep gaining valuable real-world project experience from it, so I will \emph{not} quit the job.  I also do \emph{not} want to give up on COMP6260 this semester, because that means I must re-select either it or MATH6005 in a future semester and my student visa is likely to be affected.
+
+To reduce the study load, my only option, I think, is to drop COMP6250.
+
+Over the past 5+ years, I worked at an international academic library for 4 years and the current blockchain project for over 1 year.  These professional experiences are likely to make me eligible for credit of this course.  I regret not making an application earlier.  I only have myself to blame.  I will do so as soon as the application port opens for Semester 1 2024.
+
+In addition, so far I got decent marks for the writing assignments (75 [\textsc{avg.}\,68] and 87 [\textsc{avg.}\,72]), because I have been pretty familiar with professional writing, presentation, teamwork and communication, thanks to the library work experience.  Continuing the course adds little to my current skill set, to be honest. But taking the mandatory tutorials and working on the reflective essays do require a big chunk of my time.
+
+As I have a good chance to request course credit for COMP6250, dropping the course in this semester will likely have little (if not no) impact on my student visa.
+
+
+Thank you for considering my request.
 \end{document}
