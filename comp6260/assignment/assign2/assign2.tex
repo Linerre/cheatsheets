@@ -1,0 +1,25 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[dvipsname]{xcolor}
+% Math
+\usepackage{amsmath}
+\setlength{\jot}{8pt}% Add vertical space in align* env
+
+% Space control
+\usepackage[skip=10pt]{parskip}
+
+\begin{document}
+\section{Solutions to Question 1}
+% \input{assign2q1}
+
+\section{Solutions to Question 2}
+\subsection{Suitable Invariant}
+\input{q2n1}
+\subsection{Proof for suitable invariant}
+% TODO: give a tree-version of the following proof
+Prove: $\{I\,\land\,b\}$\;\texttt{Body}\;\{I\} holds for each \texttt{Loop} where b is $i < n$ and $I$ is $y=(m+i)!/m!$
+\begin{align*}
+\mathsf{1.}\quad \{y = (m+i)!/m!\,\land\;i < n\}\;\texttt{\textcolor{blue}{y:=\! m*y}}\;{other} && \mathsf{(Asst.)} \\
+\mathsf{2.}\quad \{y = (m+i)!/m!\,\land\,i < n\}\;\texttt{\textcolor{blue}{m:=\! m-1}}\;{other} && \mathsf{(Asst.)} \\
+\mathsf{3.}\quad \{y = (m+i)!/m!\,\land\,i < n\}\;\texttt{\textcolor{blue}{i:=\! i+1}}\;{other}
+\end{align*}
+\end{document}
