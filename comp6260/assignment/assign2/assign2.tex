@@ -4,6 +4,8 @@
 \usepackage{amsmath}
 \setlength{\jot}{8pt}% Add vertical space in align* env
 
+\usepackage[left=2cm]{geometry}
+
 % Space control
 \usepackage[skip=10pt]{parskip}
 
@@ -18,8 +20,8 @@
 % TODO: give a tree-version of the following proof
 Prove: $\{I\,\land\,b\}$\;\texttt{Body}\;\{I\} holds for each \texttt{Loop} where b is $i < n$ and $I$ is $y=(m+i)!/m!$
 \begin{align*}
-\mathsf{1.}\quad \{y = (m+i)!/m!\,\land\;i < n\}\;\texttt{\textcolor{blue}{y:=\! m*y}}\;{other} && \mathsf{(Asst.)} \\
-\mathsf{2.}\quad \{y = (m+i)!/m!\,\land\,i < n\}\;\texttt{\textcolor{blue}{m:=\! m-1}}\;{other} && \mathsf{(Asst.)} \\
-\mathsf{3.}\quad \{y = (m+i)!/m!\,\land\,i < n\}\;\texttt{\textcolor{blue}{i:=\! i+1}}\;{other}
+& \mathsf{1.}\: \{y=(m+(i+1))!/m!\}\;\texttt{\textcolor{blue}{i:=i+1}}\;\{y = (m+i)!/m!\} && \mathsf{(Asst. Axiom)} \\
+& \mathsf{2.}\: \{y=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{m:=m-1}}\;\{y = (m+(i+1))!/m!\} && \mathsf{(Asst. Axiom)} \\
+& \mathsf{3.}\: \{y*m=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{y:=y*m}}\;\{y=((m-1)+(i+1))!/(m-1)!\}\ && \mathsf{(Asst. Axiom)} \\
 \end{align*}
 \end{document}
