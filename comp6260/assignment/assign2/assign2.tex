@@ -1,13 +1,18 @@
 \documentclass[a4paper,12pt]{article}
+% Color
 \usepackage[dvipsname]{xcolor}
+
 % Math
-\usepackage{amsmath}
+\usepackage{mathtools}
+\numberwithin{equation}{subsection}
 \setlength{\jot}{8pt}% Add vertical space in align* env
+\setlength{\abovedisplayskip}{0pt}%
+\setlength{\belowdisplayskip}{0pt}%
+\setlength{\abovedisplayshortskip}{0pt}%
+\setlength{\belowdisplayshortskip}{0pt}%
 
+% Layout
 \usepackage[left=2cm]{geometry}
-
-% Space control
-\usepackage[skip=10pt]{parskip}
 
 \begin{document}
 \section{Solutions to Question 1}
@@ -15,13 +20,21 @@
 
 \section{Solutions to Question 2}
 \subsection{Suitable Invariant}
-\input{q2n1}
+\label{sec:2.1}
+% \input{q2n1}
 \subsection{Proof for suitable invariant}
-% TODO: give a tree-version of the following proof
-Prove: $\{I\,\land\,b\}$\;\texttt{Body}\;\{I\} holds for each \texttt{Loop} where b is $i < n$ and $I$ is $y=(m+i)!/m!$
-\begin{align*}
-& \mathsf{1.}\: \{y=(m+(i+1))!/m!\}\;\texttt{\textcolor{blue}{i:=i+1}}\;\{y = (m+i)!/m!\} && \mathsf{(Asst. Axiom)} \\
-& \mathsf{2.}\: \{y=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{m:=m-1}}\;\{y = (m+(i+1))!/m!\} && \mathsf{(Asst. Axiom)} \\
-& \mathsf{3.}\: \{y*m=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{y:=y*m}}\;\{y=((m-1)+(i+1))!/(m-1)!\}\ && \mathsf{(Asst. Axiom)} \\
-\end{align*}
+
+\input{q2n2}
+\subsection{Proof for Hoare Triple}
+Following the above proof steps, I can further have:
+\begin{flalign*}
+\mathsf{1.}\; & \{y=(m+i)!/m!\;\land\;i < n\}\;\texttt{\textcolor{blue}{Body}}\;\{y=(m+i)!/m!\} & \mathsf{(Prec.\, Strengthen.)}  \\
+\mathsf{2.}\; & \{y=(m+i)!/m!\;\land\;i < n\}\;\texttt{\textcolor{blue}{Loop}}\;\{y=x!/(x-n)!\} & \mathsf{(While.,\;Post.\, Weaken.)}
+\end{flalign*}
+Check \texttt{Init} establishes the invariant \(I\):\\
+\begin{flalign*}
+\mathsf{3.}\; & \{y=(x+0)!/x!\}\;\texttt{\textcolor{blue}{m:=x;\;y:=1;\;i:=0}}\;\{y=(x+0)!/x!\} & \mathsf{(Initialization)}
+\end{flalign*}
+
+
 \end{document}

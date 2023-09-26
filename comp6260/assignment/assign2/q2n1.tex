@@ -20,7 +20,7 @@ Assume that $x = 6$ and $n = 4$, which satisfy the given condition $ x \geq n \;
 It is easy to see that in the $ith$ \texttt{Loop}, $y'$ is built up like:
 \[
   y' =
-  y_{initial} \;*\; m_{initial}\;*\;(m_{initial} - 1)\;*\;(m_{initial}-  2)\;*\;\ldots\;*\; (m_{initial} - i)
+  y_{initial} \;*\; m_{initial}\;*\;(m_{initial} - 1)\;*\;(m_{initial}-  2)\;*\;\dotsb\;*\; (m_{initial} - i)
 \]
 
 That is, in any given $ith$ \texttt{Loop},  y$_{ith}$ value can be calculated as:
@@ -33,7 +33,7 @@ The problem is, this equation requires $m > i$.  Yet as $m$ decreases by 1 and $
 \[
 y_{ith} = \frac{(m_{ith}+i)!}{m_{ith}!}
 \]
-So one suitable \textbf{invariant} can be the following, regardless of the \texttt{Loop} times:
+So one suitable \textbf{invariant} \(I\) can be the following, regardless of the \texttt{Loop} times:
 \begin{equation}
 \label{eq:2}
   y = \frac{(m+i)!}{m!}
