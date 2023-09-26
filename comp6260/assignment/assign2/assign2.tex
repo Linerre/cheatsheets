@@ -22,18 +22,31 @@
 \subsection{Suitable Invariant}
 \label{sec:2.1}
 % \input{q2n1}
-\subsection{Proof for suitable invariant}
+\subsection{Solution for suitable invariant}
 
 \input{q2n2}
-\subsection{Proof for Hoare Triple}
-Following the above proof steps, I can further have:
+\subsection{Solution}
+Following the above proof steps, now check that \texttt{Init} has \(I\) as the post-condition:
 \begin{flalign*}
-\mathsf{1.}\; & \{y=(m+i)!/m!\;\land\;i < n\}\;\texttt{\textcolor{blue}{Body}}\;\{y=(m+i)!/m!\} & \mathsf{(Prec.\, Strengthen.)}  \\
-\mathsf{2.}\; & \{y=(m+i)!/m!\;\land\;i < n\}\;\texttt{\textcolor{blue}{Loop}}\;\{y=x!/(x-n)!\} & \mathsf{(While.,\;Post.\, Weaken.)}
+\mathsf{6.}\: & \{y=(m+0)!/m!\}\;\texttt{\textcolor{blue}{i:=0}}\;\{y=(m+i)!/m!\} & \mathsf{(Asst.\, Axiom)} \\
+\mathsf{7.}\: & \{1=(m+0)!/m!\}\;\texttt{\textcolor{blue}{y:=1}}\;\{y=(m+0)!/m!\} & \mathsf{(Asst.\, Axiom)} \\
+\mathsf{8.}\: & \{1=(x+0)!/x!\}\;\texttt{\textcolor{blue}{m:=x}}\;\{1=(m+0)!/m!\} & \mathsf{(Asst.\, Axiom)} \\
+\mathsf{9.}\: & \{1=(x+0)!/x!\}\;\texttt{\textcolor{blue}{m:=x;\;y:=1;\;i:=0;}}\;\{1=(m+0)!/m!\} & \mathsf{(6,7,8,\;Sequencing)}
 \end{flalign*}
-Check \texttt{Init} establishes the invariant \(I\):\\
+Hence, before starting \texttt{Loop}, \(I,\;\text{i.e},\;y=(m+i)!/m!\) holds. One now has:
+% TODO: use bussproof to draw the tree
+\begin{align*}
+  \frac{\{y=(m+i)!/m!\}\;y:=y\,*\,m;\;m:=m-1;\;i:=i+1\;\{y=(m+i)!/m!\}}{\{y=(m+i)!/m!\}\;\begin{multilined}[t]
+      \mathsf{while}\;(i < n)\;\mathsf{do}\\
+      \;y:=y\,*\,m;\\
+      \;m:=m-1;\\
+      \;i:=i+1;\\
+      \;\{(y=(m+i)!/m!)\;\land\;\neg\;(i < n)\}}\end{multlined}
+\end{align*}
+
 \begin{flalign*}
-\mathsf{3.}\; & \{y=(x+0)!/x!\}\;\texttt{\textcolor{blue}{m:=x;\;y:=1;\;i:=0}}\;\{y=(x+0)!/x!\} & \mathsf{(Initialization)}
+\mathsf{6.}\: & \{y=(m+i)!/m!\;\land\;i < n\}\;\texttt{\textcolor{blue}{Body}}\;\{y=(m+i)!/m!\} & \mathsf{(Prec.\, Strengthen.)}  \\
+\mathsf{7.}\: & \{y=(m+i)!/m!\;\land\;i < n\}\;\texttt{\textcolor{blue}{Loop}}\;\{y=x!/(x-n)!\} & \mathsf{(While.,\;Post.\, Weaken.)}
 \end{flalign*}
 
 
