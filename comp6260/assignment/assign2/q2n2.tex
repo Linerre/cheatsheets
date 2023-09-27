@@ -3,8 +3,8 @@ Prove: \(\{I\,\land\,b\}\)\;\texttt{Body}\;\{I\} holds for each \texttt{Loop} wh
 %TODO fix this align
 \begin{flalign*}
 \mathsf{1.}\: & \{y=(m+(i+1))!/m!\}\;\texttt{\textcolor{blue}{i:=i+1}}\;\{y = (m+i)!/m!\} & \mathsf{(Asst.\, Axiom)} \\
-\mathsf{2.}\: & \{y=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{m:=m-1}}\;\{y = (m+(i+1))!/m!\} & \mathsf{(Asst.\, Axiom)} \\
-\mathsf{3.}\: & \{y*m=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{y:=y*m}}\;\{y=((m-1)+(i+1))!/(m-1)!\}\ & \mathsf{(Asst.\, Axiom)} \\
+\mathsf{2.}\: & \{y=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{m:=m-1}}\;\{y=(m+(i+1))!/m!\} & \mathsf{(Asst.\, Axiom)} \\
+\mathsf{3.}\: & \{y*m=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{y:=y*m}}\;\{y=((m-1)+(i+1))!/(m-1)!\}\ & \mathsf{(Asst.\, Axiom)}
 \end{flalign*}
 The precondition of the Hoare Triple 3 above can be simplified as follows:
 \begin{align}
@@ -14,8 +14,8 @@ The precondition of the Hoare Triple 3 above can be simplified as follows:
   y & = \frac{(m+i)!}{m!} \label{eq:invar}
 \end{align}
 Therefore:
-\begin{align*}
+\begin{flalign*}
 & \mathsf{4.}\: \{y*m=(m+i)!/m!\}\;\texttt{\textcolor{blue}{y:=y*m}}\;\{y=((m-1)+(i+1))!/(m-1)!\}\ && \mathsf{(3,\;Prec.\, Equiv.)} \\
-& \mathsf{5.}\: \{y=(m+i)!/m!\}\;\texttt{\textcolor{blue}{y:=y*m;\:m:=m-1;\:i:=i+1;}}\;\{y=(m+i)!/m!\}\ && \mathsf{(1,2,4,\;Sequencing)} \\
-\end{align*}
+& \mathsf{5.}\: \{y=(m+i)!/m!\}\;\texttt{\textcolor{blue}{y:=y*m;\:m:=m-1;\:i:=i+1;}}\;\{y=(m+i)!/m!\}\ && \mathsf{(1,2,4,\;Sequencing)}
+\end{flalign*}
 As long as \(b\) (i.e. \( i < n\)) holds, in each \texttt{Loop}, before and after \texttt{Body} executes, \(I\) holds, as proved above. So this establishes \(I\) in \eqref{eq:invar} as an invariant.

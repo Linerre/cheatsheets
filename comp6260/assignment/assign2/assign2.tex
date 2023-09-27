@@ -11,8 +11,16 @@
 \setlength{\abovedisplayshortskip}{0pt}%
 \setlength{\belowdisplayshortskip}{0pt}%
 
+% No indentation
+\setlength\parindent{0pt}
+
+% Proof
+% \usepackage{bussproofs}
+\usepackage{ebproof}
+
 % Layout
-\usepackage[left=2cm]{geometry}
+\usepackage[left=2cm, right=2cm]{geometry}
+
 
 \begin{document}
 \section{Solutions to Question 1}
@@ -33,21 +41,80 @@ Following the above proof steps, now check that \texttt{Init} has \(I\) as the p
 \mathsf{8.}\: & \{1=(x+0)!/x!\}\;\texttt{\textcolor{blue}{m:=x}}\;\{1=(m+0)!/m!\} & \mathsf{(Asst.\, Axiom)} \\
 \mathsf{9.}\: & \{1=(x+0)!/x!\}\;\texttt{\textcolor{blue}{m:=x;\;y:=1;\;i:=0;}}\;\{1=(m+0)!/m!\} & \mathsf{(6,7,8,\;Sequencing)}
 \end{flalign*}
-Hence, before starting \texttt{Loop}, \(I,\;\text{i.e},\;y=(m+i)!/m!\) holds. One now has:
-% TODO: use bussproof to draw the tree
-\begin{align*}
-  \frac{\{y=(m+i)!/m!\}\;y:=y\,*\,m;\;m:=m-1;\;i:=i+1\;\{y=(m+i)!/m!\}}{\{y=(m+i)!/m!\}\;\begin{multilined}[t]
-      \mathsf{while}\;(i < n)\;\mathsf{do}\\
-      \;y:=y\,*\,m;\\
-      \;m:=m-1;\\
-      \;i:=i+1;\\
-      \;\{(y=(m+i)!/m!)\;\land\;\neg\;(i < n)\}}\end{multlined}
-\end{align*}
+Hence, before starting \texttt{Loop}, \(I,\;\text{i.e},\;y=(m+i)!/m!\) holds.  In addition, as \(i\) increases by 1 in each \texttt{Loop}, it will at some point becomes equal to \(n\) (i.e. \(i = n\)) and thus make \texttt{Loop} entry condition false.  So one now has:
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l@{\hspace{4pt}}l@{\hspace{4pt}}l}
+  \(\{y=(m+i)!/m!\}\) & \(y:=y\,*\,m;\;m:=m-1;\;i:=i+1\) & \(\{y=(m+i)!/m!\}\)\\
+  \noalign{\smallskip}
+  \hline
+  \noalign{\smallskip}
+    \(\{y=(m+i)!/m!\}\) & \(\mathsf{while}\; (i < n)\; \mathsf{do}\) &\\
+                      &\(\quad y:=y\,*\,m;\;m:=m-1;\;i:=i+1\) &\\
+    & & \(\{(y=(m+i)!/m!)\;\land\;(i = n)\}\)
+  \end{tabular}
+  % \caption{}
+  % \label{}
+\end{table}
 
+To complete the proof, one still needs to show that
+\begin{equation}
+\label{eq:6}
+y=(m+i)!/m!\;\land\;i = n\;\rightarrow\;y=x!/(x-n)!\;\land\;i \geq n
+\end{equation}
+
+If one can show that
+\begin{equation}
+\label{eq:7}
+y=(m+i)!/m!\;\land\;i=n\;\equiv\;y=x!/(x-i)!\;\land\;i=n
+\end{equation}
+holds during entire \texttt{Compute}, then using post-condition weakening rule, it is easy to get \eqref{eq:6}.
+
+% TODO: re-write sentences to meet the proof order
+Start with \(\neg(i < n)\), i.e. \(\neg\,b\):
 \begin{flalign*}
-\mathsf{6.}\: & \{y=(m+i)!/m!\;\land\;i < n\}\;\texttt{\textcolor{blue}{Body}}\;\{y=(m+i)!/m!\} & \mathsf{(Prec.\, Strengthen.)}  \\
-\mathsf{7.}\: & \{y=(m+i)!/m!\;\land\;i < n\}\;\texttt{\textcolor{blue}{Loop}}\;\{y=x!/(x-n)!\} & \mathsf{(While.,\;Post.\, Weaken.)}
+\mathsf{10.}\: & y=(m+i)!/m!\;\land\;i = n\;\rightarrow\;i \geq n & \mathsf{(Post.\, Weaken.)} \\
+\mathsf{11.}\: & y=(m+i)!/m!\;\land\;i \geq n\;\leftrightarrow\;\neg(i < n) & \mathsf{(Post.\, Equiv.)}
 \end{flalign*}
+Next, one needs to show
+\[
+y=(m+i)!/m!\;\land\;i=n\;\rightarrow\; y=x!/(x-n)!
+\]
 
+% TODO: clarify there
+Since the proof for \(y=(m+i)!/m!\) has been given above, the equivalent proof is to show that \(m=x-i\) holds before and after each \texttt{Loop} and \texttt{Init} has its as the post-condition.
+
+Assume \(m=x-i\), one can have:
+\begin{flalign*}
+\mathsf{12.}\: & \{y=x!/(x-(i+1))!\}\;\texttt{\textcolor{blue}{i:=i+1}}\;\{y=x!/(x-i)!\} & \mathsf{(Asst.\, Axiom)} \\
+\mathsf{13.}\: & \{y=x!/(x-(i+1))!\}\;\texttt{\textcolor{blue}{m:=m-1}}\;\{y=x!/(x-(i+1))!\} & \mathsf{(Asst.\, Axiom)} \\
+\mathsf{14.}\: & \{y=x!/(x-(i+1))!\}\;\texttt{\textcolor{blue}{(x-i):=(x-i)-1}}\;\{y=x!/(x-(i+1))!\} & \mathsf{(13, Premise\, Equiv.)} \\
+\mathsf{15.}\: & \{y*m=x!/(x-(i+1))!\}\;\texttt{\textcolor{blue}{y:=y*m}}\;\{y=x!/(x-(i+1))!\}\ & \mathsf{(Asst.\, Axiom)} \\
+\mathsf{16.}\: & \{y*(x-i)=x!/(x-(i+1))!\}\;\texttt{\textcolor{blue}{y:=y*(x-i)}}\;\{y=x!/(x-(i+1))!\}\ & \mathsf{(15, Premise\, Equiv.)}
+\end{flalign*}
+According to the precondition of \(\mathsf{16}\), one can have:
+\begin{align*}
+  y\;*\;(x-i) & = \frac{x!}{(x-(i+1))!}\\
+  y\;*\*\frac{(x-i)!}{((x-i)-1)!} & = \frac{x!}{((x-i)-1)!}\\
+  y & = \frac{x!}{(x-i)!}
+\end{align*}
+Therefore, one can have:
+% TODO: figure out a better way to handle the \hspace
+\begin{flalign*}
+\mathsf{17.}\: & \{y*(x-i)=x!/(x-(i+1))!\}\;\texttt{\textcolor{blue}{y:=y*(x-i)}}\;\{y=x!/(x-(i+1))!\}\ & \mathsf{(15, Premise\, Equiv.)} \\
+\mathsf{18.}\: & \{y=x!/(x-i)!\}\;\texttt{\textcolor{blue}{y:=y*(x-i);\;(x-i):=(x-i)-1;\;i:=i-1;}}\;\{y=x!/(x-i)!\}\ & \mathsf{(12,14,16,\,Seq)} \\
+\mathsf{19.}\: & \{y=x!/(x-i)!\}\;\texttt{\textcolor{blue}{y:=y*m;\;m:=m-1;\;i:=i-1;}}\;\{y=x!/(x-i)!\}\ & \hspace{-40pt}\mathsf{(12,13,15,\,Seq.\,Premis\, Equiv.)}
+\end{flalign*}
+Next, one needs to check \texttt{Init} has the post-condition \(y=x!/(x-i)!\):
+\begin{flalign*}
+\mathsf{20.}\: & \{y=x!/(x-0)!\}\;\texttt{\textcolor{blue}{i:=0}}\;\{y=x!/(x-i)!\} & \mathsf{(Asst.\, Axiom)} \\
+\mathsf{21.}\: & \{1=x!/(x-0)!\}\;\texttt{\textcolor{blue}{y:=1}}\;\{y=x!/(x-0)!\} & \mathsf{(Asst.\, Axiom)} \\
+\mathsf{22.}\: & \{1=x!/(x-0)!\}\;\texttt{\textcolor{blue}{m:=x}}\;\{1=x!/(x-0)!\} & \mathsf{(Asst.\, Axiom)} \\
+\mathsf{23.}\: & \{1=x!/(x-0)!\}\;\texttt{\textcolor{blue}{m:=x;\;y:=1;\;i:=0;}}\;\{1=x!/(x-0)!\} & \mathsf{(20,21,22,\;Sequencing)}
+\end{flalign*}
+Now one has:
+\[
+y=(m+i)!/m!\;\land\;m=x-i\;\equiv\; y=x!/(x-i)!
+\]
 
 \end{document}
