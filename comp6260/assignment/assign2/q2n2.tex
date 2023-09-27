@@ -2,9 +2,9 @@
 Prove: \(\{I\,\land\,b\}\)\;\texttt{Body}\;\{I\} holds for each \texttt{Loop} where b is \(i < n\) and \(I\) is \(y=(m+i)!/m!\)
 %TODO fix this align
 \begin{flalign*}
-\mathsf{1.}\: & \{y=(m+(i+1))!/m!\}\;\texttt{\textcolor{blue}{i:=i+1}}\;\{y = (m+i)!/m!\} & \mathsf{(Asst.\, Axiom)} \\
-\mathsf{2.}\: & \{y=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{m:=m-1}}\;\{y=(m+(i+1))!/m!\} & \mathsf{(Asst.\, Axiom)} \\
-\mathsf{3.}\: & \{y*m=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{y:=y*m}}\;\{y=((m-1)+(i+1))!/(m-1)!\}\ & \mathsf{(Asst.\, Axiom)}
+\mathsf{1.}\: & \{y=(m+(i+1))!/m!\}\;\texttt{\textcolor{blue}{i:=i+1}}\;\{y = (m+i)!/m!\} & \mathsf{(Assignment)} \\
+\mathsf{2.}\: & \{y=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{m:=m-1}}\;\{y=(m+(i+1))!/m!\} & \mathsf{(Assignment)} \\
+\mathsf{3.}\: & \{y*m=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{y:=y*m}}\;\{y=((m-1)+(i+1))!/(m-1)!\}\ & \mathsf{(Assignment)}
 \end{flalign*}
 The precondition of the Hoare Triple 3 above can be simplified as follows:
 \begin{align}
