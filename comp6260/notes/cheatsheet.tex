@@ -32,10 +32,13 @@
 
 % -- Natural Deduction Tree
 \usepackage{bussproofs}
+
+% \usepackage{ebproof}
+
 % remember to install this package explicitly
 % \usepackage{cancel} use labeling feature offered by bussproofs
 
-% -- Natural Deduction Fitch (local)
+% -- Natural Deduction Fitch
 \usepackage{fitch}
 
 % -- Multi Columns --
@@ -48,22 +51,22 @@
 \setlength{\belowdisplayshortskip}{3pt}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0pt plus 0.5ex}
+
 \begin{document}
 % Suppress page number for all pages
 \pagestyle{empty}
+
 \begin{multicols*}{3}
 \section{Boolean logic}
-\textbf{Absorption}\\
-$a \lor (a \land b) = a$ \hfill $a \land (a \lor b) = a$ \\
-
-\textbf{identity}\\
-$a \lor F = a$ \hfill $a \land T = a$
+\input{lecs/lec1}
 \section{Natural deduction}
 \input{lecs/lec2}
 \section{Structural induction}
+\textbf{Induction}: \(\mathsf{Base case} + \mathsf{Step case} [+ \mathsf{Inductive Hypothesis}] \Rightarrow \mathsf{General rule}\)
 Used to prove that some proposition P(x) holds for$\forall$ll x $\in$ recursively defined structure (e.g. lists, trees).
 
 `\verb|()|' in Haskell changes the precedence (calling order) of functions. Nothing more.
+Read the given/defined equations/functions in both ways. Sometimes RHS \(\rightarrow\) LHS works in proof.
 \subsection*{Induction hypothesis}
 \begin{itemize}
 \item given as the known premise of a proof

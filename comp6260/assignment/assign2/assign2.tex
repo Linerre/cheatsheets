@@ -1,4 +1,10 @@
 \documentclass[a4paper,12pt]{article}
+% Layout
+\usepackage[left=2cm, right=2cm]{geometry}
+
+% No indentation
+\setlength\parindent{0pt}
+
 % Color
 \usepackage[dvipsname]{xcolor}
 
@@ -11,29 +17,45 @@
 \setlength{\abovedisplayshortskip}{0pt}%
 \setlength{\belowdisplayshortskip}{0pt}%
 
-% No indentation
-\setlength\parindent{0pt}
-
 % Proof
 % \usepackage{bussproofs}
 \usepackage{ebproof}
 
-% Layout
-\usepackage[left=2cm, right=2cm]{geometry}
+% Code
+% verbatim always uses full-width (not-centering), and other verbatim
+% packages do not address this problem specifically, so use listings.
+\usepackage{listings}
+\lstset{
+  aboveskip=5pt,
+  belowskip=5pt,
+  basicstyle=\ttfamily,
+  commentstyle=\upshape\ttfamily,
+  columns=fullflexible,%remove space between letters
+  keepspaces=true,
+  language=Haskell,
+  xleftmargin=4pt,
+}
+% I give up on centering code
+% \usepackage{fancyvrb}
 
-
+% ------------------ DOCUMENT ------------------
 \begin{document}
 \section{Solutions to Question 1}
-% \input{assign2q1}
+\subsection{Lemma Equation}
+\input{q1n1}
+\subsection{Proof of Lemma Equation}
+\subsection{Proof of \((\dagger)\)}
 
-\section{Solutions to Question 2}
-\subsection{Suitable Invariant}
-\label{sec:2.1}
-\input{q2n1}
-\subsection{Proof for suitable invariant}
-\label{sec:2.2}
-\input{q2n2}
-\subsection{Proof for Hoare Triple}
-\label{sec:2.3}
-\input{q2n3}
+
+% \section{Solutions to Question 2}
+% \subsection{Suitable Invariant}
+% \label{sec:2.1}
+% \input{q2n1}
+% \subsection{Proof for suitable invariant}
+% \label{sec:2.2}
+% \input{q2n2}
+% \subsection{Proof for Hoare Triple}
+% \label{sec:2.3}
+% \input{q2n3}
 \end{document}
+% ------------------ DOCUMENT ------------------

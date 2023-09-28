@@ -1,0 +1,19 @@
+% Q1N1
+If assume the list \texttt{xs} is empty \texttt{[]}, then \((\dagger)\) becomes:
+\begin{lstlisting}
+length([] ++ []) = length (dupAll([])) -- Assumption
+                 = length []           -- D2
+\end{lstlisting}
+So it seems if I can have
+\begin{lstlisting}
+length([] ++ []) = length [] + length []
+\end{lstlisting}
+or more generally
+\begin{lstlisting}
+length(xs ++ ys) = length xs + length ys
+\end{lstlisting}
+I can use this lemma to complete the proof of \((\dagger)\).  Therefore, the needed lemma is
+\[
+  \forall\verb|xs|.\,\forall\verb|ys|.\:\:
+ \verb|length (xs ++ ys) = length xs + length ys|
+\]
