@@ -1,0 +1,36 @@
+% Q1N3
+I need to show that
+\begin{equation*}
+  \forall\verb|xs|.\:\:
+  \verb|length (xs ++ xs) = length (dupAll xs)|
+\end{equation*}
+\textbf{Base Case.} When \texttt{xs} is an empty list \texttt{[]}, I need to show
+\begin{equation*}
+  \verb|length ([] ++ []) = length (dupAll [])|
+\end{equation*}
+This is easy to prove
+\begin{lstlisting}
+  length ([] ++ [])  = length [] + length []  -- Lemma
+                     = 0 + 0                  -- L1
+                     = 0                      -- Arithmetic
+                     = length []              -- L1
+                     = length (dupAll [])     -- D1
+\end{lstlisting}
+\textbf{Step Case.} Now let \texttt{x} be an arbitrary list element and \texttt{xs} an arbitrary list, and assume that
+\begin{equation*}
+  \verb|length (xs ++ xs) = length (dupAll xs)| \tag{IH}
+\end{equation*}
+I need to show that
+\begin{equation*}
+  \verb|length ((x:xs) ++ (x:xs)) = length (dupAll (x:xs))|
+\end{equation*}
+\begin{lstlisting}
+  length (dupAll (x:xs)) = length (x:x:(dupAll xs))       -- D2
+                         = 1 + length (x:(dupAll xs))     -- L2
+                         = 1 + 1 + length (xs ++ xs)      -- IH
+                         = 1 + 1 + length xs + length xs  -- Lemma
+                         = 1 + length xs + 1 + length xs  -- Commutativity
+                         = length (x:xs) + length (x:xs)  -- L2
+                         = length ((x:xs) + (x:xs))       -- Lemma
+\end{lstlisting}
+which finishes the proof.

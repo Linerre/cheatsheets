@@ -1,4 +1,26 @@
 % TODO: give a tree-version of the following proof
+First, I need to ensure the invariant \(I\) \eqref{eq:2.1.2} is initially true when \texttt{Loop} is reached:
+\begin{equation*}
+\mathsf{1.}\: \{y=(m+0)!/m!\;\land\;m=x-0\;\land\;0 \leq i \leq n\;\land\;n \geq 0\;\land\;x \geq n\}\;\texttt{\textcolor{blue}{i:=0}}\;\{y=(m+i)!/m!\} \mathsf{(Assignment)}
+\end{equation*}
+\begin{equation*}
+\mathsf{2.}\: \{1=(m+0)!/m!\;\land\;m=x-0\;\land\;0 \leq i \leq n\;\land\;n \geq 0\;\land\;x \geq n\}\;\texttt{\textcolor{blue}{y:=1}}\;\{y=(m+0)!/m!\;\land\;m=x-0\;\land\;0 \leq i \leq n\;\land\;n \geq 0\;\land\;x \geq n\} \mathsf{(Assignment)}
+\end{equation*}
+\begin{equation*}
+\mathsf{3.}\: \{1=(x+0)!/x!\}\;\texttt{\textcolor{blue}{m:=x}}\;\{1=(m+0)!/m!\} \mathsf{(Assignment)}
+\end{equation*}
+
+% \mathsf{4.}\: \{1=(x+0)!/x!\}\;\texttt{\textcolor{blue}{m:=x;\;y:=1;\;i:=0;}}\;\{1=(m+0)!/m!\} \mathsf{(6,7,8,\;Sequencing)}
+% \end{equation*}
+
+
+Clearly, in \(\mathsf{9}\): \(1=(x+0)!/x!\; \equiv\; 1=1\; \equiv\; True\). Use Precondition Strengthening rule, I can have:
+% Equation 2.2.1
+\begin{equation}
+\label{eq:2.2.1}
+\{x \geq n\;\wedge\; n \geq 0\}\; \texttt{S}\; \{I\}
+\end{equation}
+
 Prove: \(\{I\,\land\,b\}\)\;\texttt{Body}\;\{I\} holds for each \texttt{Loop} where b is \(i < n\) and \(I\) is \(y=(m+i)!/m!\)
 %TODO fix this align
 \begin{flalign*}

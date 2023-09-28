@@ -1,0 +1,45 @@
+% Q1N2
+I need to show that
+\[
+  \forall\verb|xs|.\,\forall\verb|ys|.\:\:
+ \verb|length (xs ++ ys) = length xs + length ys|
+\]
+Let \texttt{ys} be an arbitrary list and treat \texttt{ys} as a constant and then I need to show that
+\[
+  \forall\verb|xs|.\:\:
+ \verb|length (xs ++ ys) = length xs + length ys|
+\]
+\textbf{Base Case.} I need to show that
+\[
+ \verb|length ([] ++ ys) = length [] + length ys|
+\]
+\begin{lstlisting}
+  length ([] ++ ys) = length ys                -- A1
+                    = 0 + length ys            -- Arithmetic
+                    = length [] + length ys    -- L1
+\end{lstlisting}
+\textbf{Step Case.} I need to show that
+\[
+  \forall\verb|xs|.\,\forall\verb|ys|.\:\:
+ \verb|length (xs ++ ys) = length xs + length ys|
+\]
+Let \texttt{x} be an arbitrary list element and \texttt{xs}, an arbitrary non-empty list, and assume the inductive hypothesis as
+\begin{equation*}
+  \verb|length (xs + ys) = length xs ++ length ys| \tag{IH}
+\end{equation*}
+Then I need to show that
+\begin{equation*}
+  \verb|length ((x:xs) + ys) = length (x:xs) ++ length ys|
+\end{equation*}
+It is easier to prove this by starting with RHS:
+\begin{lstlisting}
+  length (x:xs) + length ys = 1 + length xs + length ys   -- L1
+                            = 1 + length (xs ++ ys)       -- IH
+                            = length (x:(xs ++ ys))       -- L2
+                            = length ((x:xs) ++ ys)       -- A2
+\end{lstlisting}
+thus this finishes the proof and I now get
+\begin{equation*}
+  \forall\verb|xs|.\,\forall\verb|ys|.\:\:
+  \verb|length (xs ++ ys) = length xs + length ys| \tag{\texttt{Lemma}}
+\end{equation*}

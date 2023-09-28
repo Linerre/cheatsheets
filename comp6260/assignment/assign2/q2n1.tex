@@ -13,28 +13,27 @@ Assume that $x = 6$ and $n = 4$, which satisfy the given condition $ x \geq n \;
     4 & 360 & 2 & 4 \\
     \hline
   \end{tabular}
-  \caption{Values in each loop}
+  \caption{Values in each loop when \(x=6\;n=4\)}
   \label{tab:loop}
 \end{table}
 
-It is easy to see that in the $ith$ \texttt{Loop}, $y'$ is built up like:
+It is easy to see that in the $i$th \texttt{Loop}, $y'$ is built up like:
 \[
   y' =
   y_{initial} \;*\; m_{initial}\;*\;(m_{initial} - 1)\;*\;(m_{initial}-  2)\;*\;\dotsb\;*\; (m_{initial} - i)
 \]
 
-That is, in any given $ith$ \texttt{Loop},  y$_{ith}$ value can be calculated as:
+That is, in any given $i$th \texttt{Loop},  the value of y$_{i}$ can be calculated as:
 \begin{equation}
-\label{eq:1}
-y_{ith} = \frac{m_{initial}!}{(m_{initial} - i)!}
+\label{eq:2.1.1}
+y_{i} = \frac{m_{initial}!}{(m_{initial} - i)!}
 \end{equation}
-
-The problem is, this equation requires $m > i$.  Yet as $m$ decreases by 1 and $i$ increases by 1 in each loop, $i$ will inevitably surpass $m$, thus making (\ref{eq:1}) invalid.  Table \ref{tab:loop} indicates the following is mathematically equivalent to (\ref{eq:1}):
+The problem is, this equation requires $m > i$.  Yet as $m$ decreases by 1 and $i$ increases by 1 in each \texttt{Loop}, $i$ will inevitably become equal to $m$, thus making \eqref{eq:2.1.1} invalid.  Given the initialization assignment \(m:=x\), the following is mathematically equivalent to \eqref{eq:2.1.1}:
 \[
-y_{ith} = \frac{(m_{ith}+i)!}{m_{ith}!}
+  y_{i} = \frac{(m_{i}+i)!}{m_{i}!} \quad \text{where}\quad m_{i}= x - i
 \]
-So one suitable \textbf{invariant} \(I\) can be the following, regardless of the \texttt{Loop} times:
+So one suitable \textbf{invariant} \(I\) can be the following:
 \begin{equation}
-\label{eq:2}
-  y = \frac{(m+i)!}{m!}
+\label{eq:2.1.2}
+  y = \frac{(m+i)!}{m!}\:\land\:m=x-i\:\land\:0 \leq i \leq n\:\land\:n \geq 0\:\land\:x \geq n
 \end{equation}
