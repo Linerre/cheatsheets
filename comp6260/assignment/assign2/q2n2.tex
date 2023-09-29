@@ -1,32 +1,42 @@
 % TODO: give a tree-version of the following proof
-First, I need to ensure the invariant \(I\) \eqref{eq:2.1.2} is initially true when \texttt{Loop} is reached:
+First, ensure the invariant \(I\) \eqref{eq:2.1.2} is initially true when \texttt{Loop} is reached:
 \begin{equation*}
-\mathsf{1.}\: \{y=(m+0)!/m!\;\land\;m=x-0\;\land\;0 \leq i \leq n\;\land\;n \geq 0\;\land\;x \geq n\}\;\texttt{\textcolor{blue}{i:=0}}\;\{y=(m+i)!/m!\} \mathsf{(Assignment)}
+  \mathsf{1.}\; \{y=(m+0)!/m!\;\land\;m=x-0\;\land\;0 \leq 0 \leq n\}\; \texttt{\textcolor{blue}{i:=0}}\; \{y=(m+i)!/m!\;\land\;m=x-i\;\land\;0 \leq i \leq n\} \tag{\(\mathsf{Assignment}\)}
 \end{equation*}
 \begin{equation*}
-\mathsf{2.}\: \{1=(m+0)!/m!\;\land\;m=x-0\;\land\;0 \leq i \leq n\;\land\;n \geq 0\;\land\;x \geq n\}\;\texttt{\textcolor{blue}{y:=1}}\;\{y=(m+0)!/m!\;\land\;m=x-0\;\land\;0 \leq i \leq n\;\land\;n \geq 0\;\land\;x \geq n\} \mathsf{(Assignment)}
+  \mathsf{2.}\; \{1=(m+0)!/m!\;\land\;m=x-0\;\land\;0 \leq 0 \leq n\}\; \texttt{\textcolor{blue}{y:=1}}\;\{y=(m+0)!/m!\;\land\;m=x-0\;\land\;0 \leq i \leq n\} \tag{\(\mathsf{Assignment}\)}
 \end{equation*}
 \begin{equation*}
-\mathsf{3.}\: \{1=(x+0)!/x!\}\;\texttt{\textcolor{blue}{m:=x}}\;\{1=(m+0)!/m!\} \mathsf{(Assignment)}
+\mathsf{3.}\; \{1=(x+0)!/x!\;\land\;x=x-0\;\land\;0 \leq 0 \leq n\}\;\texttt{\textcolor{blue}{m:=x}}\;\{1=(m+0)!/m!\;\land\;m=x-0\;\land\;0 \leq 0 \leq n\} \tag{\(\mathsf{Assignment}\)}
 \end{equation*}
 
 % \mathsf{4.}\: \{1=(x+0)!/x!\}\;\texttt{\textcolor{blue}{m:=x;\;y:=1;\;i:=0;}}\;\{1=(m+0)!/m!\} \mathsf{(6,7,8,\;Sequencing)}
 % \end{equation*}
 
-
-Clearly, in \(\mathsf{9}\): \(1=(x+0)!/x!\; \equiv\; 1=1\; \equiv\; True\). Use Precondition Strengthening rule, I can have:
+% TODO: reword this part
+Clearly, in \(\mathsf{3}\), I have
+\begin{align*}
+  1& =(x+0)!/x!\; \equiv\; 1=1\;  \equiv\; True \\
+  x& =x-0      \; \equiv\; x=x\;  \equiv\; True \\
+  0& \leq 0 \leq n\; \rightarrow\; 0 = 0\;\land 0 < n
+\end{align*}
+Use Precondition Strengthening rule, I can have:
 % Equation 2.2.1
 \begin{equation}
 \label{eq:2.2.1}
-\{x \geq n\;\wedge\; n \geq 0\}\; \texttt{S}\; \{I\}
+\{x \geq n\;\wedge\; n \geq 0\}\; \texttt{Init}\; \{S\}\; \wedge\; S\; \rightarrow\; I
 \end{equation}
 
-Prove: \(\{I\,\land\,b\}\)\;\texttt{Body}\;\{I\} holds for each \texttt{Loop} where b is \(i < n\) and \(I\) is \(y=(m+i)!/m!\)
+Next, using Precondition Weakening I can further weaken \(I\) to \(I'\)
+\[
+I\; \rightarrow\; I'\; \equiv\; y=(m+i)!/m!
+\]
+Then if \(\{I'\,\land\,b\}\;\texttt{Body}\;\{I'\}\) holds for each \texttt{Loop} where b is \(i < n\) and \(I'\) is \(y=(m+i)!/m!\), then so does \(I\) by precondition strengthening rule.
 %TODO fix this align
 \begin{flalign*}
-\mathsf{1.}\: & \{y=(m+(i+1))!/m!\}\;\texttt{\textcolor{blue}{i:=i+1}}\;\{y = (m+i)!/m!\} & \mathsf{(Assignment)} \\
-\mathsf{2.}\: & \{y=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{m:=m-1}}\;\{y=(m+(i+1))!/m!\} & \mathsf{(Assignment)} \\
-\mathsf{3.}\: & \{y*m=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{y:=y*m}}\;\{y=((m-1)+(i+1))!/(m-1)!\}\ & \mathsf{(Assignment)}
+\mathsf{4.}\: & \{y=(m+(i+1))!/m!\}\;\texttt{\textcolor{blue}{i:=i+1}}\;\{y = (m+i)!/m!\} & \mathsf{(Assignment)} \\
+\mathsf{5.}\: & \{y=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{m:=m-1}}\;\{y=(m+(i+1))!/m!\} & \mathsf{(Assignment)} \\
+\mathsf{6.}\: & \{y*m=((m-1)+(i+1))!/(m-1)!\}\;\texttt{\textcolor{blue}{y:=y*m}}\;\{y=((m-1)+(i+1))!/(m-1)!\}\ & \mathsf{(Assignment)}
 \end{flalign*}
 The precondition of the Hoare Triple 3 above can be simplified as follows:
 \begin{align}
@@ -37,7 +47,7 @@ The precondition of the Hoare Triple 3 above can be simplified as follows:
 \end{align}
 Therefore:
 \begin{flalign*}
-& \mathsf{4.}\: \{y*m=(m+i)!/m!\}\;\texttt{\textcolor{blue}{y:=y*m}}\;\{y=((m-1)+(i+1))!/(m-1)!\}\ && \mathsf{(3,\;Prec.\, Equiv.)} \\
-& \mathsf{5.}\: \{y=(m+i)!/m!\}\;\texttt{\textcolor{blue}{y:=y*m;\:m:=m-1;\:i:=i+1;}}\;\{y=(m+i)!/m!\}\ && \mathsf{(1,2,4,\;Sequencing)}
+& \mathsf{7.}\: \{y*m=(m+i)!/m!\}\;\texttt{\textcolor{blue}{y:=y*m}}\;\{y=((m-1)+(i+1))!/(m-1)!\}\ && \mathsf{(6,\;Prec.\, Equiv.)} \\
+& \mathsf{8.}\: \{y=(m+i)!/m!\}\;\texttt{\textcolor{blue}{y:=y*m;\:m:=m-1;\:i:=i+1;}}\;\{y=(m+i)!/m!\}\ && \mathsf{(4,5,7,\;Sequencing)}
 \end{flalign*}
-As long as \(b\) (i.e. \( i < n\)) holds, in each \texttt{Loop}, before and after \texttt{Body} executes, \(I\) holds, as proved above. So this establishes \(I\) in \eqref{eq:invar} as an invariant.
+So this proves that \(I\) in \eqref{eq:invar} as an invariant.

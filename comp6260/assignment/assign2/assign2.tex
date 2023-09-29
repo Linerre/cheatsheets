@@ -42,11 +42,11 @@
 \begin{document}
 \section{Solutions to Question 1}
 \subsection{Lemma Equation}
-% \input{q1n1}
+\input{q1n1}
 \subsection{Proof of Lemma Equation}
-% \input{q1n2}
+\input{q1n2}
 \subsection{Proof of \((\dagger)\)}
-% \input{q1n3}
+\input{q1n3}
 \section{Solutions to Question 2}
 \subsection{Suitable Invariant}
 \label{sec:2.1}
@@ -58,7 +58,31 @@
 \label{sec:2.3}
 \input{q2n3}
 \subsection{Loop Variant}
+I argue variant \(E\) can be:
+\begin{equation}
+\label{eq:2.4.1}
+E = n - i
+\end{equation}
+When \texttt{Loop} is first reached:
+\[
+E = n - i = n - 0 = n \geq 0 \tag{Given}
+\]
+After each \texttt{Loop}, \(E\) becomes \(n-(i+1) = n-i-1\).  It is clear that \(n-i-1 < n-i\).
 \subsection{Proof of Loop Variant}
+\newcommand{\IB}{I\;\wedge\;b\;\wedge\;}
+\newcommand{\I}{I\;\wedge\;}
 
+Proving
+\[
+[\IB E = k]\;\texttt{Body}\;[\IB E < k]
+\]
+
+\begin{flalign*}
+\mathsf{1.}\: & [\IB n-(i+1)=k]\;\texttt{\textcolor{blue}{i:=i+1}}\;[\I n-i=k] & \mathsf{(Assignment)} \\
+\mathsf{2.}\: & [\IB n-(i+1)=k]\;\texttt{\textcolor{blue}{m:=m-1}}\;[\I n-(i+1)=k] & \mathsf{(Assignment)} \\
+\mathsf{3.}\: & [\IB n-(i+1)=k];\texttt{\textcolor{blue}{y:=y*m}}\;[\I n-(i+1)=k] & \mathsf{(Assignment)} \\
+\mathsf{4.}\: & \IB n-i=k\;\rightarrow\;\IB n-i-1<n-i=k & \mathsf{(Logic)}\\
+\mathsf{5.}\: & [\IB n-i=k]\;\texttt{Body}\;[\IB n-i-1<n-i=k] & \mathsf{(1,2,3,\,Sequencing)}
+\end{flalign*}
 \end{document}
 % ------------------ DOCUMENT ------------------
