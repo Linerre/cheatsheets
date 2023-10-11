@@ -11,6 +11,8 @@
 *.toc
 *.xml
 *.fls
+*.drawio
+*.bkp
 *_latexmk
 tlmgr.html
 auto/
