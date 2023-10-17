@@ -1,0 +1,48 @@
+\renewcommand{\labelitemii}{\ding{226}}
+\begin{enumerate}
+% initial split
+\item initial split: \(\{\s{1},\s{5}\}\), \(\{\s{0}, \s{2}, \s{3}, \s{4}\}\)
+  \begin{itemize}
+    \item check \(\{\s{1},\s{5}\}\)
+      \begin{itemize}
+      \item \(\s{1} \overset{0}{\rightarrow} \s{2}\), second group
+      \item \(\s{5} \overset{0}{\rightarrow} \s{0}\), second group
+      \item \(\s{1} \overset{1}{\rightarrow} \s{1}\), first group
+      \item \(\s{5} \overset{1}{\rightarrow} \s{1}\), first group
+      \item[] no split
+    \end{itemize}
+
+    \item check \(\{\s{0}, \s{2}, \s{3}, \s{4}\}\)
+      \begin{itemize}
+      \item \(\s{0} \overset{0}{\rightarrow} \s{1}\), first group
+      \item \(\s{2} \overset{0}{\rightarrow} \s{5}\), first group
+      \item \(\s{3}/\s{4} \overset{0}{\rightarrow} \s{4}\), second group
+      \item \(\s{3} \overset{1}{\rightarrow} \s{3}\), second group
+      \item \(\s{4} \overset{1}{\rightarrow} \s{0}\), first group
+      \item[] split out \(\s{3}\) and \(\s{4}\)
+    \end{itemize}
+\end{itemize}
+
+% 2nd split
+\item next split: \(\{\s{1},\s{5}\}\), \(\{\s{0}, \s{2}\}\), \(\{\s{3}\}\), \(\{\s{4}\}\)
+  \begin{itemize}
+  \item check \(\{\s{1},\s{5}\}\)
+    \begin{itemize}
+      \item \(\s{1} \overset{0}{\rightarrow} \s{2}\), second group
+      \item \(\s{5} \overset{0}{\rightarrow} \s{0}\), second group
+      \item \(\s{1}/\s{5} \overset{1}{\rightarrow} \s{1}\), first group
+      \item [] no split
+    \end{itemize}
+  \item check \(\{\s{0}, \s{2}\}\)
+    \begin{itemize}
+      \item \(\s{0} \overset{0}{\rightarrow} \s{1}\), first group
+      \item \(\s{2} \overset{0}{\rightarrow} \s{5}\), first group
+      \item \(\s{0}/\s{2} \overset{1}{\rightarrow} \s{3}\), third group
+      \item[] no split
+    \end{itemize}
+  \item no need to check \(\{\s{3}\}\) or \(\{\s{4}\}\) alone
+  \end{itemize}
+\item Merge \(\s{1}\) and \(\s{5}\)
+\item Merge \(\s{0}\) and \(\s{2}\)
+\item Finally got \(\s{0}, \s{1}, \s{3}, \s{4}\)
+\end{enumerate}
