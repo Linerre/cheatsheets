@@ -1,0 +1,39 @@
+\subsection{\(\epsilon\)-closure}
+\textbf{Solution.}
+% step 1 find eclose of all states
+\begin{itemize}
+\item ECLOSE\((\s{0})\) = \(\{\s{0}, \s{1}, \s{4}, \s{2}\}\)
+\item ECLOSE\((\s{1})\) = \(\{\s{1}, \s{4}, \s{2}, \s{0}\}\)
+\item ECLOSE\((\s{2})\) = \(\{\s{2}\}\)
+\item ECLOSE\((\s{3})\) = \(\{\s{3}\}\)
+\item ECLOSE\((\s{4})\) = \(\{\s{4}, \s{2}, \s{0}, \s{1}\}\)
+\end{itemize}
+\subsection{Final NFA diagram}
+\textbf{Solution.}\\
+See diagram \ref{fig:nfa} on the next page.
+% step 3 NFA
+\clearpage
+\begin{figure}[t]
+  \centering
+  \begin{tikzpicture}[bezier bounding box]% reduce vertical spacing after tikzpicture
+  \node[state, initial, accepting] (s0) {\(\s{0}\)};
+  \node[state, accepting, right of=s0] (s1) {\(\s{1}\)};
+  \node[state, accepting, right of=s1] (s2) {\(\s{2}\)};
+  \node[state, right of=s0, xshift=-1cm, yshift=-3cm] (s3) {\(\s{3}\)};
+  \node[state, accepting, right of=s3] (s4) {\(\s{4}\)};
+
+  \draw (s0) edge[loop above] node{\ntxt{0, 1}} (s0)
+             edge[bend left, above] node{\ntxt{1}} (s2)
+             edge[above] node[rotate=-60]{\ntxt{0, 1}} (s3)
+             edge[out=-100, in=-120, looseness=1.2] node[below left, rotate=-25]{\ntxt{0}} (s4)
+        (s1) edge[above] node{\ntxt{1}} (s2)
+             edge[below, right=0.3] node{\ntxt{0}} (s4)
+             edge[below, right=0.3] node[below, rotate=70]{\ntxt{0, 1}} (s3)
+        (s2) edge[below, right=0.3] node{\ntxt{0}} (s4)
+        (s3) edge[bend left, above] node{\ntxt{0}} (s4)
+        (s4) edge[bend left] node[below]{\ntxt{1}} (s3)
+             edge[out=-90, in=-140, looseness=1.8] node[below left, rotate=-25]{\ntxt{0, 1}} (s0);
+  \end{tikzpicture}
+  \caption{NFA without \(\epsilon\)}
+  \label{fig:nfa}
+\end{figure}

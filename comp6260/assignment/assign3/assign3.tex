@@ -10,12 +10,24 @@ right=2cm,
 \usepackage{amsmath,amssymb,latexsym}
 \usepackage{pifont}
 
+% Automata
+\usepackage{tikz}
+\usetikzlibrary{ arrows, automata, bbox, positioning}
+\tikzset{
+->, % makes the edges directed
+>=stealth', % makes the arrow heads bold
+node distance=3cm, % specifies the minimum distance between two nodes. Change if necessary.
+every state/.style={thick}, % sets the properties for each ’state’ node
+initial text=Start, % sets the text that appears on the start arrow
+}
+
 % No indentation
 \setlength\parindent{0pt}
 
 % Shorthand
 \newcommand{\s}[1]{s_{#1}}
 \newcommand{\caps}[1]{S_{#1}}
+\newcommand{\ntxt}[1]{\footnotesize{#1}}
 
 \begin{document}
 \section{NFA to DFA}
@@ -23,6 +35,7 @@ right=2cm,
 \section{DFA minimisation}
 \input{q2}
 \section{\(\epsilon\)-NFA to NFA}
+\input{q3}
 \section{C++ streams}
 \section{Deterministic Context Free Languages}
 \end{document}
