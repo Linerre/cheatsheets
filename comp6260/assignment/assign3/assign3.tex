@@ -21,13 +21,27 @@ every state/.style={thick}, % sets the properties for each ’state’ node
 initial text=Start, % sets the text that appears on the start arrow
 }
 
+% Tree
+\usepackage{forest}
+
+% Side by side figure
+\usepackage{subcaption}
+
 % No indentation
 \setlength\parindent{0pt}
+
+% Put figure at the top of a page when its on a new page
+\makeatletter
+\setlength{\@fptop}{0pt}
+\makeatother
+%
 
 % Shorthand
 \newcommand{\s}[1]{s_{#1}}
 \newcommand{\caps}[1]{S_{#1}}
 \newcommand{\ntxt}[1]{\footnotesize{#1}}
+\newcommand{\cpp}{\small{\texttt{<<}}}
+
 
 \begin{document}
 \section{NFA to DFA}
@@ -37,5 +51,8 @@ initial text=Start, % sets the text that appears on the start arrow
 \section{\(\epsilon\)-NFA to NFA}
 \input{q3}
 \section{C++ streams}
+\input{q4}
 \section{Deterministic Context Free Languages}
+\subsection{Associative}
+\subsection{Unambiguous}
 \end{document}
