@@ -52,7 +52,7 @@ Add a new variable \emph{term} (denoted as \(T\)) to the original grammar.  \(T\
 With \(T\), the grammar now becomes:
 \begin{itemize}[itemsep=0pt]
 \item[] \(O\; \rightarrow\; \texttt{ostream}\; |\; \texttt{string}\; |\; \texttt{int} \)
-\item[] \(T\; \rightarrow\; O \;|\; O\; \cpp\; T\)
+\item[] \(T\; \rightarrow\; O \;|\; T\; \cpp\; O\)
 \item[] \(S\; \rightarrow\; T \;|\; T\; \cpp\; S\)
 \end{itemize}
 \begin{align*}
@@ -99,10 +99,10 @@ The fact that grammar is unambiguous can be observed from the parse trees of \(T
         [\dots
         [,phantom]
         [S
-        [S
         [T [O]]
         [\cpp]
-        [T [O]]]]]]]]
+        [T [O]]]
+        ]]]]
       ]
       \end{forest}
   }

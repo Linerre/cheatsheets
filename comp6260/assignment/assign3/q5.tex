@@ -1,0 +1,92 @@
+\subsection{Grammar}
+\textbf{Solution}.\\
+Language \(L\) is consisted of two sub-languages, let them be \(L_{\alpha}\) and \(L_{\beta}\) respectively.\\
+For \(L_{\alpha} = \{0^{n}1^{n}\;|\; n \geq 0\}\):
+\begin{enumerate}[itemsep=0pt]
+\item when \(n = 0\), a string in the language is \(\epsilon\), that is, empty string is accepted.
+\item when \(n > 0\), there are equal numbers of 0 and 1, so the pattern \(0T1\) is accepted, where
+\item[] \(T \rightarrow 0T1 \ror \epsilon\)
+\end{enumerate}
+Let \(S_{\alpha}\) be the start symbol for \(L_{\alpha}\); then:
+\begin{itemize}[itemsep=0pt]
+\item[] \(S_{\alpha} \rightarrow 0R1 \)
+\item[] \(R \rightarrow \epsilon \ror 0R1 \)
+\end{itemize}
+For \(L_{\beta} = \{0^{n}1^{2}n \ror; n \geq 0\}\):
+\begin{enumerate}[itemsep=0pt]
+\item when \(n = 0\), a string in the language is 110, that is an empty string is followed by 110.
+\item when \(n > 0\), there are always two ``1''s and a constant number equals to \(n\) at the end, so the pattern can be \(T11n\), where
+\item[]  \(T \rightarrow 0 \ror 0T \)
+\end{enumerate}
+Let \(S_{\beta}\) be the start symbol for \(L_{\beta}\), then:
+\begin{itemize}[itemsep=0pt]
+\item[] \(S_{\beta} \rightarrow T11n \)
+\item[] \(T \rightarrow \epsilon \ror 0 \ror 0T \)
+\end{itemize}
+Now let \(S\) be yet another start symbol, the grammar of \(L\) can be shown as below:
+\begin{itemize}[itemsep=0pt]
+\item[] \(S \rightarrow S_{\alpha} \)
+\item[] \(S \rightarrow S_{\beta} \)
+\item[] \(S_{\alpha} \rightarrow 0R1 \)
+\item[] \(R \rightarrow \epsilon \ror 0R1 \)
+\item[] \(S_{\beta} \rightarrow T11n \)
+\item[] \(T \rightarrow \epsilon \ror 0 \ror 0T \)
+\end{itemize}
+Parse trees of \(S_{\alpha}\) and \(S_{\beta}\) is unique and therefore the grammar above is unambiguous:
+
+\begin{figure}[h]
+  \centering
+  % Parse tree of T
+  \subcaptionbox{Parse tree of \(S_{\alpha}\)}
+  [0.4\linewidth]{
+  \begin{forest}
+      [\(S_{\alpha}\)
+        [O]
+        [R
+        [\(\epsilon\)]
+        [0]
+        [R
+        [\dots
+        [,phantom]
+        [R
+        [\(\epsilon\)]
+        [0]
+        [R
+        [\(\epsilon\)]
+        [0]
+        [1]]
+        [1]]]]
+        [1]
+        ]
+        [1]
+      ]
+    \end{forest}
+  }
+  % Parse tree of S
+  \subcaptionbox{Parse tree of \(S_{\beta}\)}
+  [0.4\linewidth]{
+    \begin{forest}
+      [\(S_{\beta}\)
+      [T
+      [
+      [\(\epsilon\)]
+      [0]
+      [0T
+      [0\(\epsilon\)]
+      [00]
+      [0T
+      [\dots
+      [,phantom]
+      [0T
+      [0\(\epsilon\)]
+      [00]]
+      ]]
+      ]]
+      ]
+      [11]
+      [n]
+      ]
+      \end{forest}
+  }
+  \caption{Parse trees}
+\end{figure}

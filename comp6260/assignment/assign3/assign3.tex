@@ -23,6 +23,7 @@ initial text=Start, % sets the text that appears on the start arrow
 
 % Tree
 \usepackage{forest}
+\usepackage{tikz-qtree}
 
 % Side by side figure
 \usepackage{subcaption}
@@ -40,7 +41,8 @@ initial text=Start, % sets the text that appears on the start arrow
 \newcommand{\s}[1]{s_{#1}}
 \newcommand{\caps}[1]{S_{#1}}
 \newcommand{\ntxt}[1]{\footnotesize{#1}}
-\newcommand{\cpp}{\small{\texttt{<<}}}
+\newcommand{\cpp}{\small{\texttt{<<} }}
+\newcommand{\ror}{\;|\;}
 
 
 \begin{document}
@@ -53,6 +55,6 @@ initial text=Start, % sets the text that appears on the start arrow
 \section{C++ streams}
 \input{q4}
 \section{Deterministic Context Free Languages}
-\subsection{Associative}
-\subsection{Unambiguous}
+\input{q5}
+\subsection{Deterministic pushdown automaton}
 \end{document}
