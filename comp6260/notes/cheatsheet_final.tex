@@ -1,0 +1,173 @@
+\documentclass[10pt,a4paper,fleqn,landscape]{article}
+
+% -- Layout ----
+\usepackage[top=0.25cm, bottom=0.25cm, left=0.25cm, right=0.25cm, landscape]{geometry}
+
+% -- Titles ----
+\usepackage[
+  tiny,                     % text size title
+  compact                   % reduce vertical space before/after title
+]{titlesec}
+% \titlespacing*
+% \titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{0em}{} % Remove space before and after section titles
+% \titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{0em}{} % Remove space before and after subsection titles
+
+\titlespacing*{\section}{0pt}{0pt}{0pt} % Remove space before/after section titles
+\titlespacing*{\subsection}{0pt}{0pt}{0pt} % Remove space before/after subsec titles
+
+% -- Colors ----
+\usepackage[dvipsnames]{xcolor}
+
+% -- Math ------
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% -- Lists -----
+\usepackage[inline]{enumitem}
+\setlist{noitemsep}% Remove vspace between items
+% Set vspace before and after  list environments as well as the left margin
+\setlist[itemize,1]{leftmargin=*,topsep=1pt,partopsep=1pt}
+\setlist[itemize,2]{leftmargin=2pt,topsep=1pt,partopsep=1pt}
+\setlist[enumerate,1]{leftmargin=*,topsep=1pt,partopsep=1pt}
+\setlist[enumerate,2]{leftmargin=2pt,topsep=1pt,partopsep=1pt}
+
+% -- Code listing ---
+\usepackage{listings}
+\lstset{
+  aboveskip=3pt,
+  belowskip=3pt,
+  basicstyle=\small\ttfamily,
+  commentstyle=\upshape\ttfamily,
+  frame=single,
+  language=Haskell,
+}
+
+% Parse Trees
+\usepackage{tikz}
+
+% -- Multi Columns --
+\usepackage{multicol}
+
+% -- Global spacing settings ----
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
+\setlength{\abovedisplayshortskip}{3pt}
+\setlength{\belowdisplayshortskip}{3pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt plus 0.5ex}
+
+\begin{document}
+% Suppress page number for all pages
+\pagestyle{empty}
+
+\begin{multicols*}{3}
+\section*{Hoare logic}
+% \input{lecs/lec5}
+\section*{DFA}
+Any \(S_{c}\) has ONLY ONE transition to next \(S_{n}\)
+\section*{NFA}
+A \(S\) can have MANY transitions to next \(S_{n}\)
+\section*{Regex}
+\section*{Context-free Language (CFL)}
+\newcommand{\derive}[2]{\overset{#1}{\underset{#2}{\Rightarrow}}}
+\newcommand{\gor}{\;|\;}
+\begin{itemize}
+\item \textbf{def.
+  } \(L(G) = \{w \in T^{*} \;\|\; S \derive{*}{G} w\}\)
+\item \textbf{e.g.} \(L(G) = \{a^{n}b^{n} \;\|\; n \in \mathbb{N}, n \geq 1\}\)
+\end{itemize}
+Usually need to design the grammar (see below) for a given language
+\section*{Grammar}
+Design/find a grammar is to give the following:
+\begin{align*}
+  & G = (V,T,P,S)\left\{
+    \begin{array}{l}
+      V = V_{t} \cup V_{n} \\
+      T = \mathsf{terminals}\; (V_{t}) \\
+      P = \mathsf{productions} \\
+      S = \mathsf{start \; symbol}
+    \end{array}
+    \right.
+\end{align*}
+Usually need to meet the following 6 requirements:
+\begin{enumerate}
+\item \(terminals\): a finite set of symbols forming the strings of the defined language
+\item \(S(G) \overset{*}{\Rightarrow} w\): \(start\; symbol\) derives a \emph{w} by \(G\) in 0/more steps
+\item a \emph{word}/\emph{w} contains ONLY \emph{terminals}
+\item a \emph{sentential form} MUST contain 1 or more \emph{vars} (e.g. \(aSb\))
+\item \emph{leftmost derivation}: always replace leftmost var by 1 of \(P\)s
+\item \(A = p \in P\) that has a head of \(A\)
+\end{enumerate}
+\section*{Context-free Grammar (Type 2)}
+\(\forall p \in P: A \rightarrow w\) where
+\begin{itemize}
+\item \(A \in V_{n}\) and \(w \in V^{*}\) is an arbitrary string
+\item \(A\) (\textbf{left} of each \(p \in P\)) must be a \textbf{single non-terminal}
+\item right-side can be anything
+\item free of content, LHS can replace RHS
+\end{itemize}
+\section*{Regular Grammar (Type 3)}
+\begin{itemize}
+\item \emph{regular} means any \(p \in P\) is \emph{right-linear}/\emph{left-linear}
+\item right-linear: \(A \rightarrow aB\) or \(A \rightarrow a\) or \(A \rightarrow \epsilon\) \textbf{[course focus]}
+\item left-linear: \(A \rightarrow Ba\) or \(A \rightarrow a\) or \(A \rightarrow \epsilon\)
+\item If \(A \derive{*}{lm} w\) AND \(A \derive{*}{lm} w\), THEN \(A \overset{*}{\Rightarrow} w\)
+\item right-linear == left-linear
+\item terminate with terminals or \(\epsilon\)
+\end{itemize}
+\section*{Common Grammar Patterns}
+\begin{enumerate}
+\item equal number of \(a, b\): \(T \rightarrow aTb \gor \epsilon\)
+\end{enumerate}
+\section*{Parse Trees}
+% Minipage to show a tree in two-column
+Concatenate leaves (\(V_{t}/\epsilon\)) of a parse tree \textbf{anti-clockwise}:
+\begin{tikzpicture}[level distance=8mm,level/.style={sibling distance=10mm}]
+  \node {P}
+  child {node {0}}
+  child {
+    node {P}
+    child {node {1}}
+    child {
+      node {P}
+      child {node {\(\epsilon\)}}
+    }
+    child {node {1}}
+  }
+  child {node {0}};
+\end{tikzpicture}
+and get the \emph{yield} of the parse tree: \textbf{0110}
+\section*{Un-ambiguous}
+\emph{Ambiguous} grammar leads to \emph{un}-unique parse trees of a given string in language.  Techniques to remove ambiguity:
+\begin{enumerate}
+\item left/right associativity:
+  \begin{itemize}
+    \item[] change \(S \rightarrow S - S\) to
+    \item \(S \rightarrow S - int\) [left assoc] or
+    \item \(S \rightarrow int - S\) [right assoc]
+  \end{itemize}
+\item higher precedence: the \(V_{n}\) \textbf{closer} to \(V_{t}\) or use \verb|()|
+  \begin{itemize}
+    \item \(S \rightarrow S + T \gor T\) [lower]
+    \item \(T \rightarrow T * \mathsf{int} \gor \mathsf{int}\) [lower]
+    \end{itemize}
+  \item[] \textbf{lower} level grammar productions have \textbf{higher} priority
+  \item[] higher priority means the \textbf{break point} of a given string
+
+\item Controlling \(\epsilon\):
+  \begin{itemize}
+    \item[] change \(S \rightarrow  \epsilon \gor (S) \gor SS\) to
+    \item \(S \rightarrow \epsilon \gor T\)
+    \item \(T \rightarrow TU \gor U\) and \(U \rightarrow () \gor (T)\)
+    \item[] \(\epsilon\) can ONLY be derived from \(S\) and all other drvs go through T
+  \end{itemize}
+\end{enumerate}
+\section*{PDA}
+\begin{itemize}
+\item defines CFG and recognizes all and only the CFGs
+\item essentially an \(\epsilon\)-NFA with an additional stack
+\end{itemize}
+\section*{Turing Machine}
+
+\end{multicols*}
+\end{document}
