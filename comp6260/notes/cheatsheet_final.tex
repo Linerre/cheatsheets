@@ -1,4 +1,4 @@
-\documentclass[10pt,a4paper,fleqn,landscape]{article}
+\documentclass[10pt,a4paper,landscape]{article}
 
 % -- Layout ----
 \usepackage[top=0.25cm, bottom=0.25cm, left=0.25cm, right=0.25cm, landscape]{geometry}
@@ -19,16 +19,16 @@
 \usepackage[dvipsnames]{xcolor}
 
 % -- Math ------
-\usepackage{amsmath}
+\usepackage{mathtools}
 \usepackage{amssymb}
-
+\usepackage{turnstile}%better vdash
 % -- Lists -----
 \usepackage[inline]{enumitem}
 \setlist{noitemsep}% Remove vspace between items
 % Set vspace before and after  list environments as well as the left margin
-\setlist[itemize,1]{leftmargin=*,topsep=1pt,partopsep=1pt}
+\setlist[itemize,1]{leftmargin=*,labelindent=1pt,topsep=1pt,partopsep=1pt}
 \setlist[itemize,2]{leftmargin=2pt,topsep=1pt,partopsep=1pt}
-\setlist[enumerate,1]{leftmargin=*,topsep=1pt,partopsep=1pt}
+\setlist[enumerate,1]{leftmargin=*,labelindent=1pt,topsep=1pt,partopsep=1pt}
 \setlist[enumerate,2]{leftmargin=2pt,topsep=1pt,partopsep=1pt}
 
 % -- Code listing ---
@@ -44,6 +44,21 @@
 
 % Parse Trees
 \usepackage{tikz}
+\usetikzlibrary{ arrows, automata, bbox, positioning}
+\tikzset{
+->, % makes the edges directed
+>=stealth', % makes the arrow heads bold
+node distance=1cm, % specifies minimum distance between two nodes
+smallnode/.style={},
+every state/.style={thick}, % sets the properties for each ’state’ node
+initial text=start, % sets the text that appears on the start arrow
+}
+
+% Place a figure env right here via [H] option
+\usepackage{float}
+
+% Side by side figure
+\usepackage{subcaption}
 
 % -- Multi Columns --
 \usepackage{multicol}
@@ -64,7 +79,7 @@
 \section*{Hoare logic}
 % \input{lecs/lec5}
 \section*{DFA}
-Any \(S_{c}\) has ONLY ONE transition to next \(S_{n}\)
+Any \(S_{curr}\) has ONLY ONE transition to next \(S_{next}\)
 \section*{NFA}
 A \(S\) can have MANY transitions to next \(S_{n}\)
 \section*{Regex}
@@ -79,8 +94,8 @@ A \(S\) can have MANY transitions to next \(S_{n}\)
 Usually need to design the grammar (see below) for a given language
 \section*{Grammar}
 Design/find a grammar is to give the following:
-\begin{align*}
-  & G = (V,T,P,S)\left\{
+\[
+G = (V,T,P,S)\left\{
     \begin{array}{l}
       V = V_{t} \cup V_{n} \\
       T = \mathsf{terminals}\; (V_{t}) \\
@@ -88,7 +103,7 @@ Design/find a grammar is to give the following:
       S = \mathsf{start \; symbol}
     \end{array}
     \right.
-\end{align*}
+\]
 Usually need to meet the following 6 requirements:
 \begin{enumerate}
 \item \(terminals\): a finite set of symbols forming the strings of the defined language
@@ -111,7 +126,7 @@ Usually need to meet the following 6 requirements:
 \item \emph{regular} means any \(p \in P\) is \emph{right-linear}/\emph{left-linear}
 \item right-linear: \(A \rightarrow aB\) or \(A \rightarrow a\) or \(A \rightarrow \epsilon\) \textbf{[course focus]}
 \item left-linear: \(A \rightarrow Ba\) or \(A \rightarrow a\) or \(A \rightarrow \epsilon\)
-\item If \(A \derive{*}{lm} w\) AND \(A \derive{*}{lm} w\), THEN \(A \overset{*}{\Rightarrow} w\)
+\item If \(A \derive{*}{lm} w\) AND \(A \derive{*}{rm} w\), THEN \(A \overset{*}{\Rightarrow} w\)
 \item right-linear == left-linear
 \item terminate with terminals or \(\epsilon\)
 \end{itemize}
@@ -120,7 +135,6 @@ Usually need to meet the following 6 requirements:
 \item equal number of \(a, b\): \(T \rightarrow aTb \gor \epsilon\)
 \end{enumerate}
 \section*{Parse Trees}
-% Minipage to show a tree in two-column
 Concatenate leaves (\(V_{t}/\epsilon\)) of a parse tree \textbf{anti-clockwise}:
 \begin{tikzpicture}[level distance=8mm,level/.style={sibling distance=10mm}]
   \node {P}
@@ -155,19 +169,152 @@ and get the \emph{yield} of the parse tree: \textbf{0110}
   \item[] higher priority means the \textbf{break point} of a given string
 
 \item Controlling \(\epsilon\):
-  \begin{itemize}
-    \item[] change \(S \rightarrow  \epsilon \gor (S) \gor SS\) to
-    \item \(S \rightarrow \epsilon \gor T\)
-    \item \(T \rightarrow TU \gor U\) and \(U \rightarrow () \gor (T)\)
-    \item[] \(\epsilon\) can ONLY be derived from \(S\) and all other drvs go through T
-  \end{itemize}
+  \vspace{-\baselineskip}
+  \[
+    S \rightarrow \epsilon \gor (S) \gor SS \Rightarrow\left\{
+        \begin{array}{l}
+          S \rightarrow \epsilon \gor T\\
+          T \rightarrow TU \gor U\\
+          U \rightarrow () \gor U \rightarrow (T)
+        \end{array}
+      \right.
+  \]
+  \vspace{-\baselineskip}
+  % \begin{itemize}
+  %   \item[] change \(S \rightarrow  \epsilon \gor (S) \gor SS\) to
+  %   \item \(S \rightarrow \epsilon \gor T\)
+  %   \item \(T \rightarrow TU \gor U\) and \(U \rightarrow () \gor (T)\)
+  %   \item[] \(\epsilon\) can ONLY be derived from \(S\) and all other drvs go through T
+  % \end{itemize}
 \end{enumerate}
 \section*{PDA}
 \begin{itemize}
 \item defines CFG and recognizes all and only the CFGs
 \item essentially an \(\epsilon\)-NFA with an additional stack
 \end{itemize}
-\section*{Turing Machine}
+\[ P = (Q,\Sigma,\Gamma,\delta,q_{0},Z_{0},F) \]
+\begin{itemize}
+\item[Q] finite set of \emph{states}
+\item[\(\Sigma\)] finite set of \emph{input symbols}
+\item[\(\Gamma\)] finite set of allowed \emph{stack alphabet}
+\item[\(\delta\)] \emph{transition function} in the form: \(\delta(q,a,X)\)
+  \begin{itemize}[leftmargin=1em,labelindent=2em]
+  \item[$\delta$] is \emph{partial}: undefined for some input \(\notin \Sigma\)
+  \item[$q$] a state \(\in Q\)
+  \item[$a$] an input string of symbol(s) \(\in \Sigma\) or \(a = \epsilon\)
+  \item[$X$] a stack symbol \(\in \Gamma \)
+  \item[] Output a finite set of pairs \(p, \gamma\)
+  \end{itemize}
+\item[$q_{0}$] finite set of \emph{states}
+\item[$Z_{0}$] finite set of \emph{states}
+\item[$F$] finite set of \(accepting/final\; states \subseteq Q\)
+\end{itemize}
+\subsection*{PDA Trace and ID}
+\begin{enumerate}[leftmargin=2.5em,labelindent=2em]
+\item [same] \(\sigma(p,a,X) \rightarrow \{(q,X)\}\) (stack top unchanged)
+\item [push] \(\sigma(p,a,X) \rightarrow \{(q,aX)\}\)
+\item [pop]  \(\sigma(p,\epsilon,X) \rightarrow \{(q,\epsilon)\}\)
+\end{enumerate}
+\subsection*{Derive NPDA for CFG}
+Given the CFG, derive its PDA using the following major steps
+\begin{align*}
+  S &\rightarrow S + T \gor T\\
+  T &\rightarrow T * int \gor int
+\end{align*}
+\begin{enumerate}
+\item \textbf{initialize} \(\delta(q_{0},\epsilon,Z) \mapsto q_{1}/SZ\)
+\item \textbf{expand non-terminals}: input = \(\epsilon\) and expand stack top
+  \begin{itemize}
+  \item \(\delta(q_{1},\epsilon,S) \mapsto q_{1}/SZ\)
+  \item \(\delta(q_{0},\epsilon,Z) \mapsto q_{1}/SZ\)
+  \item \(\delta(q_{0},\epsilon,Z) \mapsto q_{1}/SZ\)
+  \item \ldots
+  \end{itemize}
+\item \textbf{match and pop terminals}
+\item \textbf{terminate}
+\end{enumerate}
+
+\subsection*{Trace}
+
+\section*{Turing Machine (TM)}
+\[
+M = (Q,\Sigma,\Gamma,\delta,q_{0},B,F)
+\]
+\begin{itemize}
+\item[$Q$] finite set of \emph{states} of finite control
+\item[$\Sigma$] finite set of \emph{input symbols}: \(\Sigma \subset \Gamma\)
+\item[$\Gamma$] complete set of \emph{tape symbols} and
+\item[$\delta$] \emph{transition function}:
+  \(
+\delta\overbracket[1pt]{(q,X)}^\text{2 args} \overset{*}{\mapsto} \underbracket{(p,Y,D)}_\text{3 outputs}
+  \)
+  \begin{enumerate}
+    \item \(q\) current state, \(q \in Q\)
+    \item \(X\) current tape symbol, \(X \in \Gamma\)
+    \item \(p\) next state, \(p \in Q\), from \(q\), through 0/more moves, to \(q\)
+    \item \(Y \in \Gamma\), symb in tape cell, replacing whatever was there
+    \item \(D\) \emph{direction}, \(L \leftarrow\), \(R \rightarrow\) or \(S\) (stay/halt)
+ \end{enumerate}
+\item[$q_{0}$] \emph{start state}: \(q_{0} \in Q\)
+\item[$B$] \emph{blank} symbol, also \(\Lambda\)
+\item[$F$] set of \emph{final} or \emph{accepting} states: \(F \subset Q\)
+\end{itemize}
+% Increment
+\begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
+  \node[state, initial, minimum size=1em] (q0) {$q_0$};
+  \node[state, minimum size=1em, below left=of q0] (q1) {$q_1$};
+  \node[state, accepting, minimum size=1em, below right=of q0] (h) {$H$};
+
+  \path[->] (q0)
+  edge[loop above]
+  node[yshift=-0.3cm,xshift=-0.4cm]{\footnotesize$\frac{0}{0,R}$}
+  node[yshift=-0.3cm,xshift=0.4cm]{\footnotesize$\frac{1}{1,R}$} (q0)
+
+  edge[above] node[yshift=-0.2cm,xshift=-0.3cm]{\footnotesize$\frac{\Lambda}{\Lambda,L}$} (q1)
+
+  (q1) edge[loop left] node[yshift=0.4cm,xshift=0.5cm]{\footnotesize$\frac{1}{0,L}$}
+  (q1) edge[above]
+  node[yshift=-0.6cm]{\footnotesize$\frac{\Lambda}{1,S}$ \tiny111}
+  node{\footnotesize$\frac{0}{1,S}$ \tiny101}(h);
+\end{tikzpicture}
+% Decrement
+\begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
+  \node[state, initial, minimum size=1em] (q0) {$q_0$};
+  \node[state, minimum size=1em, above right=of q0] (q1) {$q_1$};
+  \node[state, minimum size=1em, below right=of q0] (q2) {$q_2$};
+  \node[state, minimum size=1em, right=of q2] (q3) {$q_3$};
+  \node[state, accepting, minimum size=1em, right=of q1] (h) {$H$};
+
+  \path[->]
+  (q0)
+  edge node[above,sloped,yshift=-0.1cm,xshift=-0.1cm]{\footnotesize$\frac{0}{0,R}$}(q1)
+  edge node[above,sloped,yshift=-0.1cm,xshift=-0.1cm,]{\footnotesize$\frac{1}{1,R}$}(q2)
+
+  (q1)
+  edge[loop left] node{\footnotesize$\frac{0}{0,R}$}(q1)
+  edge[below] node{\footnotesize$\frac{\Lambda}{\Lambda,S}$}(h)
+  edge node[right,xshift=-0.1cm]{\footnotesize$\frac{1}{1,R}$}(q2)
+
+  (q2)
+  edge[loop left]
+  node[yshift=0.3cm,xshift=0.2cm]{\footnotesize$\frac{0}{0,R}$}
+  node[yshift=-0.2cm,xshift=0.2cm]{\footnotesize$\frac{1}{1,R}$}(q2)
+  edge[above] node{\footnotesize$\frac{\Lambda}{\Lambda,L}$}(q3)
+
+  (q3)
+  edge[loop right] node[yshift=0.4cm,xshift=-0.6cm]{\footnotesize$\frac{0}{1,L}$}(q3)
+  edge node[left,xshift=0.1cm]{\footnotesize$\frac{1}{0,S}$}(h);
+\end{tikzpicture}
+\(TM\) for inc binary num by 1 \hfill \(TM\) for dec binary num by 1
+\subsection*{Lang of TM}
+\(L(M)\) = set of all strings that halt \(M\) in its accepting state
+\begin{itemize}
+\item \textbf{total} TM halts for any given input (never stuck in loop)
+\item \textbf{partial} TM halts for some input (loop forever)
+\end{itemize}
+\subsection*{Recursively Enumerable (RE)}
+A lang is RE if \(L = L(M)\) for some TM \(M\)
+
 
 \end{multicols*}
 \end{document}
