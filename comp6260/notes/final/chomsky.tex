@@ -1,0 +1,12 @@
+{\footnotesize
+\begin{tabular}{lp{1cm}p{1.2cm}ll}
+  \hline
+  G & Langs & Automaton & Productions & Example \\
+  \hline
+  T-3  & Regular    & DFA/NFA        & \(A \rightarrow \text{a} \& \text{a}B\) & \(L = \{a^{n}\gor n\geq n\}\)\\
+  T-2  & CFL   & (N)PDA     & \(A \rightarrow \alpha\) & \(L = \{a^{n}b^{n}\gor n>0\}\)\\
+  \textcolor{dmm}{T-1}  & \textcolor{dmm}{Ctx-sst} & \textcolor{dmm}{NDTM} & \textcolor{dmm}{\(\alpha A\beta \rightarrow \alpha\gamma\beta\)} & \textcolor{dmm}{\(L = \{a^{n}b^{n}c^{n}\gor n>0\}\)}\\
+  T-0  & RE    & TM        & \(\gamma \rightarrow \alpha\) & \(L = \{w\gor w \text{ desc. } TM\}\)\\
+\hline
+\end{tabular}
+}

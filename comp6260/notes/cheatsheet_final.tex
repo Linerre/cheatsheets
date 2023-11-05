@@ -9,7 +9,7 @@
   compact                   % reduce vertical space before/after title
 ]{titlesec}
 % \titlespacing*
-\titleformat{\section}{\normalfont\normalsize\bfseries}{\thesection}{0em}{} % Remove space before and after section titles
+\titleformat{\section}{\normalfont\small\bfseries}{\thesection}{0em}{} % Remove space before and after section titles
 \titleformat{\subsection}{\normalfont\small\bfseries}{\thesubsection}{0em}{} % Remove space before and after subsection titles
 \titlespacing*{\section}{0pt}{0pt}{0pt} % Remove space before/after section titles
 \titlespacing*{\subsection}{0pt}{0pt}{0pt} % Remove space before/after subsec titles
@@ -28,7 +28,7 @@
 \setlist{noitemsep}% Remove vspace between items
 % Set vspace before and after  list environments as well as the left margin
 \setlist[itemize,1]{leftmargin=*,labelindent=1pt,topsep=1pt,partopsep=1pt}
-\setlist[itemize,2]{leftmargin=2pt,labelindent=1pt,topset=1pt,partopsep=1pt}
+\setlist[itemize,2]{leftmargin=2pt,labelindent=1pt,topsep=1pt,partopsep=1pt}
 \setlist[enumerate,1]{leftmargin=*,labelindent=1pt,topsep=1pt,partopsep=1pt}
 \setlist[enumerate,2]{leftmargin=1.2em,labelindent=1pt,topsep=1pt,partopsep=1pt}
 
@@ -93,369 +93,56 @@ initial text=start, % sets the text that appears on the start arrow
 \pagestyle{empty}
 
 \begin{multicols*}{3}
-\subsection*{Hoare logic}
+\section*{Hoare logic}
 % \input{lecs/lec5}
-\subsection*{Grammar, Language, Automata}
-{\footnotesize
-\begin{tabular}{lp{1cm}p{1.2cm}ll}
-  \hline
-  G & Langs & Automaton & Productions & Example \\
-  \hline
-  T-3  & Regular    & DFA/NFA        & \(A \rightarrow \text{a} \& \text{a}B\) & \(L = \{a^{n}\gor n\geq n\}\)\\
-  T-2  & CFL   & (N)PDA     & \(A \rightarrow \alpha\) & \(L = \{a^{n}b^{n}\gor n>0\}\)\\
-  \textcolor{dmm}{T-1}  & \textcolor{dmm}{Ctx-sst} & \textcolor{dmm}{NDTM} & \textcolor{dmm}{\(\alpha A\beta \rightarrow \alpha\gamma\beta\)} & \textcolor{dmm}{\(L = \{a^{n}b^{n}c^{n}\gor n>0\}\)}\\
-  T-0  & RE    & TM        & \(\gamma \rightarrow \alpha\) & \(L = \{w\gor w \text{ desc. } TM\}\)\\
-\hline
-\end{tabular}
-}
 
-\subsection*{DFA v.s. (\(\epsilon\)-)NFA in 5-tuple form}
-{\footnotesize
-\begin{tabular}{l|c|c|c}
-  \hline
- = & DFA & NFA & \(\epsilon\)-NFA\\
-  \hline
- \(Q\) & \multicolumn{3}{c}{finite set of \emph{states}}\\
-  \hline
- \(\Sigma\) & \multicolumn{3}{c}{finite set of \emph{input symbols}}\\
-  \hline
-  \(q_{0}\) & \multicolumn{3}{c}{a \emph{start state} \(\in Q\) } \\
-  \hline
-  \(\delta\) & \(\delta(q,a) = q \in Q\) & \(\delta(q,a) = \mathsf{S}_{q} \subset Q\) & \(\delta(q,(a\in\Sigma\gor\epsilon)) = \mathsf{S}_{q} \subset Q\)\\
-  \hline
- \(F\) & \multicolumn{3}{c}{a set of \emph{final} or \emph{accepting} states \(\subset Q\)}\\
-\hline
-\end{tabular}
-}
+\section*{Grammar, Language, Automata}
+% \input{chomsky}
 
-\subsection*{DFA: tuple, transition diagram, transition table}
-{\footnotesize\(L\) accepted by following DFA: \(x01y\)\hfill ({\(x,y\) are any strings of 0's/1's})}
-\vspace{-0.5em}
-{\footnotesize
-  \[
-A_{\text{DFA}} = (\{q_{0},q_{1},q_{2}\},\{0,1\},\delta,q_{0},\{q_{1}\})
-  \]
-}
-\begin{figure}[H]
-  \centering
-{\footnotesize
-  \subcaptionbox{DFA transition diagram}
-  [0.45\linewidth]{
-\begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
-  \node[state, initial, minimum size=1em] (q0) {$q_0$};
-  \node[state, minimum size=1em, below left=of q0] (q2) {$q_2$};
-  \node[state, accepting, minimum size=1em, below right=of q0] (q1) {$q_{1}$};
+\section*{DFA v.s. (\(\epsilon\)-)NFA in 5-tuple form}
+% \input{final/fatuple}
 
-  \path[->]
-  (q0) edge[loop above] node{1}(q0)
-       edge node[above,sloped]{0} (q2)
+\section*{DFA: tuple, transition diagram, transition table}
+% \input{final/dfa}
 
-  (q2) edge[loop left] node{0}(q2)
-       edge node[above]{1}(q1)
+\section*{Language of (=accepted by) DFA}
+\input{final/dfalang}
 
-  (q1) edge[loop above] node{0,1}(q1);
-\end{tikzpicture}}
-}
-{\footnotesize
-\subcaptionbox{DFA transition table}
-[0.45\linewidth]{
-\begin{tabular}{r||c|c}
-   & 0 & 1 \\
-  \hline
-  \(\rightarrow q_{0}\) & \(q_{2}\) & \(q_{0}\)\\
-  \(*q_{1}\) & \(q_{1}\) & \(q_{1}\)\\
-  \(q_{2}\) & \(q_{2}\) & \(q_{1}\)\\
-  \hline
-\end{tabular}}
-}
-\end{figure}
+\section*{NFA: tuple, transition diagram, transition table}
+% \input{final/nfa}
 
+\section*{Language of (=accepted by) NFA}
+\input{final/nfalang}
 
-\subsection*{Language of (=accepted by) DFA}
+\section*{NFA to DFA (subset construction)}
+% \input{final/nfa2dfa}
 
-\vspace{0.5em}
-\[\left.
-    \begin{array}{l}
-    A_{\text{DFA}} = (Q,\Sigma,\delta,q_{0},F)\\
-    L(A) = \{w \gor \hat{\delta}(q_{0},w) \in F\}
-    \end{array}
-    \right\} \text{regular language}
-\]
+\section*{\(\epsilon\)-closures of state(s)}
+% \input{final/eclose}
 
-\subsection*{NFA: tuple, transition diagram, transition table}
-{\footnotesize\(L\) accepted by following NFA: \(x01\)\hfill (any strings ending in 01)}
-\vspace{-0.5em}
-{\footnotesize
-  \[
-A_{\text{NFA}} = (\{q_{0},q_{1},q_{2}\},\{0,1\},\delta,q_{0},\{q_{2}\})
-  \]
-}
-\begin{figure}[H]
-  \centering
-{\footnotesize
-  \subcaptionbox{NFA transition diagram}
-  [0.45\linewidth]{
-\begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
-  \node[state, initial, minimum size=1em] (q0) {$q_{0}$};
-  \node[state, minimum size=1em, below left=of q0] (q1) {$q_{1}$};
-  \node[state, accepting, minimum size=1em, below right=of q0] (q2) {$q_{2}$};
+\section*{Remove \(\epsilon\)-Transitions (\(epsilon\)-NFA to DFA)}
+% \input{final/rmeclose}
 
-  \path[->]
-  (q0) edge[loop above] node{0,1}(q0)
-       edge node[above,sloped]{0} (q1)
-  (q1) edge node[above]{1}(q2)
-  (q2);
-\end{tikzpicture}}
-}
-{\footnotesize
-\subcaptionbox{NFA transition table}
-[0.45\linewidth]{
-\begin{tabular}{r||c|c}
-   & 0 & 1 \\
-  \hline
-  \(\rightarrow q_{0}\) & \(\{q_{0},q_{1}\}\) & \(\{q_{0}\}\)\\
-  \(q_{1}\) & \(\emptyset\) & \(\{q_{2}\}\)\\
-  \(*q_{2}\) & \(\emptyset\) & \(\emptyset\)\\
-  \hline
-\end{tabular}}
-}
-\end{figure}
+\section*{Minimisation of DFA}
 
+\section*{Regular Expressions}
 
-
-\subsection*{Language of (=accepted by) NFA}
-\vspace{0.5em}
-\[\left.
-    \begin{array}{l}
-    A_{\text{NFA}} = (Q,\Sigma,\delta,q_{0},F)\\
-    L(A) = \{w \gor \hat{\delta}(q_{0},w) \cap F \neq \emptyset\}
-    \end{array}
-    \right\} \text{regular language}
-\]
-
-
-\subsection*{NFA to DFA (subset construction)}
-At worst, NFA$_{n\text{-states}}$ converts to DFA$_{2^{n}\text{-states}}$\\
-\vspace{-0.5em}
-{\footnotesize
-\[
-  N_{\text{NFA}} = (Q_{N},\Sigma,\delta_{N},\mathbf{q_{0}},F_{N}) \Rightarrow (Q_{D},\Sigma,\delta_{D},{\mathbf{\{q_{0}\}}},F_{D}) = D_{\text{DFA}}
-\]
-}
-% subset construction steps
-{\footnotesize
-\begin{minipage}{0.5\linewidth}
-Extend NFA transition table (ref)
-  \begin{enumerate}[align=left]
-    \item\label{nfa:sub} Find \textbf{sets of states} that NFA's \(\{q_{0}\}\),\(\{q_{1}\}\)\ldots\(\{q_{n }\}\) can reach
-    \item If any \textbf{new state set} in step \ref{nfa:sub}, see what \textbf{state set} it can reach
-    \item Unreachable/dead states marked by \(\emptyset\)  (``thrown away'')
-    \item If any state set found above has any \(q_{i} \in F_{N}\), mark the set with *
-    \item (optional) mark state sets as \(S_{0\ldots i}\) and draw NFA transition diagram
-  \end{enumerate}
-\end{minipage}%
-\begin{minipage}{0.45\linewidth}
-  \centering
-\begin{tabular}{r||c|c}
-   & 0 & 1 \\
-  \hline
-  \(\emptyset\) & \(\emptyset\) & \(\emptyset\)\\
-  \(\rightarrow \{q_{0}\}\) & \(\{q_{0},q_{1}\}\) & \(\{q_{0}\}\)\\
-  \(\{q_{1}\}\) & \(\emptyset\) & \(\{q_{2}\}\)\\
-  \(*\{q_{2}\}\) & \(\emptyset\) & \(\emptyset\)\\
-  \(\{q_{0},q_{1}\}\) & \(\{q_{0},q_{1}\}\) & \(\{q_{0},q_{2}\}\)\\
-  \(*\{q_{0},q_{2}\}\) & \(\{q_{0},q_{1}\}\) & \(\{q_{0}\}\)\\
-  \(*\{q_{1},q_{2}\}\) & \(\emptyset\) & \(\{q_{0}\}\)\\
-  \(*\{q_{0},q_{1},q_{2}\}\) & \(\{q_{0},q_{1}\}\) & \(\{q_{0},q_{2}\}\)\\
-  \hline
-\end{tabular}
-\end{minipage}
-}
-
-\subsection*{\(\epsilon\)-closures of state(s)}
-{\footnotesize
-\begin{minipage}{0.5\linewidth}
-  \begin{enumerate}[align=left]
-    \item state \(q\) itself is in \textsc{eclose}(\(q\))
-    \item\label{nfa:epi1} following all \(epsilon\) transitions out of \(q\)
-    \item\label{nfa:epi2} each of \(q\)'s \(epsilon\)-reachable state \(p_{q\text{-}\epsilon}\) is in \textsc{eclose}(\(q\))
-    \item each of \(p_{q\text{-}\epsilon}\)'s  \(epsilon\)-reachable state \(r_{p\text{-}\epsilon}\) is in \textsc{eclose}(\(q\))
-    \item for state set \(S\), do above steps 1-4 for each in \(S\) and take the union
-  \end{enumerate}
-\end{minipage}%
-\begin{minipage}{0.45\linewidth}
-\begin{tikzpicture}[bezier bounding box,node distance=0.8cm]%reduce vertical space around graph
-  \node[state, initial, minimum size=0.8em] (q1) {$q_{1}$};
-  \node[state, minimum size=0.8em, above right=of q1] (q2) {$q_{2}$};
-  \node[state, minimum size=0.8em, right=of q2] (q4) {$q_{4}$};
-  \node[state, minimum size=0.8em, below=of q4] (q5) {$q_{5}$};
-  \node[state, accepting, minimum size=0.5em, below right=of q1] (q3) {$q_{3}$};
-
-  \path[->]
-  (q1) edge node[above,sloped]{\(\varepsilon\)}(q2)
-  (q1) edge node[below,sloped]{\(\varepsilon\)}(q3)
-  (q3) node[below,yshift=-0.3cm]{\textsc{eclose}(\(q_{1}\))=\(\{q_{1},q_{2},q_{3},q_{4},q_{5}\}\)}
-  (q2) edge node[above]{\(\varepsilon\)}(q4)
-  (q4) edge node[left]{\(\varepsilon\)}(q5)
-  (q5) edge node[above,sloped]{a}(q3);
-\end{tikzpicture}
-\end{minipage}
-}
-
-
-\subsection*{Remove \(\epsilon\)-Transitions (\(epsilon\)-NFA to DFA)}
-{\footnotesize
-\begin{minipage}{0.5\linewidth}
-  \begin{enumerate}[align=left]
-    \item \(\epsilon\)-close each states in \(Q_{E}\)
-    \item For any \(q_{i} \in Q_{E}\), if \textsc{eclose}(\(q\)) contains any \(q_{i} \in F_{E}\), then \(q\) be a \emph{final/accepting} state in result DFA
-    \item\label{nfa:erem} Check if any \(q_{i}\) in \textsc{eclose}(\(q\)) meet: \(\delta(q_{i},a) = s \rightarrow \delta(q,a) = s\) where \(s \in Q\)
-    \item (optional) \textbf{copy} orig \(\epsilon\)-NFA diagram, \textbf{erase} all \(\epsilon\)-transitions and show connections found in step \ref{nfa:erem} in result DFA
-    \item (optional) ignore all dead states \(\emptyset\) and transitions to them (avoid clutter)
-  \end{enumerate}
-\end{minipage}%
-\begin{minipage}{0.45\linewidth}
-\begin{tikzpicture}[bezier bounding box,node distance=0.5cm]%reduce vertical space around graph
-  \node[state, initial, minimum size=0.8em] (q0) {$q_{0}$};
-  \node[state, minimum size=0.8em, right=of q0] (q1) {$q_{1}$};
-  \node[state, minimum size=0.8em, right=of q1] (q2) {$q_{2}$};
-  \node[state, minimum size=0.8em, below=of q1] (q3) {$q_{3}$};
-  \node[state, accepting, minimum size=0.5em, right=of q3] (q4) {$q_{4}$};
-
-  \path[->]
-  (q0) edge node[above]{\(\varepsilon\)}(q1)
-  (q0) edge node[below,sloped]{d}(q3)
-  (q1) edge node[above]{\(\varepsilon\)}(q2)
-  (q1) edge node[left]{a}(q3)
-  (q2) edge[bend left] node[right]{c}(q4)
-  (q3) edge node[above]{\(\varepsilon\)}(q4)
-  (q4) edge[bend left] node[left]{b}(q2);
-\end{tikzpicture}
-\vspace{0.5em}\\
-\begin{tikzpicture}[bezier bounding box,node distance=0.5cm]%reduce vertical space around graph
-  \node[state, initial, minimum size=0.8em] (q0) {$q_{0}$};
-  \node[state, minimum size=0.8em, right=of q0] (q1) {$q_{1}$};
-  \node[state, accepting, minimum size=0.8em, below=of q1] (q3) {$q_{3}$};
-  \node[state, minimum size=0.8em, right=of q3] (q2) {$q_{2}$};
-  \node[state, accepting, minimum size=0.5em, right=of q1] (q4) {$q_{4}$};
-
-  \path[->]
-  (q0) edge node[below,sloped]{a,d}(q3)
-  (q0) edge[bend left] node[above]{c}(q4)
-  (q1) edge node[above]{c}(q4)
-  (q1) edge node[left]{a}(q3)
-  (q2) edge[bend left] node[left]{c}(q4)
-  (q3) edge node[above]{b}(q2)
-  (q4) edge[bend left] node[right]{b}(q2);
-\end{tikzpicture}
-\end{minipage}
-}
-
-
-\subsection*{Minimisation of DFA}
-
-\subsection*{Regex}
-
-\subsection*{Context-free Language (CFL)}
+\section*{Context-free Language (CFL)}
 \begin{itemize}
 \item \textbf{def.} \(L(G) = \{w \in T^{*} \;\|\; S \derive{*}{G} w\}\)
 \item \textbf{e.g.} \(L(G) = \{a^{n}b^{n} \;\|\; n \in \mathbb{N}, n \geq 1\}\)
 \end{itemize}
-Usually need to design the grammar (see below) for a given language
+Usually need to design grammar for given language
 
-\subsection*{Grammar}
-Design/find a grammar is to give the following:
-% \vspace{0em}
-\[
-G = (V,T,P,S)\left\{
-    \begin{array}{l}
-      V = V_{t} \cup V_{n} \\
-      T = \mathsf{terminals}\; (V_{t}) \\
-      P = \mathsf{productions} \\
-      S = \mathsf{start \; symbol}
-    \end{array}
-    \right.
-\]
-% \vspace{-1.2em}
-\begin{enumerate}
-\item \(terminals\): a finite set of symbols forming the strings of the defined language
-\item \(S(G) \overset{*}{\Rightarrow} w\): \(start\; symbol\) derives a \emph{w} by \(G\) in 0/more steps
-\item a \emph{word}/\emph{w} contains ONLY \emph{terminals}
-\item a \emph{sentential form} MUST contain 1 or more \emph{vars} (e.g. \(aSb\))
-\item \emph{leftmost derivation}: always replace leftmost var by 1 of \(P\)s
-\item \(A = p \in P\) that has a head of \(A\)
-\end{enumerate}
+\section*{Grammar Tuple}
+\input{final/grammar}
 
-\subsection*{Context-free Grammar (Type 2)}
-\(\forall p \in P: A \rightarrow w\) where
-\begin{itemize}
-\item \(A \in V_{n}\) and \(w \in V^{*}\) is an arbitrary string
-\item \(A\) (\textbf{left} of each \(p \in P\)) must be a \textbf{single non-terminal}
-\item right-side can be anything
-\item free of content, LHS can replace RHS
-\end{itemize}
+\section*{Parse Trees and (un)ambiguity}
+% \input{final/ambiguity}
 
-\subsection*{Regular Grammar (Type 3)}
-\begin{itemize}
-\item \emph{regular} means any \(p \in P\) is \emph{right-linear}/\emph{left-linear}
-\item right-linear: \(A \rightarrow aB\) or \(A \rightarrow a\) or \(A \rightarrow \epsilon\) \textbf{[course focus]}
-\item left-linear: \(A \rightarrow Ba\) or \(A \rightarrow a\) or \(A \rightarrow \epsilon\)
-\item If \(A \derive{*}{lm} w\) AND \(A \derive{*}{rm} w\), THEN \(A \overset{*}{\Rightarrow} w\)
-\item right-linear == left-linear
-\item terminate with terminals or \(\epsilon\)
-\end{itemize}
+\section*{Regular (Type-3) \& Context-free (Type 3)}
+\input{final/twogrammars}
 
-\subsection*{Common Grammar Patterns}
-\begin{enumerate}
-\item equal number of \(a, b\): \(T \rightarrow aTb \gor \epsilon\)
-\end{enumerate}
-
-\subsection*{Parse Trees}
-Concatenate leaves (\(V_{t}/\epsilon\)) of a parse tree \textbf{anti-clockwise}:
-\begin{tikzpicture}[level distance=8mm,level/.style={sibling distance=10mm}]
-  \node {P}
-  child {node {0}}
-  child {
-    node {P}
-    child {node {1}}
-    child {
-      node {P}
-      child {node {\(\epsilon\)}}
-    }
-    child {node {1}}
-  }
-  child {node {0}};
-\end{tikzpicture}
-and get the \emph{yield} of the parse tree: \textbf{0110}
-\section*{(Un)ambiguous}
-\emph{Ambiguous} grammar: \emph{un}-unique parse trees of a given string. Tricks to remove ambiguity:
-\begin{enumerate}
-\item left/right associativity:
-  \[
-    S \rightarrow S - S \implies\left\{
-      \begin{array}{l}
-        S \rightarrow S - \mathsf{int}\quad \text{\footnotesize{left assoc}}\\
-        S \rightarrow S - \mathsf{int}\quad \text{\footnotesize{right assoc}}
-      \end{array}
-       \right.
-  \]
-\item higher precedence: the \(V_{n}\) \textbf{closer} to \(V_{t}\) or use \verb|()|
-  \begin{itemize}
-    \item \(S \rightarrow S + T \gor T\)\hfill (\(P_{1} \), where + can't break \(T\))
-    \item \(T \rightarrow T * \mathsf{int} \gor \mathsf{int}\)\hfill (\(P_{2}\), positioned lower than \(P_{1}\))
-    \item[] \(P_{2}\) has \textbf{higher} priority: always expand \(T\) first
-    \end{itemize}
-\item Controlling \(\epsilon\) (only derived from \(S\)):
-  \[
-    S \rightarrow \epsilon \gor (S) \gor SS \implies\left\{
-        \begin{array}{l}
-          S \rightarrow \epsilon \gor T\\
-          T \rightarrow TU \gor U\\
-          U \rightarrow () \gor U \rightarrow (T)
-        \end{array}
-      \right.
-  \]
-\end{enumerate}
 \section*{Pushdown Automata (PDA)}
 \vspace{0.5em}
 \[ P = (Q,\Sigma,\Gamma,\delta,q_{0},Z_{0},F) \]
@@ -484,7 +171,7 @@ and get the \emph{yield} of the parse tree: \textbf{0110}
 \item[$Z_{0}$] finite set of \emph{states}
 \item[$F$] finite set of \(accepting/final\; states \subseteq Q\)
 \end{itemize}
-\subsection*{PDA Trace and ID}
+\section*{PDA Trace and ID}
 \begin{enumerate}[leftmargin=2.5em,labelindent=2em]
 \item [same] \(\sigma(p,a,X) \rightarrow \{(q,X)\}\) (stack top unchanged)
 \item [push] \(\sigma(p,a,X) \rightarrow \{(q,aX)\}\)
@@ -494,7 +181,7 @@ and get the \emph{yield} of the parse tree: \textbf{0110}
 \item defines CFG and recognizes all and only the CFGs
 \item essentially an \(\epsilon\)-NFA with an additional stack
 \end{itemize}
-\subsection*{Derive NPDA for CFG}
+\section*{Derive NPDA for CFG}
 Given the CFG, derive its PDA using the following major steps
 \begin{align*}
   S &\rightarrow S + T \gor T\\
@@ -512,8 +199,9 @@ Given the CFG, derive its PDA using the following major steps
 \item \textbf{match and pop terminals}
 \item \textbf{terminate}
 \end{enumerate}
-\subsection*{DPDA}
-\subsection*{Trace}
+
+\section*{DPDA}
+\section*{Trace}
 \section*{Turing Machine (TM)}
 \vspace{0.5em}
 \[
@@ -538,61 +226,16 @@ M = (Q,\Sigma,\Gamma,\delta,q_{0},B,F)
 \item[$B$] \emph{blank} symbol, also \(\Lambda\)
 \item[$F$] set of \emph{final} or \emph{accepting} states: \(F \subset Q\)
 \end{itemize}
-% Increment
-\begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
-  \node[state, initial, minimum size=1em] (q0) {$q_0$};
-  \node[state, minimum size=1em, below left=of q0] (q1) {$q_1$};
-  \node[state, accepting, minimum size=1em, below right=of q0] (h) {$H$};
-
-  \path[->] (q0)
-  edge[loop above]
-  node[yshift=-0.3cm,xshift=-0.4cm]{\footnotesize$\frac{0}{0,R}$}
-  node[yshift=-0.3cm,xshift=0.4cm]{\footnotesize$\frac{1}{1,R}$} (q0)
-
-  edge[above] node[yshift=-0.2cm,xshift=-0.3cm]{\footnotesize$\frac{\Lambda}{\Lambda,L}$} (q1)
-
-  (q1) edge[loop left] node[yshift=0.4cm,xshift=0.5cm]{\footnotesize$\frac{1}{0,L}$}
-  (q1) edge[above]
-  node[yshift=-0.6cm]{\footnotesize$\frac{\Lambda}{1,S}$ \tiny111}
-  node{\footnotesize$\frac{0}{1,S}$ \tiny101}(h);
-\end{tikzpicture}
-% Decrement
-\begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
-  \node[state, initial, minimum size=1em] (q0) {$q_0$};
-  \node[state, minimum size=1em, above right=of q0] (q1) {$q_1$};
-  \node[state, minimum size=1em, below right=of q0] (q2) {$q_2$};
-  \node[state, minimum size=1em, right=of q2] (q3) {$q_3$};
-  \node[state, accepting, minimum size=1em, right=of q1] (h) {$H$};
-
-  \path[->]
-  (q0)
-  edge node[above,sloped,yshift=-0.1cm,xshift=-0.1cm]{\footnotesize$\frac{0}{0,R}$}(q1)
-  edge node[above,sloped,yshift=-0.1cm,xshift=-0.1cm,]{\footnotesize$\frac{1}{1,R}$}(q2)
-
-  (q1)
-  edge[loop left] node{\footnotesize$\frac{0}{0,R}$}(q1)
-  edge[below] node{\footnotesize$\frac{\Lambda}{\Lambda,S}$}(h)
-  edge node[right,xshift=-0.1cm]{\footnotesize$\frac{1}{1,R}$}(q2)
-
-  (q2)
-  edge[loop left]
-  node[yshift=0.3cm,xshift=0.2cm]{\footnotesize$\frac{0}{0,R}$}
-  node[yshift=-0.2cm,xshift=0.2cm]{\footnotesize$\frac{1}{1,R}$}(q2)
-  edge[above] node{\footnotesize$\frac{\Lambda}{\Lambda,L}$}(q3)
-
-  (q3)
-  edge[loop right] node[yshift=0.4cm,xshift=-0.6cm]{\footnotesize$\frac{0}{1,L}$}(q3)
-  edge node[left,xshift=0.1cm]{\footnotesize$\frac{1}{0,S}$}(h);
-\end{tikzpicture}
-\(TM\) for inc binary num by 1 \hfill \(TM\) for dec binary num by 1\\
+% Two examples of TM
+% \input{final/tm}
 Note \textbf{table symbols} can be any characters such as \(a,b,c,\ldots,X,Y,Z,B,\Lambda\)
-\subsection*{Lang of TM}
+\section*{Lang of TM}
 \(L(M)\) = set of all strings that halt \(M\) in its accepting state
 \begin{itemize}
 \item \textbf{total} TM halts for any given input (never stuck in loop)
 \item \textbf{partial} TM halts for some input (loop forever)
 \end{itemize}
-\subsection*{Recursively Enumerable (RE)}
+\section*{Recursively Enumerable (RE)}
 A lang is RE if \(L = L(M)\) for some TM \(M\)
 
 

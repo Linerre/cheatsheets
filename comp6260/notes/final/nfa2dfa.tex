@@ -1,0 +1,36 @@
+At worst, NFA$_{n\text{-states}}$ converts to DFA$_{2^{n}\text{-states}}$\\
+\vspace{-0.5em}
+{\footnotesize
+\[
+  N_{\text{NFA}} = (Q_{N},\Sigma,\delta_{N},\mathbf{q_{0}},F_{N}) \Rightarrow (Q_{D},\Sigma,\delta_{D},{\mathbf{\{q_{0}\}}},F_{D}) = D_{\text{DFA}}
+\]
+}
+% subset construction steps
+{\footnotesize
+\begin{minipage}{0.5\linewidth}
+Extend NFA transition table (ref)
+  \begin{enumerate}[align=left]
+    \item\label{nfa:sub} Find \textbf{sets of states} that NFA's \(\{q_{0}\}\),\(\{q_{1}\}\)\ldots\(\{q_{n }\}\) can reach
+    \item If any \textbf{new state set} in step \ref{nfa:sub}, see what \textbf{state set} it can reach
+    \item Unreachable/dead states marked by \(\emptyset\)  (``thrown away'')
+    \item If any state set found above has any \(q_{i} \in F_{N}\), mark the set with *
+    \item (optional) mark state sets as \(S_{0\ldots i}\) and draw NFA transition diagram
+  \end{enumerate}
+\end{minipage}%
+\begin{minipage}{0.45\linewidth}
+  \centering
+\begin{tabular}{r||c|c}
+   & 0 & 1 \\
+  \hline
+  \(\emptyset\) & \(\emptyset\) & \(\emptyset\)\\
+  \(\rightarrow \{q_{0}\}\) & \(\{q_{0},q_{1}\}\) & \(\{q_{0}\}\)\\
+  \(\{q_{1}\}\) & \(\emptyset\) & \(\{q_{2}\}\)\\
+  \(*\{q_{2}\}\) & \(\emptyset\) & \(\emptyset\)\\
+  \(\{q_{0},q_{1}\}\) & \(\{q_{0},q_{1}\}\) & \(\{q_{0},q_{2}\}\)\\
+  \(*\{q_{0},q_{2}\}\) & \(\{q_{0},q_{1}\}\) & \(\{q_{0}\}\)\\
+  \(*\{q_{1},q_{2}\}\) & \(\emptyset\) & \(\{q_{0}\}\)\\
+  \(*\{q_{0},q_{1},q_{2}\}\) & \(\{q_{0},q_{1}\}\) & \(\{q_{0},q_{2}\}\)\\
+  \hline
+\end{tabular}
+\end{minipage}
+}

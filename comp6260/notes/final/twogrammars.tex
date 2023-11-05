@@ -1,0 +1,25 @@
+{\footnotesize
+\begin{minipage}[t]{0.5\linewidth}
+  \textbf{Context-free grammar}\\
+\(\forall p \in P: A \rightarrow w\) where
+\begin{itemize}
+\item \(A \in V_{n}\) and \(w \in V^{*}\) is an arbitrary string
+\item \(A\) (\textbf{left} of each \(p \in P\)) must be a \textbf{single non-terminal}
+\item right-side can be anything
+\item free of content, LHS can replace RHS
+\end{itemize}
+\end{minipage}
+\begin{minipage}[t]{0.5\linewidth}
+  \textbf{Context-free grammar}
+\begin{itemize}
+\item \emph{regular} means any \(p \in P\) is \emph{right}-linear or \emph{left}-linear
+  \begin{itemize}[leftmargin=3em]
+  \item[right] \(A \rightarrow aB \gor a \gor \epsilon\) \textbf{(focus)}
+  \item[left] \(A \rightarrow Ba\ \gor a \gor \epsilon\)
+  \end{itemize}
+\item right-linear == left-linear
+\item If \(A \derive{*}{lm} w\) AND \(A \derive{*}{rm} w\), THEN \(A \overset{*}{\Rightarrow} w\)
+\item terminate with terminals or \(\epsilon\)
+\end{itemize}
+\end{minipage}
+}
