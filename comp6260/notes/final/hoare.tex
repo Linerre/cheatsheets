@@ -7,8 +7,8 @@
 \item Usually want to find \textbf{weakest precondition} $Q_{wp}$ (more general and allow more input).
 \end{enumerate}
 \subsection*{1/6 Assignment Rule}
-\(\qquad\{?\}\ i := 2 * i \{i < 6\}\)\hfill\(\{x > 3\}\;x:=x+2\;\{x>5\}\)\\
 \begin{minipage}{0.45\linewidth}
+  {\centering \(\{?\}\ i := 2 * i \{i < 6\}\)}
 \begin{enumerate}
 \item \textbf{copy} Q over to P: \(\{i_{post} < 6\}\)
 \item \textbf{replace} all LHS vars with RHS in assignment(s): \(\{2 * i < 6\}\)
@@ -16,6 +16,7 @@
 \end{enumerate}
 \end{minipage}
 \begin{minipage}{0.45\linewidth}
+  {\centering \(\{x > 3\}\;x:=x+2\;\{x>5\}\)}
 \begin{enumerate}
 \item \textbf{copy} Q over to P: \(\{x_{post} > 5\}\)
 \item \textbf{replace} all LHS vars with RHS vars: \(\{x_{assign}+2 > 5\}\)
@@ -27,20 +28,23 @@
 \begin{displaymath}
   \frac{P_{strong} \rightarrow P_{weak} \quad \{P_{weak}\}\,S\,\{Q\} } {\{P_{strong}\}\,S\,\{Q\}}
 \end{displaymath}
-
+Sometimes $P_{strong}$ is given, need to find $P_{weak}$ (reverse)
 \subsection*{3/6 Post-condition Weakening}
 \begin{displaymath}
   \frac{Q_{strong}\rightarrow Q_{weak} \quad \{P\}\,S\,\{Q_{strong}\} } {\{P\}\,S\,\{Q_{weak}\}}
 \end{displaymath}
-
+Sometimes $Q_{weak}$ is given, need to find $Q_{strong}$ (reverse)
 \subsection*{4/6 Sequencing}
 \begin{displaymath}
   \frac{\{P\}\,S_{1}\,\{ Q_{mid}\}\ \quad \{Q_{mid}\}\,S_{2}\,\{R\}}{\{P\}\,S\,\{R\}}
 \end{displaymath}
+\subsection*{Finding the mid conditions}
 \begin{enumerate}
-\item $Q_{mid}$ \textbf{weak} enough such that $P$ to $Q_{mid}$ holds
-\item[] strengthen precond. $W_{sp} \rightarrow Q_{mid}$, if $W_{sp}$ then $Q_{mid}$
-\item $Q_{mid}$ \textbf{strong} enough such that $P$ to $Q$ holds
+\item\label{ho:1} $Q_{mid}$ \textbf{strong} enough such that $\{Q_{mid}\}\;S_{2}\;\{P\}$ holds
+\item \textbf{weaken} $Q_{mid}$ as much as possible such that \ref{ho:1} still holds
+\item\label{ho:2} $Q_{mid}$ \textbf{weak} enough such that $\{P\}\;S_{1}\;\{Q_{mid}\}$ holds
+\item\textbf{strengthen} $Q_{mid}$ as much as possible such that \ref{ho:2} still holds
+\item[] precond. streng. $W_{sp} \rightarrow Q_{mid}$, if $W_{sp}$ then $Q_{mid}$
 \item[] weaken post $Q_{mid} \rightarrow W_{wp}$, if $W$, then $Q_{mid}$
 \item Assignment rule backwards to find proper $Q_{mid}$
 \end{enumerate}
@@ -67,7 +71,7 @@
 
 \subsection*{5/6 Conditionals}
 \begin{displaymath}
-  \frac{\{P \land\; b\}\;S_{1}\{Q\} \quad \{P \land \;\neg b\}\;S_{2}\;\{Q\}}{\{P\}\;\texttt{if}\;b\;S_{1}\;\texttt{then}\;S_{2}\;\{Q\}}
+  \frac{\{P \land\; b\}\;S_{1}\{Q\} \quad \{P \land \;\neg b\}\;S_{2}\;\{Q\}}{\{P\}\;\texttt{if}\;b\;S_{1}\;\texttt{then}\;S_{2}|\texttt{(do nothing)}\;\{Q\}}
 \end{displaymath}
 % {
 %   % Reducing vertical spacing
@@ -78,15 +82,12 @@
 %
 % \[\textbf{Prove:}\quad \{P\}\;if\:b\:then\:S_{1}\:else\:S_{2}\;\{Q\}\]
 % }
-
-\subsection*{Complete conditionals}
-Conditionals with \texttt{else} branch are \emph{complete}.
-
-\texttt{if b then S} $\Longleftrightarrow$ \texttt{if b then S else (do nothing)}
-\begin{displaymath}
-  \frac{\{P \land\; b\}\;S\{Q\} \quad \{P \land \;\neg b\}\;\texttt{(do nothing)}\;\{Q\}}{\{P\}\;\texttt{if}\;b\;\texttt{then}\;S\;\{Q\}}
-\end{displaymath}
+Conditionals with \texttt{else} branch are \emph{complete}.\\
 \texttt{do nothing} can be \textbf{strengthened} to sth like \verb|x := x|
+% \texttt{if b then S} $\Longleftrightarrow$ \texttt{if b then S else (do nothing)}
+% \begin{displaymath}
+%   \frac{\{P \land\; b\}\;S\{Q\} \quad \{P \land \;\neg b\}\;\texttt{(do nothing)}\;\{Q\}}{\{P\}\;\texttt{if}\;b\;\texttt{then}\;S\;\{Q\}}
+% \end{displaymath}
 
 \subsection*{6/6 While Loop}
 \begin{displaymath}
@@ -95,6 +96,6 @@ Conditionals with \texttt{else} branch are \emph{complete}.
 \begin{enumerate}
 \item \textbf{invariant} often looks similar to last assignment
 \item \textbf{invariant} may be an equation plus restraints $<,>,\geq$ etc
-\item \textbf{variant} often looks simiar to loop condition $b$
+\item \textbf{variant} often looks similar to loop condition $b$
 \end{enumerate}
 }

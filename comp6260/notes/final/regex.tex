@@ -10,6 +10,7 @@
 {\footnotesize
 % R1R2
 \begin{minipage}{0.4\linewidth}
+\centering
 \begin{tikzpicture}[bezier bounding box,node distance=0.8cm]%reduce vertical space around graph
   \node[state, minimum size=0.5cm] (s0) {};
   \node[state, minimum size=0.5cm, right=of s0] (s1) {};
@@ -23,6 +24,7 @@ Regex of $R_{1}R_{2}$
 \end{minipage}
 % R*
 \begin{minipage}{0.55\linewidth}
+\centering
 \begin{tikzpicture}[bezier bounding box,node distance=1cm]%reduce vertical space around graph
   \node[state, minimum size=0.5cm] (s0) {};
   \node[state, minimum size=0.5cm, right=of s0] (s1) {};
@@ -38,8 +40,8 @@ Regex of $R_{1}R_{2}$
 \end{tikzpicture}\\
 Regex of $R^{*}$
 \end{minipage}
-% R1|R2
 \begin{minipage}{0.4\linewidth}
+\centering
 \begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
   \node[state, minimum size=0.5cm] (s0) {};
   \node[state, minimum size=0.5cm, right=1cm of s0] (s1) {};
@@ -65,7 +67,9 @@ Regex $\epsilon$, language $\{\epsilon\}$
 \end{tikzpicture}\\
 Regex $\emptyset$, language $\emptyset$
 \end{minipage}
+% R1|R2
 \begin{minipage}{0.5\linewidth}
+\centering
 \begin{tikzpicture}[bezier bounding box,node distance=0.8cm]%reduce vertical space around graph
   \node[state, minimum size=0.5cm] (s1) {};
   \node[state, minimum size=0.5cm, right=of s1] (s2) {};
