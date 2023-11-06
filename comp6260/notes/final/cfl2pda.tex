@@ -56,7 +56,10 @@ Given (if \(L(P)\), convert it to) CFG, derive its PDA
     &\Rightarrow (q_{1}, \mathsf{ * int}, *UZ)\\
     &\Rightarrow (q_{1}, \mathsf{int}, UZ)\\
     &\Rightarrow (q_{1}, \mathsf{int}, \mathsf{int}Z)\\
-    &\Rightarrow (q_{1}, \epsilon, Z) \Rightarrow (q_{1}, \epsilon, \epsilon) accpet\\
+    % &\Rightarrow (q_{1}, \epsilon, Z) \Rightarrow (q_{1}, \epsilon, \epsilon) \\
+    &\Rightarrow (q_{1}, \epsilon, Z) \\
+    &\Rightarrow (q_{1}, \epsilon, \epsilon)\\
+    &\Rightarrow accept
   \end{align*}
 \end{minipage}
 }
