@@ -1,23 +1,22 @@
-\begin{minipage}[t]{0.5\linewidth}
-  \textbf{Context-free grammar}\\
+\begin{minipage}[t]{0.45\linewidth}
+  \textbf{context-free grammar}\\
 \(\forall p \in P: A \rightarrow w\) where
 \begin{itemize}
-\item \(A \in V_{n}\) and \(w \in V^{*}\) is an arbitrary string
-\item \(A\) (\textbf{left} of each \(p \in P\)) must be a \textbf{single non-terminal}
-\item right-side can be anything
-\item free of content, LHS can replace RHS
+\item \(A \in V_{n}\) and \(w \in V^{*}\): arbitrary string
+\item \textbf{left} of each \(p \in P\) must 1 \textbf{single non-terminal}
+\item RHS can be anything
+\item free of ctx; LHS can replace RHS
 \end{itemize}
 \end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
-  \textbf{Context-free grammar}
+\begin{minipage}[t]{0.45\linewidth}
+  \textbf{regular grammar}
 \begin{itemize}
-\item \emph{regular} means any \(p \in P\) is \emph{right}-linear or \emph{left}-linear
+\item any \(p \in P\) \emph{right}-/\emph{left}-linear (L==R)
   \begin{itemize}[leftmargin=3em]
-  \item[right] \(A \rightarrow aB \gor a \gor \epsilon\) \textbf{(focus)}
+  \item[right] \(A \rightarrow aB \gor a \gor \epsilon\)
   \item[left] \(A \rightarrow Ba\ \gor a \gor \epsilon\)
   \end{itemize}
-\item right-linear == left-linear
-\item If \(A \derive{*}{lm} w\) AND \(A \derive{*}{rm} w\), THEN \(A \overset{*}{\Rightarrow} w\)
-\item terminate with terminals or \(\epsilon\)
+\item If \(A \derive{*}{lm} w \wedge A \derive{*}{rm} w\) THEN \(A \overset{*}{\Rightarrow} w\)
+\item terminate on terminals/\(\epsilon\)
 \end{itemize}
 \end{minipage}

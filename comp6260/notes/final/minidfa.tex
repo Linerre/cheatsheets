@@ -1,27 +1,7 @@
-\begin{enumerate}
-\item \textbf{remove} any state unreachable from start state
-\item \textbf{split} states into \textbf{final} group and \textbf{non-final} one
-\item\label{dfa:mini} \textbf{find} where each state goes on some input
-\item if 2 states with same input go to different groups, split out
-\item repeat the step \ref{dfa:mini} until no splitting for any group
-\end{enumerate}
-Each of following has format: input [[states after input]]
 {\footnotesize
-\begin{minipage}{0.5\linewidth}
-    \begin{enumerate}[leftmargin=*,labelindent=0pt]
-\item[] [[$S_{0},S_{1},S_{2},T_{1},T_{2}$],[$S_{3},S_{4}$]] (init)
-\item[0] [[$S_{0},S_{1},S_{2},T_{1},T_{2}$],[$S_{3},S_{4}$]]
-\item[1] [[$S_{0},S_{1},T_{1},T_{2}$],[$S_{2}$],[$S_{3},S_{4}$]]
-\item[0] [[$S_{0},T_{1},T_{2}$],[$S_{2}$],[$S_{3},S_{4}$]]
-\item[1] [[$S_{0},T_{1},T_{2}$],[$S_{1}$],[$S_{2}$],[$S_{3},S_{4}$]]
-\item[0] [[$T_{1},T_{2}$],[$S_{0}$],[$S_{1}$],[$S_{2}$],[$S_{3},S_{4}$]]
-\item[0] [[$T_{1},T_{2}$],[$S_{0}$],[$S_{1}$],[$S_{2}$],[$S_{3},S_{4}$]]
-\item[1] [[$T_{1},T_{2}$],[$S_{0}$],[$S_{1}$],[$S_{2}$],[$S_{3},S_{4}$]]
-\item[] $T_{1} \equiv T_{2}$, $S_{3} \equiv S_{4}$
-\end{enumerate}
-\end{minipage}
-\begin{minipage}{0.45\linewidth}
-  \begin{tikzpicture}[bezier bounding box,node distance=0.5cm]%reduce vertical space around graph
+\begin{minipage}{0.9\linewidth}
+  \centering
+\begin{tikzpicture}[bezier bounding box,node distance=0.5cm]%reduce vertical space around graph
   \node[state, initial, initial where=below,minimum size=0.5cm] (s0) {$S_{0}$};
   \node[state, minimum size=0.5cm, right=of s0] (s1) {$S_{1}$};
   \node[state, minimum size=0.5cm, right=of s1] (s2) {$S_{2}$};
@@ -52,8 +32,49 @@ Each of following has format: input [[states after input]]
   (r1) edge node[right]{1}(s2)
   (t1) edge[loop above] node{0,1}(t1);
 \end{tikzpicture}
-\vspace{1em}
-\begin{tikzpicture}[bezier bounding box,node distance=0.5cm]%reduce vertical space around graph
+\end{minipage}
+}
+\begin{enumerate}
+\item \textbf{remove} any state unreachable from start state
+\item \textbf{split} states into \textbf{final} group and \textbf{non-final} one
+\item\label{dfa:mini} \textbf{find} where each state goes on some input
+\item if 2 states with same input go to different groups, split out
+\item repeat the step \ref{dfa:mini} until no splitting for any group
+\end{enumerate}
+
+Each of following has format: input [[states after input]]\\
+\begin{minipage}{\linewidth}
+  % Reduced vertical spacing
+\setlength{\abovedisplayskip}{4pt}
+\setlength{\belowdisplayskip}{4pt}
+  \centering
+% \begin{enumerate}[leftmargin=*,labelindent=0pt]
+% \item[] [[$S_{0},S_{1},S_{2},T_{1},T_{2}$],[$S_{3},S_{4}$]] (init)
+% \item[0] [[$S_{0},S_{1},S_{2},T_{1},T_{2}$],[$S_{3},S_{4}$]]
+% \item[1] [[$S_{0},S_{1},T_{1},T_{2}$],[$S_{2}$],[$S_{3},S_{4}$]]
+% \item[0] [[$S_{0},T_{1},T_{2}$],[$S_{2}$],[$S_{3},S_{4}$]]
+% \item[1] [[$S_{0},T_{1},T_{2}$],[$S_{1}$],[$S_{2}$],[$S_{3},S_{4}$]]
+% \item[0] [[$T_{1},T_{2}$],[$S_{0}$],[$S_{1}$],[$S_{2}$],[$S_{3},S_{4}$]]
+% \item[0] [[$T_{1},T_{2}$],[$S_{0}$],[$S_{1}$],[$S_{2}$],[$S_{3},S_{4}$]]
+% \item[1] [[$T_{1},T_{2}$],[$S_{0}$],[$S_{1}$],[$S_{2}$],[$S_{3},S_{4}$]]
+% \item[] $T_{1} \equiv T_{2}$, $S_{3} \equiv S_{4}$
+% \end{enumerate}
+\begin{align*}
+& [[S_{0},S_{1},S_{2},T_{1},T_{2}],[S_{3},S_{4}]] && \leftarrow 0\quad \text{(init)}\\
+& [[S_{0},S_{1},S_{2},T_{1},T_{2}],[S_{3},S_{4}]] && \leftarrow 1\\
+& [[S_{0},S_{1},T_{1},T_{2}],[S_{2}],[S_{3},S_{4}]] && \leftarrow 0\\
+& [[S_{0},T_{1},T_{2}],[S_{2}],[S_{3},S_{4}]] &&  \leftarrow 1\\
+& [[S_{0},T_{1},T_{2}],[S_{1}],[S_{2}],[S_{3},S_{4}]] && \leftarrow 0\\
+& [[T_{1},T_{2}],[S_{0}],[S_{1}],[S_{2}],[S_{3},S_{4}]] && \leftarrow 0\\
+& [[T_{1},T_{2}],[S_{0}],[S_{1}],[S_{2}],[S_{3},S_{4}]] && \leftarrow 1
+% & [[T_{1},T_{2}],[S_{0}],[S_{1}],[S_{2}],[S_{3},S_{4}]] && \leftarrow 1
+\end{align*}
+Thus, \(T_{1} \equiv T_{2}, S_{3} \equiv S_{4}\). New DFA diagram:
+\end{minipage}
+
+\begin{minipage}{0.9\linewidth}
+  \centering
+\begin{tikzpicture}[bezier bounding box,node distance=1cm]%reduce vertical space around graph
   \node[state, initial, minimum size=0.5cm] (s0) {$S_{0}$};
   \node[state, minimum size=0.5cm, right=of s0] (s1) {$S_{1}$};
   \node[state, minimum size=0.5cm, right=of s1] (s2) {$S_{2}$};
@@ -73,4 +94,3 @@ Each of following has format: input [[states after input]]
   (t2) edge[loop below] node{0,1}(t2);
 \end{tikzpicture}
 \end{minipage}
-}

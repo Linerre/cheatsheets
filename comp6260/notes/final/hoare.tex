@@ -1,3 +1,4 @@
+{\footnotesize
 \begin{enumerate}
 \item \textbf{Weak} pre/post-conditions: more \textbf{general} (say \emph{less})
 \item \textbf{Weakest} possible: \textbf{\texttt{True}}
@@ -5,17 +6,16 @@
 \item \textbf{Strong} pre/post-conditions: more \textbf{specific} (say \emph{more})
 \item Usually want to find \textbf{weakest precondition} $Q_{wp}$ (more general and allow more input).
 \end{enumerate}
-
 \subsection*{1/6 Assignment Rule}
 \(\qquad\{?\}\ i := 2 * i \{i < 6\}\)\hfill\(\{x > 3\}\;x:=x+2\;\{x>5\}\)\\
-\begin{minipage}{0.5\linewidth}
+\begin{minipage}{0.45\linewidth}
 \begin{enumerate}
 \item \textbf{copy} Q over to P: \(\{i_{post} < 6\}\)
 \item \textbf{replace} all LHS vars with RHS in assignment(s): \(\{2 * i < 6\}\)
 \item See if any math/logic equivalence: \(\{i_{orig} < 3\}\)
 \end{enumerate}
 \end{minipage}
-\begin{minipage}{0.5\linewidth}
+\begin{minipage}{0.45\linewidth}
 \begin{enumerate}
 \item \textbf{copy} Q over to P: \(\{x_{post} > 5\}\)
 \item \textbf{replace} all LHS vars with RHS vars: \(\{x_{assign}+2 > 5\}\)
@@ -93,7 +93,8 @@ Conditionals with \texttt{else} branch are \emph{complete}.
   \frac{\{I \land\; b\}\;S\;\{I\}}{\{I\}\;\texttt{while}\;b\;\texttt{do}\;S\;\{I \land\l \neg b\}}
 \end{displaymath}
 \begin{enumerate}
-\item \textbf{invariant} often looks similar to final $S$
-\item \textbf{invariant} may be an equation plus restraints
+\item \textbf{invariant} often looks similar to last assignment
+\item \textbf{invariant} may be an equation plus restraints $<,>,\geq$ etc
 \item \textbf{variant} often looks simiar to loop condition $b$
 \end{enumerate}
+}

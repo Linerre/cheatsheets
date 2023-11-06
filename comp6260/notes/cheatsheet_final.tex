@@ -1,7 +1,7 @@
 \documentclass[10pt,a4paper,landscape]{article}
 
 % -- Layout ----
-\usepackage[top=0.25cm, bottom=0.25cm, left=0.25cm, right=0.25cm, landscape]{geometry}
+\usepackage[top=0.3cm, bottom=0.5cm, left=0.5cm, right=0.5cm, landscape]{geometry}
 
 % -- Titles ----
 \usepackage[
@@ -123,28 +123,34 @@ initial text=start, % sets the text that appears on the start arrow
 \section*{Remove \(\epsilon\)-Transitions (\(epsilon\)-NFA to DFA)}
 \input{final/rmeclose}
 
-\section*{Regular Expressions to $\epsilon$-NFA}
-\input{final/regex}
-
 \section*{Minimisation of DFA}
 \input{final/minidfa}
 
+\section*{Regular Expressions to $\epsilon$-NFA}
+\vspace{-1em}
+\input{final/regex}
+
 \section*{Grammar Tuple}
+\vspace{-0.3em}
 \input{final/grammar}
 
 \section*{Parse Trees and (un)ambiguity}
+\vspace{-0.3em}
 \input{final/ambiguity}
 
-\section*{Regular (Type-3) \& Context-free (Type 3)}
+\section*{Context-free (Type 2) \& Regular (Type-3)}
+\vspace{-0.6em}
 \input{final/twogrammars}
 
 \section*{Pushdown Automata (PDA)}
 \input{final/pda}
 
 \section*{Derive NPDA for CFG and Trace}
+\vspace{-0.6em}
 \input{final/cfl2pda}
 
 \section*{Turing Machine (TM)}
+\vspace{-0.5em}
 \input{final/tmdef}
 \input{final/tmeg}
 

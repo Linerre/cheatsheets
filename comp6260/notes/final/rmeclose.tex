@@ -4,12 +4,14 @@
   \begin{enumerate}[align=left]
     \item \(\epsilon\)-close each states in \(Q_{E}\)
     \item For any \(q_{i} \in Q_{E}\), if \textsc{eclose}(\(q\)) contains any \(q_{i} \in F_{E}\), then \(q\) be a \emph{final/accepting} state in result DFA
-    \item\label{nfa:erem} Check if any \(q_{i}\) in \textsc{eclose}(\(q\)) meet: \(\delta(q_{i},a) = s \rightarrow \delta(q,a) = s\) where \(s \in Q\)
-    \item (optional) \textbf{copy} orig \(\epsilon\)-NFA diagram, \textbf{erase} all \(\epsilon\)-transitions and show connections found in step \ref{nfa:erem} in result DFA
+    \item\label{nfa:erem} Check if any \(q_{i}\) in \textsc{eclose}(\(q\)) meet:
+    \item[]\(\delta(q_{i},a) = s \rightarrow \delta(q,a) = s\) where \(s \in Q\)
+    \item (optional) \textbf{copy} original \(\epsilon\)-NFA diagram
+    \item[] \textbf{erase} all \(\epsilon\)-transitions and show connections found in step \ref{nfa:erem} in result DFA
     \item (optional) ignore all dead states \(\emptyset\) and transitions to them (avoid clutter)
   \end{enumerate}
 \end{minipage}%
-\begin{minipage}{0.5\linewidth}
+\begin{minipage}{0.45\linewidth}
 \centering
 \begin{tikzpicture}[bezier bounding box,node distance=0.5cm]%reduce vertical space around graph
   \node[state, initial, minimum size=0.5em] (q0) {$q_{0}$};
@@ -29,11 +31,11 @@
 \end{tikzpicture}
 \vspace{1em}\\
 \begin{tikzpicture}[bezier bounding box,node distance=0.5cm]%reduce vertical space around graph
-  \node[state, initial, minimum size=0.8em] (q0) {$q_{0}$};
-  \node[state, minimum size=0.8em, right=of q0] (q1) {$q_{1}$};
-  \node[state, accepting, minimum size=0.8em, below=of q1] (q3) {$q_{3}$};
-  \node[state, minimum size=0.8em, right=of q3] (q2) {$q_{2}$};
-  \node[state, accepting, minimum size=0.5em, right=of q1] (q4) {$q_{4}$};
+  \node[state, initial, minimum size=0.5cm] (q0) {$q_{0}$};
+  \node[state, minimum size=0.5cm, right=of q0] (q1) {$q_{1}$};
+  \node[state, accepting, minimum size=0.5cm, below=of q1] (q3) {$q_{3}$};
+  \node[state, minimum size=0.5cm, right=of q3] (q2) {$q_{2}$};
+  \node[state, accepting, minimum size=0.5cm, right=of q1] (q4) {$q_{4}$};
 
   \path[->]
   (q0) edge node[below,sloped]{a,d}(q3)
