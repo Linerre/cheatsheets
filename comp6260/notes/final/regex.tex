@@ -1,0 +1,154 @@
+\begin{enumerate}
+\item $LM$ or $L.M$ = $\{wx\}$ for any $w \in L \wedge x \in M$ (concat)
+\item $a^{*}$ 0 or more of a (Kleene star)
+\item $a^{+}$ 1 or more of a
+\item $a\gor b$ either a or b ($0+1$, union)
+\item $(01)1$ (first 0 and 1 are grouped)
+\item $\epsilon$ empty string
+\end{enumerate}
+{\footnotesize
+% R1R2
+\begin{minipage}{0.4\linewidth}
+\begin{tikzpicture}[bezier bounding box,node distance=0.8cm]%reduce vertical space around graph
+  \node[state, minimum size=0.5cm] (s0) {};
+  \node[state, minimum size=0.5cm, right=of s0] (s1) {};
+  \node[state, minimum size=0.5cm, right=of s1] (s2) {};
+
+  \path[->]
+  (s0) edge node[above]{$R_{1}$}(s1)
+  (s1) edge node[above]{$R_{2}$}(s2);
+\end{tikzpicture}\\
+Regex of $R_{1}R_{2}$
+\end{minipage}
+% R*
+\begin{minipage}{0.6\linewidth}
+\begin{tikzpicture}[bezier bounding box,node distance=1cm]%reduce vertical space around graph
+  \node[state, minimum size=0.5cm] (s0) {};
+  \node[state, minimum size=0.5cm, right=of s0] (s1) {};
+  \node[state, minimum size=0.5cm, right=of s1] (s2) {};
+  \node[state, minimum size=0.5cm, right=of s2] (s3) {};
+
+  \path[->]
+  (s0) edge node[above]{$\epsilon$}(s1)
+  (s0) edge[bend right] node[below]{$\epsilon$}(s3)
+  (s1) edge node[below]{$R$}(s2)
+  (s2) edge node[above]{$\epsilon$}(s3)
+  (s2) edge[bend right] node[above]{$\epsilon$}(s1);
+\end{tikzpicture}\\
+Regex of $R^{*}$
+\end{minipage}
+% R1|R2
+\begin{minipage}{0.4\linewidth}
+\begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
+  \node[state, minimum size=0.5cm] (s0) {};
+  \node[state, minimum size=0.5cm, right=1cm of s0] (s1) {};
+
+  \path[->] (s0) edge node[above]{$a$}(s1);
+\end{tikzpicture}\\
+Regex a, language \{a\}
+
+\begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
+  \node[state, minimum size=0.5cm] (s0) {};
+  \node[state, minimum size=0.5cm, right=1cm of s0] (s1) {};
+
+  \path[->]
+  (s0) edge node[above]{$a$}(s1);
+\end{tikzpicture}\\
+Regex $\epsilon$, language $\{\epsilon\}$
+
+\begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
+  \node[state, minimum size=0.5cm] (s0) {};
+  \node[state, minimum size=0.5cm, right=1cm of s0] (s1) {};
+
+  \path[->] (s0) edge node[above]{$a$}(s1);
+\end{tikzpicture}\\
+Regex $\emptyset$, language $\emptyset$
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{tikzpicture}[bezier bounding box,node distance=0.8cm]%reduce vertical space around graph
+  \node[state, minimum size=0.5cm] (s1) {};
+  \node[state, minimum size=0.5cm, right=of s1] (s2) {};
+  \node[state, minimum size=0.5cm, below=of s1] (s3) {};
+  \node[state, minimum size=0.5cm, right=of s3] (s4) {};
+
+  % Calculate the midpoint between S1 and S3
+  \coordinate (mid13) at ($(s1)!0.5!(s3)$);
+  \node[state, minimum size=0.5cm, left=0.5cm of mid13] (s0) {};
+
+  % Calculate the midpoint between S2 and S4
+  \coordinate (mid24) at ($(s2)!0.5!(s4)$);
+  \node[state, minimum size=0.5cm, right=0.5cm of mid24] (s5) {};
+
+  \path[->]
+  (s0) edge node[above,sloped]{$\epsilon$}(s1)
+  (s0) edge node[below,sloped]{$\epsilon$}(s3)
+  (s1) edge node[above]{$R_{1}$}(s2)
+  (s2) edge node[above,sloped]{$\epsilon$}(s5)
+  (s3) edge node[above]{$R_{2}$}(s4)
+  (s4) edge node[above,sloped]{$\epsilon$}(s5);
+\end{tikzpicture}\\
+Regex of $R_{1}|R_{2}$
+\end{minipage}
+}
+\begin{minipage}{\linewidth}
+  \centering
+\begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
+  % Outer circle 0|1 ---------------------------------
+  \node[state, minimum size=0.5cm] (s2) {};
+  \node[state, minimum size=0.5cm, right=6cm of s2] (s3) {};
+  \node[state, minimum size=0.5cm, below=of s2] (s5) {};
+  \node[state, minimum size=0.5cm, right=6cm of s5] (s6) {};
+
+  % Calculate the midpoint between S2 and S5
+  \coordinate (mid25) at ($(s2)!0.5!(s5)$);
+  \node[state, minimum size=0.5cm, left=0.6cm of mid25] (s1) {};
+
+  % Calculate the midpoint between S3 and S6
+  \coordinate (mid36) at ($(s3)!0.5!(s6)$);
+  \node[state, minimum size=0.5cm, right=0.6cm of mid36] (s4) {};
+
+  % Inner circle (0|1)* ------------------------------
+  \node[state, minimum size=0.5cm, right=3cm of mid25] (s8) {};
+  \node[state, minimum size=0.5cm, left=1.2cm of mid36] (s9) {};
+  \node[state, minimum size=0.5cm, below=of s9] (s11) {};
+  \node[state, minimum size=0.5cm, below=of s8] (s12) {};
+
+  % 7/10 special
+  \node[state, minimum size=0.5cm, right=1.8cm of s5] (s7) {};
+  \node[state, minimum size=0.5cm, left=0.5cm of s6]  (s10) {};
+
+  % 13 special
+  \node[state, minimum size=0.5cm, right=0.6cm of s5] (s13) {};
+
+  % Calculate the midpoint between S8 and S12
+  % \coordinate (mid812) at ($(s8)!0.5!(s12)$);
+  % \node[state, minimum size=0.5cm, right=1.5cm of mid25] (s7) {};
+
+  % Calculate the midpoint between S9 and S11
+  % \coordinate (mid911) at ($(s9)!0.5!(s11)$);
+  % \node[state, minimum size=0.5cm, right=1cm of mid36] (s10) {};
+
+
+  \path[->]
+  (s1) edge node[above,sloped]{$\epsilon$}(s2)
+  (s1) edge node[below,sloped]{$\epsilon$}(s5)
+  (s2) edge node[above]{0}(s3)
+  (s3) edge node[above,sloped]{$\epsilon$}(s4)
+  (s6) edge node[above,sloped]{$\epsilon$}(s4)
+
+  (s7) edge node[above,sloped]{$\epsilon$}(s8)
+  (s7) edge node[above,sloped]{$\epsilon$}(s12)
+  (s8) edge node[above]{0}(s9)
+  (s9) edge node[above,sloped]{$\epsilon$}(s10)
+  (s11) edge node[above,sloped]{$\epsilon$}(s10)
+  (s10) edge node[above]{$\epsilon$}(s6)
+  (s10) edge node[above]{$\epsilon$}(s7)
+
+  (s5) edge node[above]{1}(s13)
+  (s13) edge node[above]{$\epsilon$}(s7)
+  (s13) edge[out=-60, in=-120] node[above]{$\epsilon$}(s6)
+
+  (s12) edge node[above]{1}(s11) ;
+\end{tikzpicture}\\
+Regex $(0|1(0|1)^{*})$
+\end{minipage}

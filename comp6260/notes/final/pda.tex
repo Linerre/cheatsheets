@@ -1,0 +1,38 @@
+{\footnotesize
+\begin{minipage}[]{0.5\linewidth}
+  \[\delta\overbracket[1pt]{(q,a,X)}^\text{3 args} \overset{*}{\mapsto} \overbracket{(p,\gamma)}^\text{2 outputs} \]
+  $\delta$ is partial: undefined for some input \(\notin \Sigma\)
+\begin{enumerate}
+ \item $q$ a state \(\in Q\)
+ \item $a$ an input string of symbol(s) \(\in \Sigma\) or \(a = \epsilon\)
+ \item $X$ a stack symbol \(\in \Gamma \)
+ \item $p$ new state \(p \in Q\)
+ \item $\gamma$ string of stack symbols replacing $X$
+   \begin{enumerate}
+     \item $\gamma = \epsilon$, stack popped
+     \item $\gamma = X$, stack unchanged
+     \item $\gamma = YZ$, $X$ replaced by $Z$ and $Y$ is pushed
+  \end{enumerate}
+\end{enumerate}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+  \centering
+  \begin{tabular}{r|p{3.8cm}}
+    & $P = (Q,\Sigma,\Gamma,\delta,q_{0},Z_{0},F)$  \\
+    \hline
+    $Q$ & set of \emph{states}\\
+    $\Sigma$ & set of \emph{input symbols}\\
+    $\Gamma$ & set of allowed \emph{stack alphabet}\\
+    $\delta$ & \emph{transition function}\\
+    $q_{0}$  &  set of \emph{states}\\
+    $Z_{0}$  & set of \emph{states}\\
+    $F$      & set of \(accepting/final\; states\)\\
+    \hline
+    \multicolumn{2}{l}{all above sets are \textbf{finite}: \(F \subseteq Q\) }\\
+    \multicolumn{2}{l}{define/recog. all and only CFG}\\
+    \hline
+  \end{tabular}
+\vskip 1em
+PDA is essentially an \(\epsilon\)-NFA with an additional stack
+\end{minipage}
+}

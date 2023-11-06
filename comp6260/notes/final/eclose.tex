@@ -1,14 +1,17 @@
 {\footnotesize
-\begin{minipage}{0.5\linewidth}
-  \begin{enumerate}[align=left]
+% enumerate env better to use default c
+% tikz env better to use t or b
+\begin{minipage}{0.4\linewidth}
+  \begin{enumerate}
     \item state \(q\) itself is in \textsc{eclose}(\(q\))
     \item\label{nfa:epi1} following all \(epsilon\) transitions out of \(q\)
-    \item\label{nfa:epi2} each of \(q\)'s \(epsilon\)-reachable state \(p_{q\text{-}\epsilon}\) is in \textsc{eclose}(\(q\))
-    \item each of \(p_{q\text{-}\epsilon}\)'s  \(epsilon\)-reachable state \(r_{p\text{-}\epsilon}\) is in \textsc{eclose}(\(q\))
+    \item\label{nfa:epi2} each of \(q\)'s \(epsilon\) reachable state \(p_{q\text{-}\epsilon}\) is in \textsc{eclose}(\(q\))
+    \item each of \(p_{q\text{-}\epsilon}\)'s  \(epsilon\) reachable state \(r_{p\text{-}\epsilon}\) is in \textsc{eclose}(\(q\))
     \item for state set \(S\), do above steps 1-4 for each in \(S\) and take the union
   \end{enumerate}
 \end{minipage}%
-\begin{minipage}{0.45\linewidth}
+\begin{minipage}{0.55\linewidth}
+  \centering
 \begin{tikzpicture}[bezier bounding box,node distance=0.8cm]%reduce vertical space around graph
   \node[state, initial, minimum size=0.8em] (q1) {$q_{1}$};
   \node[state, minimum size=0.8em, above right=of q1] (q2) {$q_{2}$};
@@ -19,10 +22,10 @@
   \path[->]
   (q1) edge node[above,sloped]{\(\varepsilon\)}(q2)
   (q1) edge node[below,sloped]{\(\varepsilon\)}(q3)
-  (q3) node[below,yshift=-0.3cm]{\textsc{eclose}(\(q_{1}\))=\(\{q_{1},q_{2},q_{3},q_{4},q_{5}\}\)}
   (q2) edge node[above]{\(\varepsilon\)}(q4)
   (q4) edge node[left]{\(\varepsilon\)}(q5)
   (q5) edge node[above,sloped]{a}(q3);
-\end{tikzpicture}
+\end{tikzpicture}\\
+\textsc{eclose}(\(q_{1}\))=\(\{q_{1},q_{2},q_{3},q_{4},q_{5}\}\)
 \end{minipage}
 }

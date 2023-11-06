@@ -1,5 +1,7 @@
 {\footnotesize
 % Increment
+\begin{minipage}[b]{0.45\linewidth}
+\centering
 \begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
   \node[state, initial, minimum size=1em] (q0) {$q_0$};
   \node[state, minimum size=1em, below left=of q0] (q1) {$q_1$};
@@ -16,7 +18,11 @@
   (q1) edge[above]
   node[yshift=-0.6cm]{$\frac{\Lambda}{1,S}$ \tiny111}
   node{$\frac{0}{1,S}$ \tiny101}(h);
-\end{tikzpicture}
+\end{tikzpicture}\\
+\(TM\) for \textbf{inc} bin num by 1
+\end{minipage}
+\begin{minipage}[b]{0.45\linewidth}
+  \centering
 % Decrement
 \begin{tikzpicture}[bezier bounding box]%reduce vertical space around graph
   \node[state, initial, minimum size=1em] (q0) {$q_0$};
@@ -45,5 +51,6 @@
   edge[loop right] node[yshift=0.4cm,xshift=-0.6cm]{$\frac{0}{1,L}$}(q3)
   edge node[left,xshift=0.1cm]{$\frac{1}{0,S}$}(h);
 \end{tikzpicture}\\
-\(TM\) for inc bin num by 1 \hfill \(TM\) for dec bin num by 1\\
+\(TM\) for \textbf{dec} bin num by 1
+\end{minipage}
 }

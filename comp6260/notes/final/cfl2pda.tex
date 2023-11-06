@@ -1,0 +1,62 @@
+% Steps 1-2
+{\footnotesize
+\begin{minipage}{\linewidth}
+\begin{enumerate}
+\item \textbf{initialize} See empty stack \(Z\) and push \(S\)
+\item[] \(\delta(q_{0},\epsilon,Z) \mapsto q_{1}/\mathbf{S}Z\)
+\item \textbf{expand non-terminals}: input = \(\epsilon\)
+\end{enumerate}
+\end{minipage}
+\begin{minipage}[t]{0.45\linewidth}
+  \setlength{\abovedisplayskip}{1pt}
+  \setlength{\belowdisplayskip}{1pt}
+  \begin{align*}
+   \delta(q_{1},\epsilon,\mathbf{S})& \mapsto q_{1}/S+T\\
+   \delta(q_{1},\epsilon,\mathbf{S})& \mapsto q_{1}/T\\
+   \delta(q_{1},\epsilon,\mathbf{T})& \mapsto q_{1}/T * U\\
+   \delta(q_{1},\epsilon,\mathbf{T})& \mapsto q_{1}/U\\
+   \delta(q_{1},\epsilon,\mathbf{U})& \mapsto q_{1}/(S)\\
+   \delta(q_{1},\epsilon,\mathbf{U})& \mapsto q_{1}/\mathsf{int}
+  \end{align*}
+\end{minipage}
+% Given CFG
+\begin{minipage}[t]{0.4\linewidth}
+\begin{align*}
+  S &\rightarrow S + T \gor T\\
+  T &\rightarrow T * U \gor U\\
+  U &\rightarrow (S) \gor \mathsf{int}
+\end{align*}
+Given (if \(L(P)\), convert it to) CFG, derive its PDA
+\end{minipage}
+% Steps 3-4
+\begin{minipage}[t]{0.4\linewidth}
+\begin{enumerate}[resume,start=3]
+\item \textbf{match \& pop \(V_{t}\)}
+\item[] input \(\in V_{t}\)
+  \begin{align*}
+  \delta&(q_{1},\mathbf{+},\mathbf{+})& \mapsto &\quad q_{1}/\epsilon\\
+  \delta&(q_{1},\mathbf{*},\mathbf{*})& \mapsto &\quad q_{1}/\epsilon\\
+  \delta&(q_{1},\mathsf{int},\mathsf{int})& \mapsto &\quad q_{1}/\epsilon\\
+  \delta&(q_{1},\mathbf{(},\mathbf{(})& \mapsto &\quad q_{1}/\epsilon\\
+  \delta&(q_{1},\mathbf{)},\mathbf{)})& \mapsto &\quad q_{1}/\epsilon
+  \end{align*}
+\item \textbf{terminate} $\delta(q_{1},\epsilon,Z) \mapsto q_{2}/\epsilon$
+\end{enumerate}
+\end{minipage}
+% Exampel trace
+\begin{minipage}[t]{0.55\linewidth}
+\setlength{\abovedisplayskip}{-1em}
+\setlength{\belowdisplayskip}{0pt}
+  \begin{align*}
+    & (q_{1},\mathsf{int * int}, \mathbf{Z}) \Rightarrow (q_{1}, \mathsf{int * int}, SZ)\\
+    &\Rightarrow (q_{1}, \mathsf{int * int}, TZ)\\
+    &\Rightarrow (q_{1}, \mathsf{int * int}, T*UZ)\\
+    &\Rightarrow (q_{1}, \mathsf{int * int}, U*UZ)\\
+    &\Rightarrow (q_{1}, \mathsf{int * int}, \mathsf{int}*UZ)\\
+    &\Rightarrow (q_{1}, \mathsf{ * int}, *UZ)\\
+    &\Rightarrow (q_{1}, \mathsf{int}, UZ)\\
+    &\Rightarrow (q_{1}, \mathsf{int}, \mathsf{int}Z)\\
+    &\Rightarrow (q_{1}, \epsilon, Z) \Rightarrow (q_{1}, \epsilon, \epsilon) accpet\\
+  \end{align*}
+\end{minipage}
+}

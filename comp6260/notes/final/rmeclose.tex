@@ -1,5 +1,6 @@
 {\footnotesize
-\begin{minipage}{0.5\linewidth}
+% better to make left enumerate higher than right graph
+\begin{minipage}{0.45\linewidth}
   \begin{enumerate}[align=left]
     \item \(\epsilon\)-close each states in \(Q_{E}\)
     \item For any \(q_{i} \in Q_{E}\), if \textsc{eclose}(\(q\)) contains any \(q_{i} \in F_{E}\), then \(q\) be a \emph{final/accepting} state in result DFA
@@ -8,12 +9,13 @@
     \item (optional) ignore all dead states \(\emptyset\) and transitions to them (avoid clutter)
   \end{enumerate}
 \end{minipage}%
-\begin{minipage}{0.45\linewidth}
+\begin{minipage}{0.5\linewidth}
+\centering
 \begin{tikzpicture}[bezier bounding box,node distance=0.5cm]%reduce vertical space around graph
-  \node[state, initial, minimum size=0.8em] (q0) {$q_{0}$};
-  \node[state, minimum size=0.8em, right=of q0] (q1) {$q_{1}$};
-  \node[state, minimum size=0.8em, right=of q1] (q2) {$q_{2}$};
-  \node[state, minimum size=0.8em, below=of q1] (q3) {$q_{3}$};
+  \node[state, initial, minimum size=0.5em] (q0) {$q_{0}$};
+  \node[state, minimum size=0.5em, right=of q0] (q1) {$q_{1}$};
+  \node[state, minimum size=0.5em, right=of q1] (q2) {$q_{2}$};
+  \node[state, minimum size=0.5em, below=of q1] (q3) {$q_{3}$};
   \node[state, accepting, minimum size=0.5em, right=of q3] (q4) {$q_{4}$};
 
   \path[->]
@@ -25,7 +27,7 @@
   (q3) edge node[above]{\(\varepsilon\)}(q4)
   (q4) edge[bend left] node[left]{b}(q2);
 \end{tikzpicture}
-\vspace{0.5em}\\
+\vspace{1em}\\
 \begin{tikzpicture}[bezier bounding box,node distance=0.5cm]%reduce vertical space around graph
   \node[state, initial, minimum size=0.8em] (q0) {$q_{0}$};
   \node[state, minimum size=0.8em, right=of q0] (q1) {$q_{1}$};

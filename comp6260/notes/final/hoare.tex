@@ -1,0 +1,99 @@
+\begin{enumerate}
+\item \textbf{Weak} pre/post-conditions: more \textbf{general} (say \emph{less})
+\item \textbf{Weakest} possible: \textbf{\texttt{True}}
+\item \textbf{Strongest} possible: \textbf{\texttt{False}}
+\item \textbf{Strong} pre/post-conditions: more \textbf{specific} (say \emph{more})
+\item Usually want to find \textbf{weakest precondition} $Q_{wp}$ (more general and allow more input).
+\end{enumerate}
+
+\subsection*{1/6 Assignment Rule}
+\(\qquad\{?\}\ i := 2 * i \{i < 6\}\)\hfill\(\{x > 3\}\;x:=x+2\;\{x>5\}\)\\
+\begin{minipage}{0.5\linewidth}
+\begin{enumerate}
+\item \textbf{copy} Q over to P: \(\{i_{post} < 6\}\)
+\item \textbf{replace} all LHS vars with RHS in assignment(s): \(\{2 * i < 6\}\)
+\item See if any math/logic equivalence: \(\{i_{orig} < 3\}\)
+\end{enumerate}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{enumerate}
+\item \textbf{copy} Q over to P: \(\{x_{post} > 5\}\)
+\item \textbf{replace} all LHS vars with RHS vars: \(\{x_{assign}+2 > 5\}\)
+\item \textbf{find} if any math/logic equivalence: \(\{x_{orig} > 3\}\)
+\end{enumerate}
+\end{minipage}
+
+\subsection*{2/6 Pre-condition Strengthening}
+\begin{displaymath}
+  \frac{P_{strong} \rightarrow P_{weak} \quad \{P_{weak}\}\,S\,\{Q\} } {\{P_{strong}\}\,S\,\{Q\}}
+\end{displaymath}
+
+\subsection*{3/6 Post-condition Weakening}
+\begin{displaymath}
+  \frac{Q_{strong}\rightarrow Q_{weak} \quad \{P\}\,S\,\{Q_{strong}\} } {\{P\}\,S\,\{Q_{weak}\}}
+\end{displaymath}
+
+\subsection*{4/6 Sequencing}
+\begin{displaymath}
+  \frac{\{P\}\,S_{1}\,\{ Q_{mid}\}\ \quad \{Q_{mid}\}\,S_{2}\,\{R\}}{\{P\}\,S\,\{R\}}
+\end{displaymath}
+\begin{enumerate}
+\item $Q_{mid}$ \textbf{weak} enough such that $P$ to $Q_{mid}$ holds
+\item[] strengthen precond. $W_{sp} \rightarrow Q_{mid}$, if $W_{sp}$ then $Q_{mid}$
+\item $Q_{mid}$ \textbf{strong} enough such that $P$ to $Q$ holds
+\item[] weaken post $Q_{mid} \rightarrow W_{wp}$, if $W$, then $Q_{mid}$
+\item Assignment rule backwards to find proper $Q_{mid}$
+\end{enumerate}
+% \subsection*{Question Type}
+% {
+%   % Reducing vertical spacing
+%   \setlength{\abovedisplayskip}{0pt}
+%   \setlength{\belowdisplayskip}{3pt}
+%   \setlength{\abovedisplayshortskip}{0pt}
+%   \setlength{\belowdisplayshortskip}{3pt}
+%
+%   \[\textbf{Prove:}\quad \{P\}\,S_{1};\,S_{2};\,\ldots ;\,S_{n}\,\{Q\}\]
+% }
+% \textbf{Solution} Start backwards and use Assignment Rule:
+% \begin{enumerate}
+% \item\label{step1} \textbf{Copy} \(Q_{n}\) as \(P_{n}\) for \(S_{n}\)
+% \item\label{step2} \textbf{Use} assignment rule and math equivalence to simplify \(P_{n}\) if possible
+% \item \textbf{Use} \(P_{n}\) as \(P_{n-1}\) for \(S_{n-1}\)
+% \item \textbf{Repeat} \ref{step1} and \ref{step2} until getting \(P_{1}\)
+% \item \textbf{Strengthen} precondition \(\{P\}\rightarrow \{P_{1}\}\)
+% \item (Optional) Sometimes need (0th/boolean) logic to simplify compound propositions.
+%
+% \end{enumerate}
+
+\subsection*{5/6 Conditionals}
+\begin{displaymath}
+  \frac{\{P \land\; b\}\;S_{1}\{Q\} \quad \{P \land \;\neg b\}\;S_{2}\;\{Q\}}{\{P\}\;\texttt{if}\;b\;S_{1}\;\texttt{then}\;S_{2}\;\{Q\}}
+\end{displaymath}
+% {
+%   % Reducing vertical spacing
+%   \setlength{\abovedisplayskip}{0pt}
+%   \setlength{\belowdisplayskip}{3pt}
+%   \setlength{\abovedisplayshortskip}{0pt}
+%   \setlength{\belowdisplayshortskip}{3pt}
+%
+% \[\textbf{Prove:}\quad \{P\}\;if\:b\:then\:S_{1}\:else\:S_{2}\;\{Q\}\]
+% }
+
+\subsection*{Complete conditionals}
+Conditionals with \texttt{else} branch are \emph{complete}.
+
+\texttt{if b then S} $\Longleftrightarrow$ \texttt{if b then S else (do nothing)}
+\begin{displaymath}
+  \frac{\{P \land\; b\}\;S\{Q\} \quad \{P \land \;\neg b\}\;\texttt{(do nothing)}\;\{Q\}}{\{P\}\;\texttt{if}\;b\;\texttt{then}\;S\;\{Q\}}
+\end{displaymath}
+\texttt{do nothing} can be \textbf{strengthened} to sth like \verb|x := x|
+
+\subsection*{6/6 While Loop}
+\begin{displaymath}
+  \frac{\{I \land\; b\}\;S\;\{I\}}{\{I\}\;\texttt{while}\;b\;\texttt{do}\;S\;\{I \land\l \neg b\}}
+\end{displaymath}
+\begin{enumerate}
+\item \textbf{invariant} often looks similar to final $S$
+\item \textbf{invariant} may be an equation plus restraints
+\item \textbf{variant} often looks simiar to loop condition $b$
+\end{enumerate}

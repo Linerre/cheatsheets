@@ -1,0 +1,31 @@
+{\footnotesize
+\begin{minipage}[]{0.45\linewidth}
+  \[\delta\overbracket[1pt]{(q,a,X)}^\text{3 args} \overset{*}{\mapsto} \overbracket{(p,\gamma)}^\text{2 outputs} \]
+  $\delta$ is partial: undefined for some input \(\notin \Sigma\)
+\begin{enumerate}
+    \item \(q\) current state, \(q \in Q\)
+    \item \(X\) current tape symbol, \(X \in \Gamma\)
+    \item \(p\) next state, \(p \in Q\), from \(q\), through 0/more moves, to \(q\)
+    \item \(Y \in \Gamma\), symb in tape cell, replacing whatever was there
+    \item \(D\) \emph{direction}, \(L \leftarrow\), \(R \rightarrow\) or \(S\) (stay/halt)
+    \item if \(L = L(M)\) accpt. by some TM \(M\), \(L\) is \emph{recursively enumerable}
+\end{enumerate}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+  \centering
+  \begin{tabular}{r|p{3.8cm}}
+    & $ M = (Q,\Sigma,\Gamma,\delta,q_{0},B,F)$  \\
+    \hline
+    $Q$ & set of \emph{states} of finite ctrl\\
+    $\Sigma$ & finite set of \emph{input symbols}: \(\Sigma \subset \Gamma\)\\
+    $\Gamma$ & complete set of \emph{tape symbols}\\
+    $\delta$ & \emph{transition function}\\
+    $q_{0}$  &  \emph{start state} \(\in Q\)\\
+    $B$     & \emph{blank} symbol$^{2}$, also \(\Lambda\)\\
+    $F$      & set of \emph{final} or \emph{accepting} states: \(F \subset Q\)\\
+    \hline
+    \multicolumn{2}{l}{all above sets are \textbf{finite}: \(F \subseteq Q\) }\\
+    \hline
+\end{tabular}\\
+\end{minipage}
+}

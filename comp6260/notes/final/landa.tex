@@ -1,0 +1,18 @@
+% Language accepted by some Automata
+{\footnotesize
+\begin{tabular}{l|l}
+    $A$utomata & $L$anguage   \\
+    \hline
+  $\text{DF}A = (Q,\Sigma,\delta,q_{0},F)$
+                   & $L(A) = \{w \gor \hat{\delta}(q_{0},w) \in F\}$ \\
+  \(\text{NF}A = (Q,\Sigma,\delta,q_{0},F)\)
+                   & $L(A) = \{w \gor \hat{\delta}(q_{0},w) \cap F \neq \emptyset\}$\\
+  \(\text{PD}A = (Q,\Sigma,\Gamma,\delta,q_{0},F)\)
+                   & $L(A) = \{w \gor (q_{0},w,Z_{0}) \underset{P}{\xvdash{*}} (q,\epsilon,\alpha)\}$\\
+  \(\text{TM}A = (Q,\Sigma,\Gamma,\delta,q_{0},B,F)\)
+                   & $L(A) = \{w \gor (q_{0}w)\xvdash{*} (\alpha p\beta)\}$\\
+  \hline
+  \multicolumn{2}{l}{$L(A)$ is set of strings $w \in \Sigma^{*}$}\\
+  \hline
+\end{tabular}
+}

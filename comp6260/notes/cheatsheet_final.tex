@@ -45,13 +45,14 @@
 
 % Parse Trees
 \usepackage{tikz}
-\usetikzlibrary{ arrows, automata, bbox, positioning}
+\usetikzlibrary{ arrows, automata, bbox, calc, positioning }
 \tikzset{
 % ->, % makes the edges directed
 >=stealth', % makes the arrow heads bold
 node distance=1cm, % specifies minimum distance between two nodes
-smallnode/.style={},
+% small/.style={},
 every state/.style={thick}, % sets the properties for each ’state’ node
+every node/.style={inner sep=1pt},
 initial text=start, % sets the text that appears on the start arrow
 }
 
@@ -70,16 +71,17 @@ initial text=start, % sets the text that appears on the start arrow
 % -- Global spacing settings ----
 % https://lyx-users.lyx.narkive.com/9PDn3r9V/vertical-space-before-and-after-equations
 % https://groups.google.com/g/latexusersgroup/c/cXwZxCy29zI?pli=1
-\AtBeginDocument{
-\addtolength{\abovedisplayskip}{-1ex}
-\addtolength{\abovedisplayshortskip}{-1ex}
-\addtolength{\belowdisplayskip}{-1ex}
-\addtolength{\belowdisplayshortskip}{-1ex}
-\addtolength{\textfloatsep}{-2ex}
-\addtolength{\floatsep}{-1ex}
-}
-\setlength{\abovecaptionskip}{-1ex}
-\setlength{\belowcaptionskip}{-1ex}
+% \AtBeginDocument{
+% \addtolength{\abovedisplayskip}{-1ex}
+% \addtolength{\abovedisplayshortskip}{-1ex}
+% \addtolength{\belowdisplayskip}{-1ex}
+% \addtolength{\belowdisplayshortskip}{-1ex}
+% \addtolength{\textfloatsep}{-2ex}
+% \addtolength{\floatsep}{-1ex}
+% }
+% \setlength{\abovecaptionskip}{-1ex}
+% \setlength{\belowcaptionskip}{-1ex}
+
 % No indentation
 \setlength\parindent{0pt}
 
@@ -87,157 +89,67 @@ initial text=start, % sets the text that appears on the start arrow
 \newcommand{\gor}{\;|\;}
 \newcommand{\mset}[1]{\(\{q_{#1}\}\)}
 \renewcommand{\arraystretch}{1.2}
+\newcommand{\xvdash}[1]{%
+  \vdash^{\mkern-10mu\footnotesize\rule[-1.2ex]{0pt}{0pt}#1}%
+}
 
 \begin{document}
 % Suppress page number for all pages
 \pagestyle{empty}
 
 \begin{multicols*}{3}
-\section*{Hoare logic}
-% \input{lecs/lec5}
 
 \section*{Grammar, Language, Automata}
-% \input{chomsky}
+\input{final/chomsky}
+
+\section*{Language of (=accepted by) Automata}
+\input{final/landa}
 
 \section*{DFA v.s. (\(\epsilon\)-)NFA in 5-tuple form}
-% \input{final/fatuple}
+\input{final/fatuple}
 
 \section*{DFA: tuple, transition diagram, transition table}
-% \input{final/dfa}
-
-\section*{Language of (=accepted by) DFA}
-\input{final/dfalang}
+\input{final/dfa}
 
 \section*{NFA: tuple, transition diagram, transition table}
-% \input{final/nfa}
-
-\section*{Language of (=accepted by) NFA}
-\input{final/nfalang}
+\input{final/nfa}
 
 \section*{NFA to DFA (subset construction)}
-% \input{final/nfa2dfa}
+\input{final/nfa2dfa}
 
 \section*{\(\epsilon\)-closures of state(s)}
-% \input{final/eclose}
+\input{final/eclose}
 
 \section*{Remove \(\epsilon\)-Transitions (\(epsilon\)-NFA to DFA)}
-% \input{final/rmeclose}
+\input{final/rmeclose}
+
+\section*{Regular Expressions to $\epsilon$-NFA}
+\input{final/regex}
 
 \section*{Minimisation of DFA}
-
-\section*{Regular Expressions}
-
-\section*{Context-free Language (CFL)}
-\begin{itemize}
-\item \textbf{def.} \(L(G) = \{w \in T^{*} \;\|\; S \derive{*}{G} w\}\)
-\item \textbf{e.g.} \(L(G) = \{a^{n}b^{n} \;\|\; n \in \mathbb{N}, n \geq 1\}\)
-\end{itemize}
-Usually need to design grammar for given language
+\input{final/minidfa}
 
 \section*{Grammar Tuple}
 \input{final/grammar}
 
 \section*{Parse Trees and (un)ambiguity}
-% \input{final/ambiguity}
+\input{final/ambiguity}
 
 \section*{Regular (Type-3) \& Context-free (Type 3)}
 \input{final/twogrammars}
 
 \section*{Pushdown Automata (PDA)}
-\vspace{0.5em}
-\[ P = (Q,\Sigma,\Gamma,\delta,q_{0},Z_{0},F) \]
-\begin{itemize}
-\item[Q] finite set of \emph{states}
-\item[\(\Sigma\)] finite set of \emph{input symbols}
-\item[\(\Gamma\)] finite set of allowed \emph{stack alphabet}
-\item[\(\delta\)] \emph{transition function}
-    \(
-\delta\overbracket[1pt]{(q,a,X)}^\text{3 args} \overset{*}{\mapsto} \overbracket{(p,\gamma)}^\text{2 outputs}
-  \)
-  \begin{enumerate}[leftmargin=1em,labelindent=2em]
-  \item[$\delta$] is \emph{partial}: undefined for some input \(\notin \Sigma\)
-  \item $q$ a state \(\in Q\)
-  \item $a$ an input string of symbol(s) \(\in \Sigma\) or \(a = \epsilon\)
-  \item $X$ a stack symbol \(\in \Gamma \)
-  \item $p$ new state \(p \in Q\)
-  \item $\gamma$ string of stack symbols replacing $X$
-    \begin{enumerate}
-      \item $\gamma = \epsilon$, stack popped
-      \item $\gamma = X$, stack unchanged
-      \item $\gamma = YZ$, $X$ replaced by $Z$ and $Y$ is pushed
-    \end{enumerate}
-  \end{enumerate}
-\item[$q_{0}$] finite set of \emph{states}
-\item[$Z_{0}$] finite set of \emph{states}
-\item[$F$] finite set of \(accepting/final\; states \subseteq Q\)
-\end{itemize}
-\section*{PDA Trace and ID}
-\begin{enumerate}[leftmargin=2.5em,labelindent=2em]
-\item [same] \(\sigma(p,a,X) \rightarrow \{(q,X)\}\) (stack top unchanged)
-\item [push] \(\sigma(p,a,X) \rightarrow \{(q,aX)\}\)
-\item [pop]  \(\sigma(p,\epsilon,X) \rightarrow \{(q,\epsilon)\}\)
-\end{enumerate}
-\begin{itemize}
-\item defines CFG and recognizes all and only the CFGs
-\item essentially an \(\epsilon\)-NFA with an additional stack
-\end{itemize}
-\section*{Derive NPDA for CFG}
-Given the CFG, derive its PDA using the following major steps
-\begin{align*}
-  S &\rightarrow S + T \gor T\\
-  T &\rightarrow T * \mathsf{int} \gor \mathsf{int}
-\end{align*}
-\begin{enumerate}
-\item \textbf{initialize} \(\delta(q_{0},\epsilon,Z) \mapsto q_{1}/SZ\)
-\item \textbf{expand non-terminals}: input = \(\epsilon\) and expand stack top
-  \begin{itemize}
-  \item \(\delta(q_{1},\epsilon,S) \mapsto q_{1}/SZ\)
-  \item \(\delta(q_{0},\epsilon,Z) \mapsto q_{1}/SZ\)
-  \item \(\delta(q_{0},\epsilon,Z) \mapsto q_{1}/SZ\)
-  \item \ldots
-  \end{itemize}
-\item \textbf{match and pop terminals}
-\item \textbf{terminate}
-\end{enumerate}
+\input{final/pda}
 
-\section*{DPDA}
-\section*{Trace}
+\section*{Derive NPDA for CFG and Trace}
+\input{final/cfl2pda}
+
 \section*{Turing Machine (TM)}
-\vspace{0.5em}
-\[
-M = (Q,\Sigma,\Gamma,\delta,q_{0},B,F)
-\]
-\begin{itemize}
-\item[$Q$] finite set of \emph{states} of finite control
-\item[$\Sigma$] finite set of \emph{input symbols}: \(\Sigma \subset \Gamma\)
-\item[$\Gamma$] complete set of \emph{tape symbols} and
-\item[$\delta$] \emph{transition function}:
-  \(
-\delta\overbracket[1pt]{(q,X)}^\text{2 args} \overset{*}{\mapsto} \overbracket{(p,Y,D)}^\text{3 outputs}
-  \)
-  \begin{enumerate}
-    \item \(q\) current state, \(q \in Q\)
-    \item \(X\) current tape symbol, \(X \in \Gamma\)
-    \item \(p\) next state, \(p \in Q\), from \(q\), through 0/more moves, to \(q\)
-    \item \(Y \in \Gamma\), symb in tape cell, replacing whatever was there
-    \item \(D\) \emph{direction}, \(L \leftarrow\), \(R \rightarrow\) or \(S\) (stay/halt)
- \end{enumerate}
-\item[$q_{0}$] \emph{start state}: \(q_{0} \in Q\)
-\item[$B$] \emph{blank} symbol, also \(\Lambda\)
-\item[$F$] set of \emph{final} or \emph{accepting} states: \(F \subset Q\)
-\end{itemize}
-% Two examples of TM
-% \input{final/tm}
-Note \textbf{table symbols} can be any characters such as \(a,b,c,\ldots,X,Y,Z,B,\Lambda\)
-\section*{Lang of TM}
-\(L(M)\) = set of all strings that halt \(M\) in its accepting state
-\begin{itemize}
-\item \textbf{total} TM halts for any given input (never stuck in loop)
-\item \textbf{partial} TM halts for some input (loop forever)
-\end{itemize}
-\section*{Recursively Enumerable (RE)}
-A lang is RE if \(L = L(M)\) for some TM \(M\)
+\input{final/tmdef}
+\input{final/tmeg}
 
+\section*{Hoare logic}
+\input{final/hoare}
 
 \end{multicols*}
 \end{document}

@@ -1,0 +1,76 @@
+\begin{enumerate}
+\item \textbf{remove} any state unreachable from start state
+\item \textbf{split} states into \textbf{final} group and \textbf{non-final} one
+\item\label{dfa:mini} \textbf{find} where each state goes on some input
+\item if 2 states with same input go to different groups, split out
+\item repeat the step \ref{dfa:mini} until no splitting for any group
+\end{enumerate}
+Each of following has format: input [[states after input]]
+{\footnotesize
+\begin{minipage}{0.5\linewidth}
+    \begin{enumerate}[leftmargin=*,labelindent=0pt]
+\item[] [[$S_{0},S_{1},S_{2},T_{1},T_{2}$],[$S_{3},S_{4}$]] (init)
+\item[0] [[$S_{0},S_{1},S_{2},T_{1},T_{2}$],[$S_{3},S_{4}$]]
+\item[1] [[$S_{0},S_{1},T_{1},T_{2}$],[$S_{2}$],[$S_{3},S_{4}$]]
+\item[0] [[$S_{0},T_{1},T_{2}$],[$S_{2}$],[$S_{3},S_{4}$]]
+\item[1] [[$S_{0},T_{1},T_{2}$],[$S_{1}$],[$S_{2}$],[$S_{3},S_{4}$]]
+\item[0] [[$T_{1},T_{2}$],[$S_{0}$],[$S_{1}$],[$S_{2}$],[$S_{3},S_{4}$]]
+\item[0] [[$T_{1},T_{2}$],[$S_{0}$],[$S_{1}$],[$S_{2}$],[$S_{3},S_{4}$]]
+\item[1] [[$T_{1},T_{2}$],[$S_{0}$],[$S_{1}$],[$S_{2}$],[$S_{3},S_{4}$]]
+\item[] $T_{1} \equiv T_{2}$, $S_{3} \equiv S_{4}$
+\end{enumerate}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+  \begin{tikzpicture}[bezier bounding box,node distance=0.5cm]%reduce vertical space around graph
+  \node[state, initial, initial where=below,minimum size=0.5cm] (s0) {$S_{0}$};
+  \node[state, minimum size=0.5cm, right=of s0] (s1) {$S_{1}$};
+  \node[state, minimum size=0.5cm, right=of s1] (s2) {$S_{2}$};
+  \node[state, accepting, minimum size=0.5cm, right=of s2] (s3) {$S_{3}$};
+  \node[state, accepting, minimum size=0.5cm, below=of s3] (s4) {$S_{4}$};
+  \node[state, minimum size=0.5cm, below=of s1] (t2) {$T_{1}$};
+  \node[state, minimum size=0.5cm, below=of s2] (r1) {$R_{1}$};
+
+  % Calculate the midpoint between S3 and S4
+  \coordinate (midpoint) at ($(s3)!0.5!(s4)$);
+
+  \node[state, minimum size=0.5cm, right=1cm of midpoint] (t1) {$T_{2}$};
+  \draw[black, line width=1pt] (r1.south west) -- (r1.north east);
+  \draw[black, line width=1pt] (r1.north west) -- (r1.south east);
+
+  \path[->]
+  (s0) edge node[above]{0}(s1)
+  (s0) edge node[below,sloped]{1}(t2)
+  (s1) edge node[above]{1}(s2)
+  (s1) edge node[right]{0}(t2)
+  (s2) edge node[above]{1}(s3)
+  (s2) edge node[below,sloped]{0}(t2)
+  (s3) edge[bend left] node[right]{1}(s4)
+  (s3) edge node[above,sloped]{0}(t1)
+  (s4) edge node[below]{0}(t1)
+  (s4) edge[bend left] node[left]{1}(s3)
+  (r1) edge node[above,sloped]{0}(s3)
+  (r1) edge node[right]{1}(s2)
+  (t1) edge[loop above] node{0,1}(t1);
+\end{tikzpicture}
+\vspace{1em}
+\begin{tikzpicture}[bezier bounding box,node distance=0.5cm]%reduce vertical space around graph
+  \node[state, initial, minimum size=0.5cm] (s0) {$S_{0}$};
+  \node[state, minimum size=0.5cm, right=of s0] (s1) {$S_{1}$};
+  \node[state, minimum size=0.5cm, right=of s1] (s2) {$S_{2}$};
+  \node[state, accepting, minimum size=0.5cm, below=of s2] (s3) {$S_{3}$};
+  % \node[state, accepting, minimum size=0.5cm, below=of s3] (s4) {$S_{4}$};
+  \node[state, minimum size=0.5cm, below=of s1] (t2) {$T_{1}$};
+  % \node[state, minimum size=0.5cm, below=of s2] (r1) {$R_{1}$};
+
+  \path[->]
+  (s0) edge node[above]{0}(s1)
+  (s0) edge node[below,sloped]{1}(t2)
+  (s1) edge node[above]{1}(s2)
+  (s1) edge node[right]{0}(t2)
+  (s2) edge node[right]{1}(s3)
+  (s2) edge node[above,sloped]{0}(t2)
+  (s3) edge node[below]{0}(t2)
+  (t2) edge[loop below] node{0,1}(t2);
+\end{tikzpicture}
+\end{minipage}
+}
