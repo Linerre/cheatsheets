@@ -1,0 +1,27 @@
+\begin{minipage}{0.55\linewidth}
+\begin{tikzpicture}[level distance=5mm,level/.style={sibling distance=2.5cm}]
+  \node {$\pi_{\text{lname,result,title}}$}
+  child {
+      node {$\sigma_{\text{result}\leq 3}$}
+      child {
+        node {$\bowtie_{\text{exams.crsNo}=\text{course.crsNo}}$}
+        child {
+          child {node {$\bowtie_{\text{exams.crsNo}=\text{course.crsNo}}$}
+            child {
+              child {node {students}}
+              child {node {exams}}
+            }
+          }
+          child {node {courses}}
+        }
+      }
+    };
+\end{tikzpicture}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\begin{itemize}
+\item leaf nodes: input relations
+\item internal nodes: intermediate result
+\item root nodes: resulting relations
+\end{itemize}
+\end{minipage}

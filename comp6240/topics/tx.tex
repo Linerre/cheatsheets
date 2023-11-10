@@ -1,0 +1,26 @@
+\begin{minipage}{0.5\linewidth}
+ACID properties of db transactions
+\begin{enumerate}
+\item \textbf{A}tomicity each tx is atomic
+\item[]ALL/NONE completed (central)
+\item \textbf{C}onsistency
+\item[]db st. consistent before/after tx
+\item \textbf{I}solation
+\item[] tx not affected by concurrency
+\item \textbf{D}urability
+\item[] tx done has persist effects in db
+\end{enumerate}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+Concurrency ctrl to avod 4 problems
+\begin{enumerate}
+\item lost update (write-write conflt.)
+\item[] 2 txs update same object
+\item dirty read (write-read conflt.)
+\item[] tx$_{1}$ reads obj uncommited by tx$_{2}$
+\item un-repeated read (read-write)
+\item[] tx$_{1}$ reads in-progress objs (tx$_{2}$)
+\item phantom read
+\item[] txs get diff rets at diff times
+\end{enumerate}
+\end{minipage}

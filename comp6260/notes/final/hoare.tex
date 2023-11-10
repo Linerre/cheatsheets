@@ -23,21 +23,6 @@
 \item \textbf{find} if any math/logic equivalence: \(\{x_{orig} > 3\}\)
 \end{enumerate}
 \end{minipage}
-
-\subsection*{2/6 Pre-condition Strengthening}
-\begin{displaymath}
-  \frac{P_{strong} \rightarrow P_{weak} \quad \{P_{weak}\}\,S\,\{Q\} } {\{P_{strong}\}\,S\,\{Q\}}
-\end{displaymath}
-Sometimes $P_{strong}$ is given, need to find $P_{weak}$ (reverse)
-\subsection*{3/6 Post-condition Weakening}
-\begin{displaymath}
-  \frac{Q_{strong}\rightarrow Q_{weak} \quad \{P\}\,S\,\{Q_{strong}\} } {\{P\}\,S\,\{Q_{weak}\}}
-\end{displaymath}
-Sometimes $Q_{weak}$ is given, need to find $Q_{strong}$ (reverse)
-\subsection*{4/6 Sequencing}
-\begin{displaymath}
-  \frac{\{P\}\,S_{1}\,\{ Q_{mid}\}\ \quad \{Q_{mid}\}\,S_{2}\,\{R\}}{\{P\}\,S\,\{R\}}
-\end{displaymath}
 \subsection*{Finding the mid conditions}
 \begin{enumerate}
 \item\label{ho:1} $Q_{mid}$ \textbf{strong} enough such that $\{Q_{mid}\}\;S_{2}\;\{P\}$ holds
@@ -48,6 +33,21 @@ Sometimes $Q_{weak}$ is given, need to find $Q_{strong}$ (reverse)
 \item[] weaken post $Q_{mid} \rightarrow W_{wp}$, if $W$, then $Q_{mid}$
 \item Assignment rule backwards to find proper $Q_{mid}$
 \end{enumerate}
+
+% \subsection*{2/6 Pre-condition Strengthening}
+% \begin{displaymath}
+%   \frac{P_{strong} \rightarrow P_{weak} \quad \{P_{weak}\}\,S\,\{Q\} } {\{P_{strong}\}\,S\,\{Q\}}
+% \end{displaymath}
+% Sometimes $P_{strong}$ is given, need to find $P_{weak}$ (reverse)
+% \subsection*{3/6 Post-condition Weakening}
+% \begin{displaymath}
+%   \frac{Q_{strong}\rightarrow Q_{weak} \quad \{P\}\,S\,\{Q_{strong}\} } {\{P\}\,S\,\{Q_{weak}\}}
+% \end{displaymath}
+% Sometimes $Q_{weak}$ is given, need to find $Q_{strong}$ (reverse)
+% \subsection*{4/6 Sequencing}
+% \begin{displaymath}
+%   \frac{\{P\}\,S_{1}\,\{ Q_{mid}\}\ \quad \{Q_{mid}\}\,S_{2}\,\{R\}}{\{P\}\,S\,\{R\}}
+% \end{displaymath}
 % \subsection*{Question Type}
 % {
 %   % Reducing vertical spacing
@@ -69,10 +69,10 @@ Sometimes $Q_{weak}$ is given, need to find $Q_{strong}$ (reverse)
 %
 % \end{enumerate}
 
-\subsection*{5/6 Conditionals}
-\begin{displaymath}
-  \frac{\{P \land\; b\}\;S_{1}\{Q\} \quad \{P \land \;\neg b\}\;S_{2}\;\{Q\}}{\{P\}\;\texttt{if}\;b\;S_{1}\;\texttt{then}\;S_{2}|\texttt{(do nothing)}\;\{Q\}}
-\end{displaymath}
+% \subsection*{5/6 Conditionals}
+% \begin{displaymath}
+%   \frac{\{P \land\; b\}\;S_{1}\{Q\} \quad \{P \land \;\neg b\}\;S_{2}\;\{Q\}}{\{P\}\;\texttt{if}\;b\;S_{1}\;\texttt{then}\;S_{2}|\texttt{(do nothing)}\;\{Q\}}
+% \end{displaymath}
 % {
 %   % Reducing vertical spacing
 %   \setlength{\abovedisplayskip}{0pt}
@@ -82,20 +82,20 @@ Sometimes $Q_{weak}$ is given, need to find $Q_{strong}$ (reverse)
 %
 % \[\textbf{Prove:}\quad \{P\}\;if\:b\:then\:S_{1}\:else\:S_{2}\;\{Q\}\]
 % }
-Conditionals with \texttt{else} branch are \emph{complete}.\\
-\texttt{do nothing} can be \textbf{strengthened} to sth like \verb|x := x|
+% Conditionals with \texttt{else} branch are \emph{complete}.\\
+% \texttt{do nothing} can be \textbf{strengthened} to sth like \verb|x := x|
 % \texttt{if b then S} $\Longleftrightarrow$ \texttt{if b then S else (do nothing)}
 % \begin{displaymath}
 %   \frac{\{P \land\; b\}\;S\{Q\} \quad \{P \land \;\neg b\}\;\texttt{(do nothing)}\;\{Q\}}{\{P\}\;\texttt{if}\;b\;\texttt{then}\;S\;\{Q\}}
 % \end{displaymath}
 
-\subsection*{6/6 While Loop}
-\begin{displaymath}
-  \frac{\{I \land\; b\}\;S\;\{I\}}{\{I\}\;\texttt{while}\;b\;\texttt{do}\;S\;\{I \land\l \neg b\}}
-\end{displaymath}
+% \subsection*{6/6 While Loop}
+% \begin{displaymath}
+%   \frac{\{I \land\; b\}\;S\;\{I\}}{\{I\}\;\texttt{while}\;b\;\texttt{do}\;S\;\{I \land\l \neg b\}}
+% \end{displaymath}
 \begin{enumerate}
-\item \textbf{invariant} often looks similar to last assignment
-\item \textbf{invariant} may be an equation plus restraints $<,>,\geq$ etc
+\item \textbf{invariant} often looks similar to some given assignment
+\item \textbf{invariant} may be an equation plus restraints $<,>,\geq$, etc.
 \item \textbf{variant} often looks similar to loop condition $b$
 \end{enumerate}
 }

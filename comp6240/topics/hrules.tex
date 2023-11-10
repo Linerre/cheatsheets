@@ -1,0 +1,17 @@
+\begin{minipage}{\linewidth}
+\begin{enumerate}[leftmargin=4em]
+\item $\sigma_{\varphi}(\sigma_{\psi}(R))\equiv\sigma_{\varphi\wedge\psi}(R)$
+\item $\pi_{X}(\pi_{Y}(R))\equiv\pi_{X}(R)$ if $X \subseteq Y$
+\item $\sigma_{\varphi}(R_{1}\times R_{2})\equiv R_{1}\bowtie_{\varphi} R_{2}$
+\item $\sigma_{\varphi1}(R_{1}\bowtie_{\varphi2} R_{2})\equiv R_{2}\bowtie_{\varphi1\wedge\varphi2} R_{1}$
+
+\item $\sigma_{\varphi}(R_{1}\bowtie R_{2})\equiv\sigma_{\varphi}(R_{1})\bowtie R_{2}$
+\item[] if $\varphi$ contains only attrs in $R_{1}$
+\item $\sigma_{\varphi1\wedge\varphi2}(R_{1}\bowtie R_{2})\equiv\sigma_{\varphi1}(R_{1})\bowtie\sigma_{\varphi2}(R_{2})$
+\item[] if $\varphi1$ contains only attrs in $R_{1}$; $\varphi2$ contains attrs only in  $R_{2}$
+\item $\pi_{X}(R_{1}\bowtie R_{2})\equiv \pi_{X_{1}}(R_{1})\bowtie \pi_{X_{2}}(R_{2})$
+\item[] join condition contains only attrs in $X$
+\item $\pi_{X}(R_{1}\bowtie R_{2})\equiv \pi_{X}(\pi_{X_{1}}(R_{1})\bowtie \pi_{X_{2}}(R_{2}))$
+\item[] join condition contains attrs not in $X$
+\end{enumerate}
+\end{minipage}

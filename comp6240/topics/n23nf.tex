@@ -1,0 +1,30 @@
+\begin{minipage}{0.5\linewidth}
+\begin{enumerate}
+\item\label{item:5} find all candidate keys
+\item find minimum cover
+\begin{enumerate}[leftmargin=0pt]
+\item[a.] make each $X\rightarrow \{A_{1},\ldots A_{k}\}$ to
+\item[] $X\rightarrow A_{1}\ldots X\rightarrow A_{k}$
+\item[b.] each FD has as few LHS $A$s as possible
+\item[]check each $B \in X$, if $(X-B) \rightarrow A$?
+\end{enumerate}
+\item create a $R$ for each FD in min cover
+\item create a $R$ for each $CK$ not yet in $Rs$ of step 3
+\end{enumerate}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+$\Sigma=\{A\rightarrow B,ABCD\rightarrow E,EF\rightarrow GH,ACDF\rightarrow EG\}$
+\begin{enumerate}
+\item each FD has ONLY 1 RHS $A$ and get a new FDs set $\Sigma'$
+  \begin{enumerate}[leftmargin=2pt]
+  \item[a.] $EF\rightarrow G,EF\rightarrow H$\ldots
+  \end{enumerate}
+\item remove redundant FDs in $\Sigma'$
+  \begin{enumerate}[leftmargin=2pt]
+  \setcounter{enumi}{2}
+  \item[b.] A\st{B}CD due to $A^{+} = AB$ and $ABCD^{+}=ABCDE$
+  \item[a.] $ACD\rightarrow E$ cancels $ACDF\rightarrow E$
+  \end{enumerate}
+\item minimal cover always exists but not necessarily unique
+\end{enumerate}
+\end{minipage}

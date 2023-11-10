@@ -1,0 +1,21 @@
+\begin{minipage}{\linewidth}
+\begin{tabular}{l|l|l|l}
+  \hline
+  NF & \multicolumn{3}{l}{Trait}\\
+  \hline
+  \textcolor{dmm}{1NF} & \multicolumn{3}{l}{\textcolor{dmm}{$R_{\text{attrs}}$ are all single type values (int,str,etc.); not relations}}\\
+  \textcolor{dmm}{2NF} & \multicolumn{3}{l}{\textcolor{dmm}{FD $\geq 1$ where $CK \rightarrow A_{\text{non-prime}}$}}\\
+  3NF & \multicolumn{3}{l}{All non-trivial FDs: $CK \rightarrow A_{\text{ttrs}}\;|\; X_{\text{attr(s)}} \rightarrow A_{\text{prime}}$}\\
+  BCNF &  \multicolumn{3}{l}{All non-trivial FDs: $CK \rightarrow A$}\\
+  \hline
+  \multicolumn{4}{l}{It's important to find (candidate) keys ($SK$/$CK$ , aka. keys) first}\\
+  \multicolumn{4}{l}{Prime attributes $\subseteq CK$}\\
+  \hline
+  \multicolumn{4}{l}{Normalization of $R$ is to decompose $R$ into $R_{\text{smaller}}$ in 3NF/BCNF}\\
+  \hline
+     & loss-less join & dependency preserving & no anomalies\\
+  3NF & \ding{51}  & \ding{51} & \ding{55} (data redundy.)\\
+  BCNF &\ding{51} & \ding{55} & \ding{51}\\
+  \hline
+\end{tabular}
+\end{minipage}

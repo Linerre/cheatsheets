@@ -1,0 +1,82 @@
+\begin{minipage}{0.5\linewidth}
+  \centering
+  \begin{tabular}{c|ccccc}
+    \hline
+    \multicolumn{6}{c}{R($X_{i} \rightarrow Y_{i}$)}\\
+    \hline
+    & $X$ & $Y$ & $Z$ & $W$ & $U$ \\
+    $t_{1}$ & $X_{1}$ & $Y_{1}$ & $Z_{1}$ & $W_{1}$ & $U_{1}$ \\
+    & \multicolumn{5}{c}{\ldots}\\
+    $t_{2}$ & $X_{2}$ & $Y_{2}$ & $Z_{2}$ & $W_{2}$ & $U_{2}$ \\
+    \hline
+    \multicolumn{6}{l}{$t_{1}[X_{i}] = t_{2}[X_{i}] \rightarrow t_{1}[Y_{i}] = t_{2}[Y_{i}]$}\\
+    \hline
+\end{tabular}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+  \centering
+  \begin{tabular}{ccccc}
+    \hline
+    $A$ & $B$ & $C$ & $D$ & $E$ \\
+    1 & 4 & 1 & 9 & 5 \\
+    1 & 4 & 2 & 8 & 5 \\
+    1 & 4 & 1 & 8 & 5 \\
+    \hline
+    \multicolumn{5}{l}{$AB \rightarrow E$}\\
+    \multicolumn{5}{l}{$C \nrightarrow DE$}\\
+    \hline
+\end{tabular}
+\end{minipage}
+
+\begin{itemize}
+% \item define \textbf{goodness} and \textbf{badness} of relational db design
+% \item show \textbf{relationship} between and among attributes
+\item top down: $R_{\text{schema}}$ + FDs \(\Rightarrow\) smaller schemas (normalization)
+\item bottom up: $R_{\text{attrs}}$ + FDs $\Rightarrow$ $R_{\text{schema}}$ (not popular)
+\item Attrs $A,B,C$ determine attrs $D,E$, written as:
+  \begin{displaymath}
+\{\underbracket[1pt]{A,B,C}_{\text{determinant}}\} \rightarrow \{\underbracket[1pt]{D,E}_{\text{dependent}}\}
+\end{displaymath}
+\item \textbf{trivial}: $\{A,B,C\} \rightarrow \{C\}$
+\item \textbf{syntactical convention}: $ABC \rightarrow DE$
+% \item  specify constraints that must hold at all times on a relation
+\end{itemize}
+\textbf{Theorem}\quad Given $\Sigma = \{FD_{1},\ldots,FD_{n}\}$, that $X \rightarrow Y$ is implied by $\Sigma$ is denoted as $\Sigma \models X \rightarrow Y$ and all possible FDs implied by $\Sigma$ is denoted as $\Sigma^{*}$.  If $\Sigma^{*}_{1} = \Sigma^{*}_{2}$, $\Sigma_{1}, \Sigma_{2}$ are equivalent
+
+\begin{minipage}{\linewidth}
+  \centering
+  \begin{tabular}{l|c}
+    \hline
+    $\Sigma_{1} = \{ X \rightarrow Y, Y \rightarrow Z\}$ & $\{ X \rightarrow Y, Y \rightarrow Z, X \rightarrow Z\}$\\
+    $\Sigma_{2} = \{ X \rightarrow Y, Y \rightarrow Z, X \rightarrow Z\}$ & $\{ X \rightarrow Y, Y \rightarrow Z, X \rightarrow Z\}$ \\
+    \hline
+    \multicolumn{2}{l}{$\because \Sigma^{*}_{1} = \Sigma^{*}_{2} \therefore \Sigma_{1}, \Sigma_{2}$ are equivalent but $\Sigma_{1} \neq \Sigma_{2}$ in this case}\\
+    \multicolumn{2}{l}{if $\Sigma^{*}_{1} \neq \Sigma^{*}_{2}$, then $\Sigma_{1} \neq \Sigma_{2}$}\\
+    \hline
+\end{tabular}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{itemize}
+\item \textbf{closure} of $X$ under $\Sigma$: $X^{+}$
+\item $\Sigma \models X \rightarrow Y\; \mathsf{iff} \;Y \subseteq X^{+}$
+\item \textbf{algorithm} of computing $X^{+}$
+  \begin{enumerate}[leftmargin=0.5em]
+  \item start with $X^{+} := X$
+  \item\label{fd:clo1} if $X \rightarrow Y \in \Sigma$, add $Y$ to $X^{+}$
+  \item\label{fd:clo2} for each $FD_{i}(\in \Sigma): A_{1} \rightarrow A_{2} $ if $A_{1} \subseteq X^{+}$, add $A_{2}$ to $X^{+}$
+  \item[] $A_{1},A_{2}$ are both set of attrs
+  \item repeat step \ref{fd:clo1} \& \ref{fd:clo2} until \textbf{no} changes on $X^{+}$
+  \end{enumerate}
+\end{itemize}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+$R = \{A,B,C,D,E,F\}$, $\Sigma_{R}=\{AC\rightarrow B,B\rightarrow CD, C \rightarrow E, AF \rightarrow B\}$, \hl{$\Sigma \models AC \rightarrow ED$?}
+\begin{align*}
+  (AC)^{+} & \subseteq AC && \text{initialisation}\\
+           & \subseteq ACB && AC \rightarrow B\\
+           & \subseteq ACBD && B \rightarrow CD\\
+           & \subseteq ACBDE && C \rightarrow E\\
+           & = ACBDE
+\end{align*}
+\[\because ED \subseteq (AC)^{+},\;\therefore \Sigma \models AC \rightarrow ED\]
+\end{minipage}

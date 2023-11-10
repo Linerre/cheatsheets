@@ -1,0 +1,116 @@
+\documentclass[8pt,a4paper,landscape]{extarticle}
+
+% -- Layout ----
+\usepackage[top=0.5cm, bottom=0.5cm, left=0.5cm, right=0.5cm, landscape]{geometry}
+
+% -- Titles ----
+\usepackage[
+  tiny,                     % text size title
+  compact                   % reduce vertical space before/after title
+]{titlesec}
+% \titlespacing*
+\titleformat{\section}{\normalfont\normalsize\bfseries}{\thesection}{0em}{} % Remove space before and after section titles
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{0em}{} % Remove space before and after subsection titles
+\titlespacing*{\section}{0pt}{0pt}{0pt} % Remove space before/after section titles
+\titlespacing*{\subsection}{0pt}{0pt}{0pt} % Remove space before/after subsec titles
+
+% -- Colors ----
+\usepackage[dvipsnames,table]{xcolor}
+% \definecolor{dim}{RGB}{192,192,192} % Define a custom dimmed text color
+\definecolor{dim}{RGB}{240,240,245} % Define a custom dimmed text color
+\definecolor{drow}{RGB}{248,249,250} % Define a custom dimmed text color
+\definecolor{dmm}{RGB}{167,167,167} % Define a custom dimmed text color
+\usepackage{soul}
+
+% -- Math ------
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{pifont}
+
+% -- Lists & tables -----
+\usepackage[inline]{enumitem}
+\setlist{noitemsep}% Remove vspace between items
+% Set vspace before and after  list environments as well as the left margin
+\setlist[itemize,1]{leftmargin=*,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[itemize,2]{leftmargin=2pt,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[enumerate,1]{leftmargin=*,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[enumerate,2]{leftmargin=1.2em,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\usepackage{multirow}
+
+% Parse Trees
+\usepackage{tikz}
+\usetikzlibrary{ arrows, automata, bbox, calc, positioning }
+\tikzset{
+% ->, % makes the edges directed
+>=stealth', % makes the arrow heads bold
+node distance=1cm, % specifies minimum distance between two nodes
+% small/.style={},
+every state/.style={thick}, % sets the properties for each ’state’ node
+every node/.style={inner sep=1pt},
+initial text=start, % sets the text that appears on the start arrow
+}
+
+% Place a figure env right here via [H] option
+\usepackage{float}
+
+% Side by side figure
+\usepackage{subcaption}
+
+% -- Multi-Col layout --
+\usepackage{multicol}
+
+
+% No indentation
+\setlength\parindent{0pt}
+
+\newcommand{\mset}[1]{\(\{q_{#1}\}\)}
+\renewcommand{\arraystretch}{1.2}
+\newcommand{\xvdash}[1]{%
+  \vdash^{\mkern-10mu\footnotesize\rule[-1.2ex]{0pt}{0pt}#1}%
+}
+
+\begin{document}
+% Suppress page number for all pages
+\pagestyle{empty}
+% Math env spacing
+\setlength{\abovedisplayskip}{1pt}
+\setlength{\belowdisplayskip}{1pt}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{0pt}
+% hl
+\sethlcolor{dim}
+% TODO:
+% [] update anomalies
+% [] ...
+\begin{multicols*}{3}
+\section*{Functional Dependencies (by E.F.Codd, 1971)}
+\input{topics/fd}
+\section*{Finding [Candidate] Keys (FD closure)}
+\input{topics/findkey}
+\section*{Normal Forms (from weak to strong/more restrictive)}
+\input{topics/nfs}
+\section*{Minimal Cover/Basis (Normalization to 3NF)}
+\input{topics/n23nf}
+\section*{Normalization to BCNF}
+\input{topics/n2bcnf}
+\section*{Query Optimization}
+\input{topics/queryoptimization}
+\section*{Heuristic Rules}
+\input{topics/hrules}
+\section*{SQL Security (objects, threats \& ctrl measures)}
+\input{topics/security}
+\section*{Transactions (seq of db grouped operations)}
+\input{topics/tx}
+\section*{Relational Algebra (6 operators makes a complete set)}
+\input{topics/ra}
+\section*{Query Tree}
+\input{topics/qt}
+\section*{Enhanced Entity Relational Diagram}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\linewidth]{eer.png}
+  % \caption{Notations for EER diagrams}
+  \label{fig:example}
+\end{figure}
+\end{multicols*}
+\end{document}

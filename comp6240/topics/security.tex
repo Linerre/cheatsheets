@@ -1,0 +1,44 @@
+\begin{minipage}{\linewidth}
+  \centering
+  \begin{tabular}{r|l}
+    \hline
+    Objects & Threats \\
+    \hline
+    Confidentiality & illegitimate access (std can view others' grades)\\
+    Integrity & data corruption (std can modify their grades)\\
+    Availability & inaccessible (lecturer can't modify std' grades)\\
+    \hline
+\end{tabular}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{itemize}
+\item Access, restrict access privileges
+  \begin{itemize}
+  \item authentication (passwd,PIN...)
+  \item authorization (privilege level)
+  \item other measures (IP restrct.)
+  \end{itemize}
+\item Inference, can't infer data statistically (avg $\nrightarrow$ particular)
+\item Flow, data $\overset{flow}{\nrightarrow}$ unauthorized
+\item Encryption, protect sensitive data
+\end{itemize}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{enumerate}
+\item Discretionary access ctrl (DAC)
+  \begin{itemize}
+  \item based on access privileges
+  \item support: SQL + DBMS$_{\text{most}}$
+  \end{itemize}
+\item Mandatory access ctrl (MAC)
+  \begin{itemize}
+  \item various data sensitivity level
+  \item support:  DBMS$_{\text{some}}$
+  \end{itemize}
+\item Row-based access ctrl (RBAC)
+  \begin{itemize}
+  \item users grouped by roles
+  \item support: SQL + DBMS$_{\text{many}}$
+  \end{itemize}
+\end{enumerate}
+\end{minipage}

@@ -3,15 +3,15 @@
   % Reduced vertical spacing
 \setlength{\abovedisplayskip}{0pt}
 \setlength{\belowdisplayskip}{0pt}
-  \[\delta\overbracket[1pt]{(q,a,X)}^\text{3 args} \overset{*}{\mapsto} \overbracket{(p,\gamma)}^\text{2 outputs} \]
+  \[\delta\overbracket[1pt]{(q,X)}^\text{2 args} \overset{*}{\mapsto} \overbracket{(p,Y,D)}^\text{3 outputs} \]
   $\delta$ is partial: undefined on input \(\notin \Sigma\)
 \begin{enumerate}[leftmargin=*,labelindent=0pt]
-    \item[$q$] curr. state, \(q \in Q\)
-    \item[$X$] curr. tape symbol, \(X \in \Gamma\)
-    \item[$p$] next state, \(p \in Q\), from \(q\), through 0/more moves, to \(q\)
-    \item[$Y$] \(\in \Gamma\), symb in tape cell, replacing whatever was there
-    \item[$D$] \emph{direction}, \(L\leftarrow\), \(R\rightarrow\), \(S\)tay
-    \item[]\(L(M)\) is \emph{recursively enumerable}
+    \item[$q$] current state, \(q \in Q\)
+    \item[$X$] current tape symbol, \(X \in \Gamma\)
+    \item[$p$] next state, \(p \in Q\)
+    \item[$Y$] \(\in \Gamma\), symbol in tape cell, replacing whatever was there
+    \item[$D$] \emph{direction}, \(L\leftarrow\), \(R\rightarrow\), \(S\)tay/\(H\)alt
+    \item[] if accepted by some TM \(M\), \(L(M)\) is \emph{recursively enumerable}
     \end{enumerate}
 
 \end{minipage}

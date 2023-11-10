@@ -1,0 +1,54 @@
+\begin{minipage}{\linewidth}
+  \begin{tabular}{r|l|l}
+    \hline
+    Key & Def & Range\\
+    \hline
+    Super & uniquely determin all attrs of $R$ & $SK \subseteq R_{\text{attrs}}$ \\
+    Candidate & $\nexists CK_{i} \subset CK \equiv SK $ & $CK_{i} \subset CK \subset SK$\\
+    Primary & chosen from candidate keys & $PK \subset CK$\\
+    \hline
+    \multicolumn{3}{l}{to find a key is to find a candidate key (aka. \textbf{keys})}\\
+    \hline
+\end{tabular}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\vspace{0.2em}
+\begin{enumerate}
+\item for each $X \subseteq R$, compute: $(A)^{+},\ldots,(Z)^{+},(AB)^{+},\ldots$
+\item if $(X)^{+} = R$, $X$ is a superkey,
+\item if $\nexists (Y\subset X)^{+} = R$, x is a key
+\item Attrs in key: \textbf{prime}
+\item Attrs \emph{not} in key \textbf{non-prime}
+\end{enumerate}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+$R=\{ABCD\}$, $\Sigma=\{AB\rightarrow C, AC\rightarrow D\}$, \hl{find superkey?}
+\[
+(A)^{+}=A,(B)^{+}=B,(C)^{+}=C,\ldots
+\]
+\[
+(AB)^{+}=ABCD,(AC)^{+}=ACD,\ldots
+\]
+\[
+(ABC)^{+}=ABCD,(ABD)^{+}=ABCD\ldots
+\]
+key: $AB$, superk: $AB[CD]\{2\}$
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{enumerate}
+\item\label{fd:key1} if $A$ never shows in RHS of any FD, $A$ must be part of each key
+\item[]$R=\{ABCD\}$, $\Sigma=\{C\rightarrow D, AB\rightarrow C, D\rightarrow A\}$, $B$ must be part of each key (\ref{fd:key1})
+\item\label{fd:key2} if $A$ never shows in LHR det. of any FD but in RHS of any FD, $A$ must \emph{not} be part of each key
+\item if $\exists X_{A} \subset A$ is a key, $A$ must \emph{not} be a key
+\end{enumerate}
+\end{minipage}
+\begin{minipage}{0.47\linewidth}
+$R=\{ABCDE\}$, $\Sigma=\{AE\rightarrow BC, B\rightarrow A, AB\rightarrow DE, C\rightarrow A\}$
+\begin{itemize}
+\item $D$ must \emph{not} be in each k (\ref{fd:key2})
+\item  $(B)^{+} = ABCDE$, $B$ is a key
+\item  $(A_{1}A_{2})^{+}$ \emph{without} $B$ e.g. $(AE)^{+}$
+\item  $(A_{1}A_{2}A_{3})^{+}$ \emph{without} $B$ e.g. $(ACD)^{+}$
+\item do \emph{not} comp. each $(FD_{\text{LHS}})^{+}$
+\end{itemize}
+\end{minipage}
