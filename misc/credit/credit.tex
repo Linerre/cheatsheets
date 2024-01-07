@@ -1,0 +1,131 @@
+\documentclass[12pt,a4paper]{article}
+% Page layout and paras
+\usepackage[top=1.5cm,left=2.5cm,right=2.5cm, bottom=1.8cm]{geometry}
+\usepackage{parskip}
+
+% References
+\usepackage[square]{natbib}
+\bibliographystyle{apalike}
+\setcitestyle{notesep={; }}
+% \renewcommand\bibpreamble{\raggedright}
+\newcommand*{\doi}[1]{\href{https://doi.org/#1}{doi: #1}}
+\defcitealias{nyu2020}{NYU}
+\defcitealias{hath2022}{[2022]}
+
+% Appendix
+\usepackage{appendix}
+\renewcommand{\appendixpagename}{\centerline{{\Large\bfseries Appendix}}}
+
+% Font
+% \usepackage{baskervillef}
+% \usepackage[T1]{fontenc}
+
+\usepackage[inline]{enumitem}
+
+% Colors
+\usepackage{xcolor}
+\definecolor{gr}{HTML}{007A5E}
+\definecolor{bl}{HTML}{3366CC}
+
+% Links
+\usepackage[
+breaklinks=true,
+colorlinks=true,
+% pagebackref=true,
+linkcolor=gr,
+citecolor=gr,
+]{hyperref}
+
+% \hypersetup{
+% % urlcolor=bl,
+% }
+\newcommand{\refpp}[1]{\hyperref[#1]{LO~\ref{#1}}}
+\newcommand{\pmk}[2]{\hypertarget{#1}{#2}}
+\newcommand{\refpa}[1]{\hyperlink{para#1}{#1}}
+
+\setlength\parindent{0pt}
+
+\begin{document}
+
+Dear CECC Student Services,
+
+% Para 1
+My name is Zhiren Lin (u7753813).  I am applying for course credits of both Professional Practice 1 and 2 (COMP6250 \& COMP8260). Since my previous academic records have exceeded the time limits \citep[Pol.~7a]{policy7}, I will primarily demonstrate how my professional experience over the past 5 years makes me eligible for the credits.
+
+
+% Para 2
+\hypertarget{para2}{}
+In summer of 2018 I joined New York University Shanghai (NYUSH) Library, to take on the role of Course Reserves Coordinator.  There were 3 teams, about 20 people from across the world\footnote{Back then, librarians came from Canada, the U.S. and Singapore. The RITS team had a Hungarian fellow. It hasn't changed much since I resigned: \url{https://library.shanghai.nyu.edu/contact}}; the one I worked at, Access Services, had 6.  Unlike my previous translator job, my new role entailed considerably more spoken and written communications within and between various teams and groups across the entire NYU community [\refpp{lo4}].
+
+
+% Para 3
+\hypertarget{para3}{}
+One of my core responsibilities was to bridge professors and students regarding their textbooks and recommended readings, electronic and physical alike.  In busy times, say, near the start of a new term, there would be 10-15 queries every day from instructors and/or students, asking about their course materials: from simple questions about item status to technically complicated ones like ebook/database access [\refpp{lo1}].  To avoid missing the important messages from my overwhelmed inbox, I later leveraged Gmail’s APIs to always prioritize the most relevant emails \citep{lin2020}.
+
+% Para 4
+\hypertarget{para4}{}
+Another important task then was to work closely with my supervisor, Qinghua Xu, to \emph{promote} a new course reserve system called Ares\footnote{The official site: \url{https://www.atlas-sys.com/ares}}. We needed to persuade a wide range of target users (professors, their assistants, librarians, etc.) to embrace it.  First, we drafted an Ares Guide for Instructors \citep{ares}.  Then I created a series of short tutorial videos for the impatient [\refpp{lo7}].  The next year Ares became widely accepted by the community.  I also built a HTML demo to suggest the two-tab layout\footnote{See: \url{https://library.shanghai.nyu.edu/course-reserves}} for the new course reserves page.  I am competent to develop and maintain professional documents using appropriate sources and technologies, be it static webpages\footnote{I made this landing page as a starting point for my group members in PP1 tutorials: \url{https://toolkit-professionalpracitceone-dafb25a6bb5b92c5f728f5b46efdcd4.gitlab.io/}}, \LaTeX\ documents (as this one) or Word-like files (NYU uses Google Doc) [\refpp{lo2}, \ref{lo3}]. I enjoy making them too.
+
+
+% Para 5
+\hypertarget{para5}{}
+Ares can be technically overwhelming for new users, especially those instructors who get pretty used to plain Google forms.  Thus, each semester, I would provide one-on-one training on ARes for faculty, and hands-on workshops for assistants from the Academic Affairs Office.  Since it was less often for other team members to process requests using Ares, I would gave them a fresher at each semester end, a time when old reserves (avg. 400) need de-processing and new ones (about 200) need processing. Handling referrals from the librarians happened quite frequently too, as professors tend to reach out to them first.  As the coordinator, I often updated the librarians on changes in course reserves and Ares. It was also common for me to report issues to Ares technicians and my counterparts in New York [\refpp{lo1}, \ref{lo4}, \ref{lo7}].  After studying its ``Addon functionality''\footnote{See: \url{https://atlas-sys.atlassian.net/wiki/spaces/ILLiadAddons/pages/1409384453/Addons+Overview}}, I developed our own one for quickly copying items' info from spreadsheets to Ares forms \citep{addon2022}.
+
+
+
+% Para 6
+In 2021, the COVID-19 significantly disrupted our channels for purchasing new books.  My team had to resort to a shared Google Sheet to manage new arrivals: the scanned copies for emergency use.  Since over 90\% of them were requested for courses, I became the de facto maintainer of that ever-growing spreadsheet for around 2 years, until my resignation. This allowed me to bring my skills at work to the next level, thanks to the Controlled Digital Lending\footnote{See the briefing at its website: \url{https://controlleddigitallending.org/}} (CDL) project.
+
+
+
+% Para 7
+\hypertarget{para7}{}
+It was not enough to merely track the scanned items: the patrons needed to access them. Yet in light of copyrights, the library was not in a position to distribute the scanned files.  Although \citetalias{nyu2020} had parterned with HathiTrust, it simply could not help with the newly purchased (yet not fully cataloged) books.  To solve this pressing problem, which involved many key stakeholders in the academic field, I joined Qinghua in implementing a CDL.  Our research, discussions, negotiations (with leading copyright members in New York) and experiments culminated in one journal article later \citep[\refpp{lo2}, \ref{lo3}, \ref{lo8}, \ref{lo9}]{qx2021}.
+
+
+% Para 8
+\hypertarget{para8}{}
+I did not stop there, however. Despite the creative use of Google Sheet and Drive, I noticed some colleagues were reluctant to use it at all.  By discussing with them, I learned their main reason: each single operation usually required several steps and took about 10 minutes to finish, tedious and error-prone.  Based on their feedback, I built an user-friendly interface on that sheet, reducing the operation to submitting a simple form, which took less than 10 seconds \citep[\refpp{lo9}]{lin2022}.  My reflection on this career episode through the lens of ``Systems Thinking'' and ``Stakeholder Analysis'' got a score of 87 (avg. 72).
+
+% Para 9
+\hypertarget{para9}{}
+An annual mandatory routine at NYUSH is that employees must set their goals for the next year and write a self evaluation one year later.  For me it was always a good opportunity to practice the SMART method for setting goals \citep{wiki:smart} and to reflect on my work performance.  My supervisor was required to provide feedback on my self evaluations [\refpp{lo6}].   I really appreciate such peer-reviewing in that her comments helped me become an more effective team member --- from the second year on I could well balanced tasks specific to my role and many shared circulation duties.  I saw bigger pictures when making decisions and devising solutions, too.
+
+% RACE
+% Para 10
+\hypertarget{para10}{}
+After joining RACE, things changed fundamentally.  First, in a startup team, self-motivation becomes the most essential quality: I'm not waiting for tasks, I'm picking up whatever needs to be done.  The fast pace forced me to ask precisely right questions when having doubts and follow closely team Git rules  [\refpp{lo4}].  Further, I observed my tech leader did exactly what \citet*{dan2021} realized when reviewing my code --- no nitpicking.  ``ATM it's the correct logic that matters'', he often emphasized.  Being unable to review his code, to my surprise, is indeed a windfall: ``so you can focus on testing the game logic instead of, well, my code.'' That means to find wrong code with right tests, not vice versa.  In testing our games, I also applied the good practices from \citet*{ms2022}: prefer helper methods to setup\footnote{For example: \url{https://github.com/RACE-Game/race-holdem/blob/master/base/tests/helper.rs}} and validate private methods by unit testing public methods\footnote{Only public methods tested: \url{https://github.com/RACE-Game/race-holdem/tree/subgame/mtt/src/tests}} [\refpp{lo6}].
+
+
+% Para 11
+\hypertarget{para11}{}
+In our series of blogs, my tech leader and I explained how the protocol works to ensure the fairness of on-chain games \citep{race2022}.  Besides writing tech docs,  I also read lengthy, sometimes rather advanced documentations, such as the classic intro to Solana programming by \citet*{paulx2021} (for writing smart contracts) and the comprehensive \texttt{re-frame} handbook \citep{day8} (for building the workshop).  A Github Gist I compiled years ago still echoes in the community.\footnote{See \url{https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2}}  Input and output of such amount and types make me fairly used to articulating complex ideas  and communicating with both tech and non-tech audiences in engineering professions [\refpp{lo1}, \ref{lo5}].
+
+% Para 12
+With my current work experience, even if I returned to the China's job market right now, I am pretty sure few companies would bother to doubt my ability to quickly adopt any professional practices required.  What would remain questionable, however, even when I complete the degree, is my knowledge of computer science.  After all, I do not have the luxury of a full-blown, 4-year formal CS training, which sounds obviously more reliable to employers than my 2-year one does.  I sincerely hope that, by being granted the credits, I would have more time and freedom to study those core computing courses that are truly vital to my future career possibilities.  Thank you for reviewing my application.
+
+\bibliography{src}
+
+
+\clearpage
+\appendixpagename
+\setcounter{section}{0}% Reset numbering for sections
+\renewcommand{\thesection}{\Alph{section}}% Adjust section printing (from here onward)
+\section*{Learning Outcomes of Professional Practice 1}
+\begin{enumerate}
+\item\label{lo1} Communicate effectively in written and spoken English to transfer complex knowledge and ideas to technical and non-technical audiences. [In paras.~\refpa{3}, \refpa{5}, and \refpa{11}]
+\item\label{lo2} Identify and use appropriate sources of information when developing professional documents.  [In paras.~\refpa{4} and \refpa{7}].
+\item\label{lo3} Maintain and develop appropriate, effective and professional forms of documentation.  [In paras.~\refpa{4} and \refpa{7}]
+\item\label{lo4} Demonstrate effective team membership skills and contribute collaboratively within diverse team environments.  [In paras. \refpa{2} and \refpa{10}]
+\item\label{lo5} Articulate and reflect on the industry expectations of competence and conduct in engineering and computing professions.  [In para. \refpa{11}]
+\end{enumerate}
+
+\section*{Learning Outcomes of Professional Practice 2}
+\begin{enumerate}[start=6]
+\item\label{lo6} Demonstrate understanding of the responsibilities of membership in a professional community through engagement in ethical reflective practice, critical self-review and peer evaluation.  [In paras. \refpa{9} and \refpa{10}]
+\item\label{lo7} Justify, interpret and communicate professional propositions and decisions to technical and non-technical audiences.  [In paras. \refpa{4} and \refpa{5}]
+\item\label{lo8} Identify, analyse and synthesise information from multiple sources when developing solutions to complex problems.  [In para. \refpa{7}]
+\item\label{lo9} Apply creativity, sensitivity, and initiative to decision-making and leadership of diverse team activities, especially where these involve negotiation of disparate stakeholder requirements.  [In paras. \refpa{7} and \refpa{8}]
+\end{enumerate}
+
+\end{document}
