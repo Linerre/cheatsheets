@@ -10,7 +10,6 @@
 % \renewcommand\bibpreamble{\raggedright}
 \newcommand*{\doi}[1]{\href{https://doi.org/#1}{doi: #1}}
 \defcitealias{nyu2020}{NYU}
-\defcitealias{hath2022}{[2022]}
 
 % Appendix
 \usepackage{appendix}
@@ -43,6 +42,7 @@ citecolor=gr,
 \newcommand{\pmk}[2]{\hypertarget{#1}{#2}}
 \newcommand{\refpa}[1]{\hyperlink{para#1}{#1}}
 
+% No indentation for paragraphs
 \setlength\parindent{0pt}
 
 \begin{document}
@@ -94,7 +94,7 @@ An annual mandatory routine at NYUSH is that employees must set their goals for 
 % RACE
 % Para 10
 \hypertarget{para10}{}
-After joining RACE, things changed fundamentally.  First, in a startup team, self-motivation becomes the most essential quality: I'm not waiting for tasks, I'm picking up whatever needs to be done.  The fast pace forced me to ask precisely right questions when having doubts and follow closely team Git rules  [\refpp{lo4}].  Further, I observed my tech leader did exactly what \citet*{dan2021} realized when reviewing my code --- no nitpicking.  ``ATM it's the correct logic that matters'', he often emphasized.  Being unable to review his code, to my surprise, is indeed a windfall: ``so you can focus on testing the game logic instead of, well, my code.'' That means to find wrong code with right tests, not vice versa.  In testing our games, I also applied the good practices from \citet*{ms2022}: prefer helper methods to setup\footnote{For example: \url{https://github.com/RACE-Game/race-holdem/blob/master/base/tests/helper.rs}} and validate private methods by unit testing public methods\footnote{Only public methods tested: \url{https://github.com/RACE-Game/race-holdem/tree/subgame/mtt/src/tests}} [\refpp{lo6}].
+After joining RACE, things changed fundamentally.  First, in a startup team, self-motivation becomes the most essential quality: I'm not waiting for tasks, I'm picking up whatever needs to be done.  The fast pace forced me to ask precisely right questions when having doubts and follow closely team Git rules  [\refpp{lo4}].  Further, I observed my tech leader did exactly what \citet*{dan2021} realized when reviewing my code --- no nitpicking.  ``ATM it's the correct logic that matters'', he often emphasized.  Being unable to review his code, to my surprise, is indeed a windfall: ``so you can focus on testing the game logic instead of, well, my code.'' That means to find wrong code with right tests, not vice versa.  In testing our games, I also applied the good practices from \citet*{ms2022}: prefer helper methods to setup\footnote{For example: \url{https://github.com/RACE-Game/race-holdem/blob/subgame/mtt/src/tests/helper.rs}} and validate private methods by unit testing public methods\footnote{Only public methods tested: \url{https://github.com/RACE-Game/race-holdem/blob/subgame/mtt/src/tests.rs}} [\refpp{lo6}].
 
 
 % Para 11
@@ -102,7 +102,7 @@ After joining RACE, things changed fundamentally.  First, in a startup team, sel
 In our series of blogs, my tech leader and I explained how the protocol works to ensure the fairness of on-chain games \citep{race2022}.  Besides writing tech docs,  I also read lengthy, sometimes rather advanced documentations, such as the classic intro to Solana programming by \citet*{paulx2021} (for writing smart contracts) and the comprehensive \texttt{re-frame} handbook \citep{day8} (for building the workshop).  A Github Gist I compiled years ago still echoes in the community.\footnote{See \url{https://gist.github.com/Linerre/f11ad4a6a934dcf01ee8415c9457e7b2}}  Input and output of such amount and types make me fairly used to articulating complex ideas  and communicating with both tech and non-tech audiences in engineering professions [\refpp{lo1}, \ref{lo5}].
 
 % Para 12
-With my current work experience, even if I returned to the China's job market right now, I am pretty sure few companies would bother to doubt my ability to quickly adopt any professional practices required.  What would remain questionable, however, even when I complete the degree, is my knowledge of computer science.  After all, I do not have the luxury of a full-blown, 4-year formal CS training, which sounds obviously more reliable to employers than my 2-year one does.  I sincerely hope that, by being granted the credits, I would have more time and freedom to study those core computing courses that are truly vital to my future career possibilities.  Thank you for reviewing my application.
+With my current work experience, even if I returned to the Chinese job market right now, I am pretty sure few companies would bother to doubt my ability to quickly adopt any required professional practices.  What would remain questionable, however, even when I complete the degree, is my knowledge of computer science.  After all, I do not have the luxury of a full-blown, 4-year formal CS training, which sounds obviously more reliable to employers than my 2-year one does.  I sincerely hope that, by being granted the credits, I would have more time and freedom to study those core computing courses that are truly vital to my future career possibilities.  Thank you for reviewing my application.
 
 \bibliography{src}
 
