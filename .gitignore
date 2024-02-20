@@ -14,8 +14,10 @@
 *.fls
 *.drawio
 *.bkp
+*.zip
 *_latexmk
 tlmgr.html
 auto/
 comp6710/
+Digital
 */notes/fitch.sty
