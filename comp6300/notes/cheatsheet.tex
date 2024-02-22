@@ -1,0 +1,204 @@
+\documentclass[8pt,a4paper,landscape]{extarticle}
+\input{preamble}
+
+\begin{document}
+% Suppress page number for all pages
+\pagestyle{empty}
+% Math env spacing
+\setlength{\abovedisplayskip}{1pt}
+\setlength{\belowdisplayskip}{1pt}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{0pt}
+% hl
+\sethlcolor{dim}
+
+% Notes begin
+\begin{multicols*}{3}
+\section*{Decimal $\iff$ Binary (Unsigned, U)}
+\begin{flalign*}
+B2U(X) & = \displaystyle\sum_{i=0}^{w-1}x_{i}\cdot 2^{i}, w = \text{number of digits} \\
+  10110_{2} & =  1 \times 2^{4} + 0 \times 2^{3} + 1 \times 2^{2} + 1 \times 2^{1} + 0 \times 2^{0}\\
+  & = 22 &&
+\end{flalign*}
+\begin{enumerate}
+\item\label{item:1} Divide the N$_{10}$ by 2
+\item Get the \textbf{Q}uotient for the next iteration, and
+\item Get the \textbf{R}mainder
+\item Repeat the above steps until \textbf{Q} becomes 0 (1/2)
+\item In the \emph{reverse} order, write all the \textbf{R}s.
+\end{enumerate}
+\begin{tabular}[h]{l|l|l}
+   \hline
+    Division by 2 & \textbf{Q}uotient & \textbf{R}emainder \\
+    \hline
+     333/2 $\Rightarrow$      & 166 & 1 \\
+     166/2 $\Rightarrow$      & 83 & 0 \\
+     83/2 $\Rightarrow$     & 41 & 1 \\
+     41/2 $\Rightarrow$     & 20 & 1 \\
+     20/2 $\Rightarrow$     & 10 & 0 \\
+     10/2 $\Rightarrow$     & 5 & 0 \\
+     5/2  $\Rightarrow$    & 2 & 1 \\
+     2/2  $\Rightarrow$    & 1 & 0 \\
+     1/2  $\Rightarrow$   & \textbf{0} & 1 \\
+    \hline
+    \multicolumn{3}{c}{333$_{10}$ = 101001101$_{2}$}\\
+    \multicolumn{3}{c}{The above goes for Base$_{n}$ to Base$_{m}$}\\
+    \hline
+\end{tabular}
+\section*{Hexadecimal (Memorize 10, 12, 14, 15)}
+\begin{tabular}[h]{r|c|c}
+  \hline
+Decimal & Binary & Hex \\
+  \hline
+  0 & 0000 & 1 \\
+  1 & 0001 & 2 \\
+  2 & 0010 & 3 \\
+  3 & 0011 & 4 \\
+  4 & 0100 & 5 \\
+  5 & 0101 & 5 \\
+  6 & 0110 & 6 \\
+  7 & 0111 & 7 \\
+  8 & 1000 & 8 \\
+  9 & 1001 & 9 \\
+  10 & \textbf{1010} & \textbf{A} \\
+  11 & 1011 & B \\
+  12 & \textbf{1100} & \textbf{C} \\
+  13 & 1101 & D \\
+  14 & \textbf{1110} & \textbf{E} \\
+  15 & 1111 & F \\
+  \hline
+\end{tabular}
+\section*{Binary $\iff$ Hexadecimal}
+As shown above, 1 hex digit = 4 binary digits
+\begin{flalign*}
+  2ED_{16} = \underbracket{0010}_{2_{16}}\overbracket{1110}^{E_{16}}\underbracket{1101}_{D_{16}} \quad(\text{Binary}) &&
+\end{flalign*}
+Binary-to-hex starts from right of the binary:
+\begin{flalign*}
+  (\text{Binary})\quad \overbracket{111}^{7_{16}}\underbracket{1010}_{A_{16}} = 7A_{16} &&
+\end{flalign*}
+
+\section*{Sign/Magnitude numbers}
+\begin{equation*}
+  \underbracket{0}_{\mathclap{\text{most significant bit as sign}}}101_{2} = 5_{10}\qquad\qquad\qquad\qquad 1\overbracket{101}_{2}^{\mathclap{\text{remaining } N-1 \text{ bits as magnitude (abs value)}}} = -5_{10}
+\end{equation*}
+
+\section*{Two's Complement (T)}
+Most significant bit (MSB) indicates sign (same as above):
+\begin{itemize}
+\item 0 for non-negative (including zero)
+\item 1 for negative
+\end{itemize}
+\begin{flalign*}
+B2T(X) & = -x_{w-1}\cdot 2^{w-1} + \displaystyle\sum_{i=0}^{w-2}x_{i}\cdot 2^{i} \\
+  10110_{2} & = 1 \times -(2^{4}) + 0 \times 2^{3} + 1 \times 2^{2} + 1 \times 2^{1} + 0 \times 2^{0}\\
+       & = -16 + 0 + 4 + 2 + 0 \\
+  & = -10_{10} &&
+\end{flalign*}
+\begin{tabular}[h]{c|c|c|c}
+  \hline
+  0 & -1 & most positive & most negative \\
+  \hline
+  $00\ldots 000_{2}$ & 11\ldots 111$_{2}$ & $01\ldots 111_{2} = 2^{N-1} - 1$ & $10\ldots 000_{2} = -2^{N-1}$ \\
+  \hline
+\end{tabular}
+\section*{Taking the Two's Complement}
+\begin{enumerate}
+\item\label{item:2} invert all the bits in the number
+\item add 1 to the \emph{least significant} bit (LSB) position
+\end{enumerate}
+\begin{minipage}{0.48\linewidth}
+-2$_{10}$ as a 4-bit two's complement number
+\begin{align*}
+  2_{10} & = 0010_{2} \\
+         & \xrightarrow{\text{invert all bits}} 1101_{2}\\
+         & \xrightarrow{\text{add 1 to LSB}} 1110_{2} = -2_{10}
+\end{align*}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+Find decimal value of two's compl. number $1001_{2}$
+\begin{align*}
+  1001_{2} & \Rightarrow{\text{has leading 1, must be negative}} \\
+           & \xrightarrow{\text{invert all bits}} 0110_{2} \\
+           & \xrightarrow{\text{add 1 to LSB}} 0111_{2} = -7_{10}
+\end{align*}
+\end{minipage}
+% Addition
+\begin{minipage}{0.5\linewidth}
+\begin{align*}
+  -2_{10} + 1_{10} & = 1110_{2} + 0001_{2} \\
+                   & = 1111_{2} = -1_{10} \\
+  -7_{10} + 7_{10} & = 1001_{2} + 0111_{2} \\
+                   & = 10000_{2} \\
+                   &\xrightarrow{\text{discard carry}} \dimtxt{1}0000_{2} \\
+  & = 0_{10}
+\end{align*}
+\end{minipage}
+% Subtraction
+\begin{minipage}{0.5\linewidth}
+\begin{align*}
+  5_{10} - 3_{10} & = 5_{10} + (-3_{10}) = 0101_{2} + 1101_{2} \\
+                  & = 10010_{2} \xrightarrow{\text{discard carry}} \dimtxt{1}0010_{2}\\
+                  & = 2_{10} \\
+  3_{10} - 5_{10} & = 3_{10} + (-5_{10}) = 0011_{2} + 1011_{2} \\
+                  & = 1110_{2} \quad (\text{must be negative}) \\
+                  & = -2_{10}
+\end{align*}
+\end{minipage}
+
+\begin{itemize}
+\item Adding 2 $N$-bit positive or negative numbers may cause overflow ($> 2^{N-1} \text{or} < -2^{N-1}$)
+\item Adding a positive to a negative \emph{never} cause overflow
+\item A carry out of most significant bit does \emph{not} indicate overflow
+\item Overflow occurs when two numbers have the same sign bit and result has the opposite sign bit
+\end{itemize}
+\begin{tabular}[h]{l|l|l}
+  \hline
+  System & Min  & Max \\
+  \hline
+  Unsigned & 0 & $2^{N} - 1$ \\
+  \hline
+  Sign/Magnitude & $-2^{N-1} + 1$ & $2^{N-1} - 1$ \\
+  \hline
+  Two's Complement & $-2^{N-1}$ & $2^{N-1} - 1$ \\
+  \hline
+\end{tabular}
+
+% Extension and truncation
+\textbf{Sign extension}: Extend $w$-bit signed integer to \emph{w}+\emph{k}-bit integer with same value:
+\begin{itemize}
+\item Make $k$ copies of sign bit for signed integer
+\[
+X' = \underbracket{x_{w-1},\ldots,x_{w-1}}_{k\; \text{copies of MSB}},x_{w-1},x_{w-2},\ldots,x_{0}
+\]
+\item Prepend $k$ copies of zeros for unsigned integer
+\[
+X' = \underbracket{0,\ldots,0,}_{k\; \text{copies of }0}x_{w-1},x_{w-2},\ldots,x_{0}
+\]
+\end{itemize}
+
+\begin{flalign*}
+  3_{10} = 0011_{2} \quad\text{(4-bit)} \xrightarrow{\text{copy sign bit into 3 new upper bits}} 0000011_{2} \quad\text{(7-bit)} \\
+  -3_{10} = 1101_{2} \quad\text{(4-bit)} \xrightarrow{\text{copy sign bit into 3 new upper bits}} 1111101_{2} \quad\text{(7-bit)} \\
+\end{flalign*}
+\textbf{Truncation} Truncate k+$w$-bit un-/signed integer $X$ to $w$-bit $X'$.
+\begin{itemize}
+\item For small un-/signed numbers, result remains the same (mod 2$^{w}$ until remainder $< 2^{w}$)
+\begin{align*}
+  2_{10}  & = 00010_{2} \xrightarrow[\text{truncate MSB}]{2 \modu 16} \dimtxt{0}0010_{2} = 2_{10} \\
+  -6_{10} & = 11010_{2} \xrightarrow[\text{truncate MSB}]{-6 \modu 16 = 26\text{U} \modu 16 = 10\text{U} = -6 } \\
+  & = \dimtxt{1}1010_{2} = -6_{10}\qquad
+\end{align*}
+\item For larger numbers, sign will change after truncation
+
+  \begin{align*}
+  10_{10} & = 01010_{2} \xrightarrow[\text{truncate MSB}]{2 \modu 16} \dimtxt{0}1010_{2} = -6_{10} \\
+  -10_{10} & = 10110_{2} \xrightarrow[\text{truncate MSB}]{-10 \modu 16 = 22\text{U} \modu 16 = 6\text{U} = 6 } \\
+  & = \dimtxt{1}0110_{2} = 6_{10}
+\end{align*}
+
+\end{itemize}
+
+
+\end{multicols*}
+\end{document}

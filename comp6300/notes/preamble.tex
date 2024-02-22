@@ -1,0 +1,63 @@
+% -- Layout ----
+\usepackage[top=0.5cm, bottom=0.5cm, left=0.5cm, right=0.5cm, landscape]{geometry}
+
+% -- Titles ----
+\usepackage[
+  tiny,                     % text size title
+  compact                   % reduce vertical space before/after title
+]{titlesec}
+% \titlespacing*
+\titleformat{\section}{\normalfont\normalsize\bfseries}{\thesection}{0em}{} % Remove space before and after section titles
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{0em}{} % Remove space before and after subsection titles
+\titlespacing*{\section}{0pt}{0pt}{0pt} % Remove space before/after section titles
+\titlespacing*{\subsection}{0pt}{0pt}{0pt} % Remove space before/after subsec titles
+
+% -- Colors ----
+\usepackage[dvipsnames,table]{xcolor}
+% \definecolor{dim}{RGB}{192,192,192} % Define a custom dimmed text color
+\definecolor{dim}{RGB}{235,235,240} % Define a custom dimmed text color
+\definecolor{drow}{RGB}{248,249,250} % Define a custom dimmed text color
+\definecolor{dmm}{RGB}{167,167,167} % Define a custom dimmed text color
+\usepackage{soul}
+
+% -- Math ------
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{pifont}
+\usepackage{annotate-equations}
+
+% -- Lists & tables -----
+\usepackage[inline]{enumitem}
+\setlist{noitemsep}% Remove vspace between items
+% Set vspace before and after  list environments as well as the left margin
+\setlist[itemize,1]{leftmargin=*,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[itemize,2]{leftmargin=2pt,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[enumerate,1]{leftmargin=*,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[enumerate,2]{leftmargin=1.2em,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\usepackage{multirow}
+
+% Drawings
+\usepackage{tikz}
+\usetikzlibrary{ arrows, bbox, calc, positioning, circuits.logic }
+
+
+% Place a figure env right here via [H] option
+\usepackage{float}
+
+% Side by side figure
+\usepackage{subcaption}
+
+% -- Multi-Col layout --
+\usepackage{multicol}
+
+
+% No indentation
+\setlength\parindent{0pt}
+
+\newcommand{\mset}[1]{\(\{q_{#1}\}\)}
+\renewcommand{\arraystretch}{1.2}
+\newcommand{\xvdash}[1]{%
+  \vdash^{\mkern-10mu\footnotesize\rule[-1.2ex]{0pt}{0pt}#1}%
+}
+\newcommand{\dimtxt}[1]{\textcolor{dim}{#1}}
+\newcommand{\modu}{\;\text{mod}\;}
