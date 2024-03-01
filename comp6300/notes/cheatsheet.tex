@@ -14,122 +14,29 @@
 
 % Notes begin
 \begin{multicols*}{3}
-\section*{Decimal $\iff$ Binary (Unsigned, U)}
+
+% \section*{Decimal $\iff$ Binary (Unsigned, U)}
 % \input{topics/binary_num}
+
 % \pagebreak
 
-\section*{Combinational Digital Logic}
+\section*{Combinational v.s. Sequential}
+% \input{topics/combvsseq}
+
+\section*{MOSFETS (pMOS, nMOS, CMOS)}
+% \input{topics/cmos}
+
+\section*{Functional Specifications (Boolean Equations)}
+% \input{topics/fnspec}
+
+\section*{Bubble Pushing (backward: inputs $\leftarrow$ output)}
+% \input{topics/bubpush}
+
+\section*{Karnaugh Maps (K-Maps works well for up to 4 vars)}
 \begin{itemize}
-\item lowest voltage = 0V, called \emph{ground} or GND (sometimes, V$_{SS}$)
-\item highest voltage dec. from 5V (1970s-80s) to $\leqslant$1.2V, called V$_{DD}$
-\item \emph{short circut} occurs when both pull-up and pull-down network ON
-\item output \emph{floats} when both pull-up and pull-down network OFF
+\item each square in K-map corresponds to a row in Truth table
+\item each square in K-map contains value of output for that row
+\item adjacent squares share all the same literals except one
 \end{itemize}
-\begin{tabular}[h]{cllcl}
-  \hline
-  Gate & nMOS & pMOS & Pass well & Network  \\
-  \hline
-  0/LOW/GND & OFF & ON  & 0 &  pull-dow\textbf{n}\\
-  1/HIGH/V$_{DD}$ & ON & OFF & 1 & pull-u\textbf{p}\\
-  \hline
-\end{tabular}
-
-% Handy function to show the positions of nodes
-\def\normalcoord(#1){coordinate(#1)}
-\def\showcoord(#1){coordinate(#1) node[circle, red, draw, inner sep=1pt,
-pin={[red, overlay, inner sep=0.5pt, font=\tiny, pin distance=0.1cm,
-pin edge={red, overlay}]45:#1}](){}}
-\let\coord=\normalcoord
-\let\coord=\showcoord % coordinates markers
-\def\killdepth#1{{\raisebox{0pt}[\height][0pt]{#1}}} % baseline tweaks
-
-% Two-input NAND gate
-\begin{minipage}{0.4\linewidth}
-  \begin{circuitikz}
-    [scale=0.7,
-    transform shape,
-    information text/.style={inner sep=1ex}]
-  % Nodes
-  \draw (2,1.5) node[pmos](p2){\large p2};
-  \draw (3.5,1.5) node[pmos](p1){\large p1};
-  \draw (3.5,0) node[nmos](n1){\large n1};
-  \draw (3.5,-1.2) node[nmos](n2){\large n2} (3.5,-1.5) node[ground](GND){};
-  \draw (0,0) node[left](A){A};
-  \draw (0,-1.2) node[left](B){B};
-  % Wires
-  \draw (A) -- (n1.G);
-  \draw (B) -- (n2.G);
-  \draw (p1.G) -- (n1.G);
-  % from p2.G to the intersection of two lines:
-  % vertical line that passes p2.G and horizontal line that passes n2.G
-  \draw (p2.G) -- (p2.G |- n2.G);
-  % I/O
-  \draw (p2.D) -- (p1.D) -- ++(0.5,0) node[circ]{} +(0.1,0) node[right](y){$Y$};
-  \draw ($(p2.G |- p2.S)+(.7,0)$) -- (p2.S) -- +(1,0) node[above]{\large $V_{DD}$} -- (p1.S) -- +(0.3,0);
-
-  % Caption
-  \draw (GND) ($(GND) - (2,0)$) node[below, text width=2.5cm]
-  {Two-input NAND gate schematic};
-  % Information text, see https://tikz.dev/tutorial#sec-2.21
-  % Whenever possible, use it
-\end{circuitikz}
-\end{minipage}
-\begin{minipage}{0.55\linewidth}
-  The nMOS transistors n1 and n2 are connected in series;
-  The pMOS transistors p1 and p2 are in parallel.
-  This acts as the base for multiple-input NAND gate schematic.
-  For example, 4-input type would have 4 pMOS transistors in parallel
-  and 4 nMOS transistors in series.
-\end{minipage}
-\begin{tabular}[h]{ccccc}
-  \hline
-  A & B & Pull-Dow\textbf{n} network & Pull-U\textbf{p} network & Y  \\
-  \hline
-  0 & 0 & OFF & ON  & 1 \\
-  0 & 1 & OFF & ON  & 1 \\
-  1 & 0 & OFF & ON  & 1 \\
-  1 & 1 & ON & OFF  & 0 \\
-  \hline
-\end{tabular}
-
-% Two-input NOR gate
-\begin{minipage}{\linewidth}
-\begin{circuitikz}
-  [scale=0.7,
-    transform shape,
-    information text/.style={inner sep=2em}]
-    % Input A is the origin
-    \node at (0, 0) [left](A){A};
-    \node at (0, -1.2) [left](B){B};
-    \node at (3,0) [pmos](p1){\large p1};
-    \node at (3,-1.2) [pmos](p2){\large p2};
-    \node at (1.5,-2.7) [nmos](n1){\large n1};
-    \node at (3,-2.7) [nmos](n2){\large n2};
-    \node at (p1.S) [tground](vdd){};
-    \node at ($(p1.S)+(0,.1)$) [above]{V$_{DD}$};
-    \node at (n2.S) [sground](gnd){};
-    \node at (gnd.east) [left, yshift=-.2cm, xshift=-.2cm, text width=2.5cm]{Two-input NOR Gate Schematic};
-
-    \draw
-    (A) -- (p1.G)
-    (B) -- (p2.G)
-    (p2.D) -- (n2.D)
-    (n1.D) -- (n2.D) to[short, o-*] (n2.D) -- +(.5,0) node[right](Y){Y}
-    (n1.S) -- (n2.S)
-    (n1.G) -- (n1.G |- p1.G)
-    (n2.G) -- (n2.G |- p2.G);
-
-    % Text information
-    \draw (Y.east) node[right, xshift=.3cm, text width=6cm, information text]
-    {\LARGE The NOR gate should produce a 0 output if either input is 1.
-
-      Hence, the pull-down network should have two nMOS transistors in parallel.
-
-      By the conduction complements rule, the pMOS transistors must be in series.
-    };
-
-\end{circuitikz}
-\end{minipage}
-
 \end{multicols*}
 \end{document}

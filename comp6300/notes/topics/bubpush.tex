@@ -1,0 +1,136 @@
+% Step 1
+\begin{enumerate}
+  \item Begin at output and work \emph{back} toward inputs.
+  \item Work on one gate each time, use Demorgan's law
+  \item NAND(AB)
+
+% NAND to NOT (OR)
+\begin{circuitikz}
+  [transform shape,
+  information text/.style={inner sep=1ex}]
+  \ctikzset{
+      logic ports=ieee,
+      logic ports/scale=0.6,
+   }
+
+   \draw (-2,.6) node[nand port](nd1){}
+   (nd1.in 1) -- +(0,0) node[left](A){A}
+   (nd1.in 2) -- +(0,0) node[left](B){B}
+   (nd1.out) -- +(.3,0) node[right](o1){C$_{out}$};
+   \draw [-{Latex[length=3mm]}] (o1.east) -- ++(1,0)
+   node[above](tip1){$\qquad\overline{A\cdot B} = \overline{A} + \overline{B}$} --
+   ++(2,0) node[](emp1){};
+
+   \draw (emp1.east)  +(1.5,0) node[or port](or1){};
+   \draw (or1.bin 1) -- +(-.05,0) node[ocirc]{};
+   \draw (or1.bin 2) -- +(-.05,0) node[ocirc]{};
+   \draw (or1.in 1) -- +(-.15,0) node[left]{A};
+   \draw (or1.in 2) -- +(-.15,0) node[left]{B};
+   \draw (or1.out) +(.2,0) node[right]{C$_{out}$};
+\end{circuitikz}
+
+\item NOR(AB)
+
+% NOR to AND(NOT)
+\begin{circuitikz}
+  [transform shape,
+  information text/.style={inner sep=1ex}]
+  \ctikzset{
+      logic ports=ieee,
+      logic ports/scale=0.6,
+   }
+
+   \draw (-2,.6) node[nor port](nr2){}
+   (nr2.in 1) -- +(0,0) node[left](A){A}
+   (nr2.in 2) -- +(0,0) node[left](B){B}
+   (nr2.out) -- +(.3,0) node[right](o2){C$_{out}$};
+   \draw [-{Latex[length=3mm]}] (o2.east) -- ++(1,0)
+   node[above](tip1){$\qquad\overline{A+B} = \overline{A} \cdot \overline{B}$} --
+   ++(2,0) node[](emp2){};
+
+   \draw (emp2.east)  +(1.5,0) node[and port](ad1){};
+   \draw (ad1.bin 1) -- +(-.05,0) node[ocirc]{};
+   \draw (ad1.bin 2) -- +(-.05,0) node[ocirc]{};
+   \draw (ad1.in 1) -- +(-.15,0) node[left]{A};
+   \draw (ad1.in 2) -- +(-.15,0) node[left]{B};
+   \draw (ad1.out) +(.2,0) node[right]{C$_{out}$};
+ \end{circuitikz}
+
+\item Bubble canceling
+
+\begin{circuitikz}[framed]
+  [transform shape,
+  information text/.style={inner sep=1ex}]
+  \ctikzset{
+      logic ports=ieee,
+      logic ports/scale=0.5,
+   }
+
+   % original (left)
+   \draw (-2,.6) node[nand port](nd1){}
+   (nd1.in 1) -- +(0,0) node[left](a1){A}
+   (nd1.in 2) -- +(0,0) node[left](b1){B}
+   (nd1.out) -- ++(.3,0) node[anchor=east](emp1){}
+   node[nand port, anchor=in 1](nd2){}
+   (emp1) -- +(.2,0) -- (nd2.in 1)
+   (nd2.in 2) -- +(-.2,0) node(emp2){}
+   (emp2.center) -- +(0,-.3)node(emp3){} -- (nd1.in 2 |- emp3.center) node[left](c1){C}
+   (nd2.out) -- +(0.1,0) node[right](y1){Y};
+
+   % arrow
+   \draw ($(nd2.out)+(.5,.5)$) node [above](note1){push this bubble first};
+   \draw [-{Latex[length=2mm]}] (note1.south) -- (nd2.bout);
+
+   \draw [-{Latex[length=2mm]}] (y1.east) -- ++(.5,0)
+   node[above,xshift=2em](tip1){$\overline{D\cdot C} = \overline{D} + \overline{C}$} --
+   ++(2,0) node(emp3){}
+   node[below,below of=tip1,yshift=.5cm](tip2){$D=\overline{A\cdot B}$};
+
+
+   % and to nand (left below)
+   \draw ($(nd1.bin 1)+(0,-1.3)$) node[and port,scale=0.9](ada){};
+   \draw [-{Latex[length=2mm]}] (ada.bout)  ++(.4,0)
+   node(t1){} -- +(.5,0) node(){};
+   \draw ($(ada.out)+(1.5,0)$) node[nand port,scale=0.9](na){};
+   \draw (na.out) -- +(.2,0) node[not port,anchor=in,scale=0.9](noa){};
+
+   \draw ($(nd1.bin 1)+(0,-2)$) node[or port,scale=0.9](ora){};
+   \draw [-{Latex[length=2mm]}] (ora.bout)  ++(.4,0)
+   node(t1){} -- +(.5,0) node(){};
+   \draw ($(ora.out)+(1.5,0)$) node[nor port,scale=0.9](nb){};
+   \draw (nb.out) -- +(.2,0) node[not port,anchor=in,scale=0.9](noa){};
+
+   % bubble identifying (right)
+   \draw ($(emp3)+(1,0)$) node[nand port,anchor=bin 2](nd3){}
+   (nd3.in 1) -- +(0,0) node[left](a2){A}
+   (nd3.in 2) -- +(0,0) node[left](b2){B}
+   (nd3.out) -- ++(.3,0) node[anchor=east](emp4){}
+   node[or port, anchor=in 1](or4){}
+   (or4.bin 1)  +(-.05,0) node[ocirc](or4b1){}
+   (or4.bin 2)  +(-.05,0) node[ocirc]{}
+
+   (emp4) -- +(.2,0) -- (or4.in 1)
+   (or4.in 2) -- +(-.2,0) node(emp5){}
+   (emp5.center) -- +(0,-.3)node(emp6){} -- (nd3.in 2 |- emp6.center) node[left](c2){C}
+   (or4.out) -- +(0,0) node[right](y2){Y};
+
+   \draw ($(nd3.out)+(.2,.5)$) node [above](note2){can cancel each other};
+   \draw [-{Latex[length=1.5mm]}] (note2.south) -- (nd3.bout);
+   \draw [-{Latex[length=1.5mm]}] (note2.south) -- (or4b1);
+
+
+   % bubble canceling (right below)
+   \draw ($(nd3.bin 2)+(0,-1.2)$) node[and port,anchor=bin 2](ad1){}
+   (ad1.in 1) -- +(0,0) node[left](a3){A}
+   (ad1.in 2) -- +(0,0) node[left](b3){B}
+   (ad1.out) -- ++(.3,0) node[below,anchor=east](emp7){}
+   node[or port, anchor=in 1](or5){}
+   (or5.bin 1)  +(-.05,0) node{}
+   (or5.bin 2)  +(-.05,0) node[ocirc]{}
+
+   (emp7) -- +(.2,0) -- (or5.in 1)
+   (or5.in 2) -- +(-.2,0) node(emp7){}
+   (emp7.center) -- +(0,-.3)node(emp8){} -- (ad1.in 2 |- emp8.center) node[left](c3){C}
+   (or5.out) -- +(0,0) node[right](y2){Y};
+\end{circuitikz}
+\end{enumerate}

@@ -39,7 +39,7 @@
 % Drawings
 \usepackage{tikz}
 \usepackage[american,siunitx,emptypmoscircle]{circuitikz} % autoload tikz, calc, arrows.meta
-\usetikzlibrary{bbox, positioning}
+\usetikzlibrary{bbox, positioning, tikzmark}
 
 
 % Place a figure env right here via [H] option
@@ -54,7 +54,7 @@
 
 % No indentation
 \setlength\parindent{0pt}
-
+\setlength{\tabcolsep}{5pt} % space between table columns
 \newcommand{\mset}[1]{\(\{q_{#1}\}\)}
 \renewcommand{\arraystretch}{1.2}
 \newcommand{\xvdash}[1]{%
