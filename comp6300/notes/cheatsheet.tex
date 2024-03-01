@@ -37,6 +37,64 @@
 \item each square in K-map corresponds to a row in Truth table
 \item each square in K-map contains value of output for that row
 \item adjacent squares share all the same literals except one
+\item a var's true and compl. forms all in circle, it's excluded from implicant
+\item K-map is cyclic, left edge adjacent to right,  top adjacent to bottom
 \end{itemize}
+
+Rules for finding a minimized equation from a K-map
+\begin{enumerate}
+\item draw recton K-Map where sum of squares (boolean fn) evals to 1
+\item draw \textbf{fewest} rects necessary to cover all 1s
+\item rect has a width and length that must be a power of 2: 1,2,4
+\item rect can overlap other implicants (rule 1)
+\item a prime implicant is not completely contained in any other implicant
+\item implicant can be uniquely identified by a single product term
+\item the larger the implicant, the smaller the product term (rule 2)
+\item each rect keeps vars that appear only in true or complement forms
+\item If a var is 0, use its complement form ($\overline{A}$)
+\end{enumerate}
+\begin{minipage}{\linewidth}
+  \rowcolors{1}{Gray}{white}
+\begin{tabular}{|c|c|c|c|c|}
+  \hline
+C\textbackslash AB & 00 & 01 & 11 & 10\tikzmark{t} \\
+  \hline
+  \hiderowcolors
+  \cellcolor{Gray}0 & 0 & 0 & 1\tikzmark{i1} & 1\tikzmark{i2} \\
+  \hline
+  \cellcolor{Gray}1 & 0 & 1\tikzmark{i3} & 1\tikzmark{i4} & 0 \\
+  \hline
+\end{tabular}
+\begin{tikzpicture}[remember picture, overlay]
+  \tikzset{shape example/.style=
+    {color=red, draw, line width=1pt, inner sep=0pt, minimum width=1cm,minimum height=0.3cm,anchor=west,rounded corners}}
+  \draw node[name=im1,shape=rectangle,shape example] at ($(pic cs:i1)+(-.23,.1)$) {};
+  \draw node[name=im2,shape=rectangle,shape example] at ($(pic cs:i3)+(-.23,.1)$) {};
+  \draw node[inner sep=0pt](tip1) at ($(pic cs:i2)+(1,.3)$){$A\overline{C}$};
+  \draw node[inner sep=0pt](tip2) at ($(pic cs:i3)+(-.8,-.5)$){$BC$};
+
+  \draw [arrows={- Latex[length=1.5mm,bend,line width=0pt]}]
+  (tip1) edge[bend right=30] (im1.north east);
+  \draw [arrows={- Latex[length=1.5mm,bend,line width=0pt]}]
+  (tip2) edge[bend right=30] (im2.south);
+
+  \draw node[text width=4cm] at ($(pic cs:t.east)+(3.1,0)$) {
+    In $A\overline{C}$, $B$ is excluded because it appears in both true and complement form.
+
+    $Y= A\cdot \overline{C} + B\cdot C$
+  }
+  ;
+\end{tikzpicture}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+\begin{tikzpicture}
+\begin{tabular}{cccc}
+
+\end{tabular}
+\end{tikzpicture}
+\end{minipage}
+
+
 \end{multicols*}
 \end{document}
