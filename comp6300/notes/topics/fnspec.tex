@@ -2,34 +2,27 @@
 \item In a given truth table, look for rows that have an output of 1/TRUE
 \item\label{bf:step2} For each such row, write a boolean equation such that inputs $\rightarrow$ 1/TRUE; usually using AND (multiplication $A\cdot B$) and NOT ($\overline{B}$)
 \item Chain all the terms in \ref{bf:step2} using OR (production +)
-  \[
-Y = \overbracket{\overline{C}\overline{B}A + \overline{C}BA + \underbracket{CB\overline{A}}_{\mathclap{\text{product/implicant}}} + CBA}^{\text{sum of products}}
-  \]
+  \begin{equation}\label{eq:fnspec1}
+Y = \overbracket{\overline{C}\overline{B}A + \overline{C}BA + \underbracket{CB\overline{A}}_{\mathclap{\text{product/implicant/minterm}}} + CBA}^{\text{sum of products}}
+  \end{equation}
 \item sum-of-products also called \emph{two-level logic} (AND connected to SUM)
 \end{enumerate}
+\begin{tabular}[h]{ccccc}
+  \hline
+  literals & true form & complementary form & product & sum \\
+  \hline
+  $A, \overline{A}, B, C, \overline{C}$ & $A, B, C$ & $\overline{A}, \overline{B}, \overline{C}$ & $\overline{A}BC$ & A + B \\
+  \hline
+\end{tabular}
 \begin{itemize}
-\item chain: propagation delays increase linearly with number of inputs
-\item tree: propagation delays increase logarithmatically with number of inputs
+\item[] \emph{true form} does NOT mean A is TRUE, just that A has no overline
+\item \textbf{minterm}: a TRUE prodt. involving all inputs to the boolean fn: $\overline{A}B$
+\item \textbf{maxterm}: a FALSE sum involving all inputs to the boolean fn: $A + B$
+\item chain: $t_{pd}$ increases linearly with number of inputs
+\item tree: $t_{pd}$ increases logarithmatically with number of inputs
 \item A boolean equation can be the sum of minterms (0-indexed) (but not necessarily the shortest): $f(A,B) = \Sigma(m_{i},m_{k},\ldots)$
 \item A boolean equation can be the product of maxterms (0-index): $F(A,B) = \Pi(m_{i},m_{k},\ldots)$; each $m$ is FALSE
 \item To simplify a boolean equation, use boolean algebra or K-map
 \item To simplify a truth table, use ``don't care'' $X$
 \item Simplifying a boolean equation for digital circuits may cause hazards
 \end{itemize}
-
-\begin{tabular}{l|c|c|c}
-  \hline
-  \multicolumn{4}{c}{$Y = \overline{A}B + B$} \\
-  \hline
-  literals & true form & complementary form & product/implicant \\
-  \hline
-  A, $\overline{A}$, B & A & $\overline{A}$ & $\overline{A}B$\\
-  \hline
-  \multicolumn{4}{l}{\emph{true form} does NOT mean A is TRUE, just that A has no overline} \\
-  \hline
-  \textbf{implicant} & \multicolumn{3}{l}{The AND of one or more literals, also \emph{product} } \\
-  \textbf{sum} & \multicolumn{3}{l}{The OR of one or more literals} \\
-  \textbf{minterm} & \multicolumn{3}{l}{a TRUE product involving all inputs to the boolean fn: $\overline{A}B$}\\
-  \textbf{maxterm} & \multicolumn{3}{l}{a FALSE sum involving all inputs to the boolean fn: $A + B$}\\
-  \hline
-\end{tabular}

@@ -1,0 +1,55 @@
+\begin{circuitikz}
+  \ctikzset{
+    logic ports=ieee,
+    logic ports/scale=0.6,
+  }
+
+  \node[](D) at (0, 0){D};
+  \node[](C) at (0, 0.4){C};
+  \node[](A) at (0, 1.2){A};
+  \node[and port,anchor=in 1] (ad1) at ($(A)+(.2,0)$) {};
+  \node[](B) at ($(ad1.in 2)+(-.2,0)$) {B};
+  \node[or port,anchor=in 2] (or) at ($(C)+(2.2,0)$) {};
+  \node[and port,anchor=in 2] (ad2) at ($(D)+(4.2,0)$) {};
+
+  \draw (C) -- (or.in 2);
+  \draw[color=gray,line width=1pt] (D) -- (ad2.in 2) -- (ad2.bin 2);
+  \draw (ad2.out) +(0,0) node[right](y){Y};
+  \draw[color=cyan,line width=1pt] (ad1.bin 1) -- (ad1.in 1);
+  \draw[color=cyan,line width=1pt] (ad1.bin 2) -- (ad1.in 2);
+  \draw[color=cyan,line width=1pt] (ad1.bout) -- (ad1.out)
+  -- ++(.2,0) node[above,color=cyan](inset1){n1} --
+  (inset1 |- or.in 1) -- (or.in 1) -- (or.bin 1);
+
+  \draw[color=cyan,line width=1pt] (or.bout) -- (or.out)
+  -- ++(.2,0) node[above,color=cyan](inset2){n2}
+  -- (inset2 |- ad2.in 1) -- (ad2.in 1) -- (ad2.bin 1);
+
+  \draw[<-,cyan] (or.in 1) -- +(.3,.6) node[above]{\small Critical Path (longest,slow)};
+  \draw[<-,gray] (ad2.in 2) ++(-2,0) -- +(0,-.3) node[below]{\small Short Path (fast)};
+
+  \node[text width=5cm](info) at ($(y)+(.5,1)$) {
+    \begin{align}
+      t_{pd} &= 2t_{pd\_\text{AND}} + t_{pd\_\text{OR}} \\
+      t_{cd} &= t_{cd\_\text{AND}}
+    \end{align}
+  };
+
+  \node[text width=3.5cm](info) at ($(y)+(2,-.2)$) {
+    See ARM book Figure-2.69 (pp90) for the timing diagrams of both paths
+  };
+
+  % \draw[color=cyan,line width=1pt] (ad1.out) -- +(.2,0) node[](inset1){};
+  % % \draw[color=cyan,line width=1pt] (ad1.out) -- +(.5,0) -- (ad1.out |- or.in 1);
+\end{circuitikz}
+
+\begin{itemize}
+\item LOW $\rightarrow$ HIGH is \emph{rising edge}; HIGH $\rightarrow$ LOW is \emph{falling edge}
+\item circuits slowing down when hot and speeding up when cold
+\item manufacturers provide data sheets showing delays for each gate
+\item propagation delay $t_{pd} = \Sigma e$ where $e$ is an element along \textbf{critical} path
+\item[] $t_{pd}$ is the min time from when an input changes until the output(s) reach their final value.
+\item combinational delay $t_{cd} = \Sigma e$ where $g$ is an element long \textbf{short} path
+\item[] $t_{cd}$ is the min time from when an input changes until any output starts changing
+\item delays usually occur on order of $10^{-12}$(pico)/$10^{-9}$(nano) second
+\end{itemize}

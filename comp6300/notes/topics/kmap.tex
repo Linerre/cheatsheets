@@ -1,0 +1,116 @@
+\begin{itemize}
+\item each square in K-map corresponds to a row in Truth table
+\item each square in K-map contains value of output for that row
+\item adjacent squares share all the same literals except one
+\item a var's true and compl. forms all in circle, it's excluded from implicant
+\item K-map is cyclic, left edge adjacent to right,  top adjacent to bottom
+\end{itemize}
+
+Rules for finding a minimized equation from a K-map
+\begin{enumerate}
+\item draw recton K-Map where sum of squares (boolean fn) evals to 1
+\item draw \textbf{fewest} rects (largest, greedy) necessary to cover all 1s
+  \begin{enumerate}
+  \item circle the greatest possible rectangle (rule 2,3,4)
+  \item repeat until all prime implicants circled
+  \end{enumerate}
+\item rect has a width and length that must be a power of 2: 1,2,4
+\item rect can overlap other implicants (rule 1)
+\item a prime implicant is not completely contained in any other implicant
+\item implicant can be uniquely identified by a single product term
+\item the larger the implicant, the smaller the product term (rule 2)
+\item each rect keeps vars that appear only in true or complement forms
+\item If a var is 0, use its complement form ($\overline{A}$)
+\end{enumerate}
+In the below K-map, the minimal SOP, with the 3rd column (in blue circle) removed, may cause
+hazards/glitches in digital circuits. See ENGN6213 Lab1-3, ARM section 2.9.2, and \href{https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/pages/c4/c4s2/c4s2v5/}{MIT6.004-4.2.5 Karnaugh}
+
+\begin{minipage}{\linewidth}
+  \rowcolors{1}{Gray}{white}
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    C\textbackslash AB & 00 & 01 & 11 & 10\tikzmark{t} \\
+    \hline
+    \hiderowcolors
+  \cellcolor{Gray}0 & 0 & 0 & 1\tikzmark{i1} & 1\tikzmark{i2} \\
+  \hline
+  \cellcolor{Gray}1 & 0 & 1\tikzmark{i3} & 1\tikzmark{i4} & 0 \\
+  \hline
+\end{tabular}
+\begin{tikzpicture}[remember picture, overlay]
+  \tikzset{
+    shape example/.style={color=red, draw, line width=1pt, inner sep=0pt, minimum width=1cm,minimum height=0.3cm,anchor=west,rounded corners=1ex},
+    hazard/.style={color=blue,draw,line width=0.5pt,inner sep=0pt}
+  }
+  \draw node[name=im1,shape=rectangle,shape example] at ($(pic cs:i1)+(-.23,.1)$) {};
+  \draw node[name=im2,shape=rectangle,shape example] at ($(pic cs:i3)+(-.23,.1)$) {};
+  \draw node[inner sep=0pt](tip1) at ($(pic cs:i2)+(.8,.3)$){$A\overline{C}$};
+  \draw node[inner sep=0pt](tip2) at ($(pic cs:i3)+(-.8,-.3)$){$BC$};
+
+  % Hazard
+  \draw[hazard] ($(pic cs:i1)+(-.2,.2)$) rectangle ($(pic cs:i4)+(.1,-.1)$);
+
+  \draw [arrows={- Latex[length=1.5mm,bend,line width=0pt]}]
+  (tip1) edge[bend right=30] (im1.north east);
+  \draw [arrows={- Latex[length=1.5mm,bend,line width=0pt]}]
+  (tip2) edge[bend right=30] (im2.south);
+
+  \draw node[text width=4cm] at ($(pic cs:t.east)+(3,0)$) {
+   $B$ is excluded from $A\overline{C}$, as it is in both true and complementary form.
+
+    $Y= A\overline{C} + BC$
+  }
+  ;
+\end{tikzpicture}
+\end{minipage}
+\vspace{1.2em}
+
+\begin{minipage}{\linewidth}
+  \rowcolors{1}{Gray}{white}
+  \begin{tabular}{|c|c|c|c|c|}
+    {\small $\frac{AB\rightarrow}{CD\downarrow}$} & 00 & 01 & 11 & 10 \\
+    \hline
+    \hiderowcolors
+    \cellcolor{Gray}00 & 0 & \tikzmark{a}1 & \tikzmark{b}1 & \tikzmark{c}1 \\
+    \hline
+    \cellcolor{Gray}01 & \tikzmark{d}1 & \tikzmark{e}1 & \tikzmark{f}1 & \tikzmark{g}1 \\
+    \hline
+    \cellcolor{Gray}11 & \tikzmark{h}1 & 1 & 1 & \tikzmark{i}1 \\
+    \hline
+    \cellcolor{Gray}10 & \tikzmark{j}1 & 0 & 0 & \tikzmark{k}1 \\
+    \hline
+  \end{tabular}
+  \begin{tikzpicture}[remember picture,overlay]
+    \tikzset{shape example/.style=
+      {color=red, draw, line width=1pt, inner sep=0pt, minimum width=1cm,minimum height=0.3cm,anchor=west,rounded corners=1ex},
+      wraps/.style={color=red,draw,line width=1pt,inner sep=0pt},
+      pointer/.style={color=cyan,line width=.5pt,arrows={-Latex[length=1.1mm]}},
+    }
+    \draw[shape example] ($(pic cs:a)+(-.1,.25)$) rectangle ($(pic cs:f)+(.2,.-.05)$);
+    \draw[shape example] ($(pic cs:b)+(-.1,.2)$) rectangle ($(pic cs:g)+(.2,.-.1)$);
+    \draw[shape example] ($(pic cs:d)+(-.1,.22)$) rectangle ($(pic cs:i)+(.22,.-.05)$);
+    \draw[wraps] ($(pic cs:i)+(-.1,.2)$) -- ($(pic cs:i)+(.5,.2)$)
+    ($(pic cs:i)+(-.1,.2)$) -- ($(pic cs:k)+(-.1,-.2)$) -- ($(pic cs:k)+(.5,-.2)$);
+    \draw[wraps] ($(pic cs:h)+(.3,.2)$) -- ($(pic cs:h)+(-.3,.2)$)
+    ($(pic cs:h)+(.3,.2)$) -- ($(pic cs:j)+(.3,-.2)$) -- ($(pic cs:j)+(-.3,-.2)$);
+
+    \draw node[text width=4cm](mbf) at ($(pic cs:g.east)+(3,.1)$) {
+      $Y= D + B\overline{C} + A\overline{C} + \overline{B}C$
+    };
+
+    % D
+    \path[pointer] (pic cs:i) edge[bend right,out=-20,in=-100] ($(mbf.west)+(.9,-.15)$);
+
+    % B AND (NOT C)
+    \path[pointer] ($(pic cs:a)+(0,.2)$) edge[bend left,out=40,in=140] ($(mbf.center)+(-.4,.2)$);
+
+    % A AND (NOT C)
+    \path[pointer] ($(pic cs:c)+(.1,.2)$) edge[bend left,out=20,in=105] ($(mbf.center)+(.42,.2)$);
+
+    % (NOT B) AND C
+    \path[pointer] ($(pic cs:k)+(.1,0)$) edge[bend left,out=-5,in=-90] ($(mbf.east)+(-1,-.2)$);
+  \end{tikzpicture}
+
+  \vspace{.5em}
+  In the above K-map, the rightmost column can also be counted as an implicant, leading to a different sum of products $Y=D + B\overline{C} + \textcolor{red}{A\overline{B}} + \overline{B}C$. Minimal SOP is \emph{not} necessarily unique.
+\end{minipage}

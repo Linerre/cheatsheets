@@ -1,0 +1,105 @@
+% MUX
+\begin{tabular}[h]{ccc|c}
+  S & A & B & Y\\
+  \hline
+  0 & 0 & X & 0\\
+  0 & 1 & X & \tikzmark{m}1\\
+  1 & X & 0 & 0\\
+  1 & X & 1 & 1\\
+\end{tabular}
+\begin{circuitikz}[remember picture,overlay,scale=0.8, transform shape]
+  \tikzset{
+    mux2by1/.style={muxdemux, muxdemux def={Lh=3.2,Rh=1.5,NL=2,NT=1,NB=0,NR=1, w=1.2}},
+    mux4by1/.style={muxdemux, muxdemux def={Lh=3.2,Rh=2.5,NL=4,NT=2,NB=0,NR=1, w=1.5}}
+  }
+
+  % 2by1 mux
+  \node [mux2by1,anchor=west](mux) at ($(pic cs:m)+(1.2,0)$) {};
+  \draw (mux.lpin 1) -- +(0,0) node[left](A){A};
+  \draw (mux.blpin 1) +(.05,0) node[right]{0};
+  \draw (mux.lpin 2) -- +(0,0) node[left](B){B};
+  \draw (mux.blpin 2) +(.05,0) node[right]{1};
+  \draw (mux.tpin 1) -- +(0,-.05) node[above](S){\textbf{S}};
+  \draw (mux.rpin 1) -- +(0,0) node[right](Y){Y};
+
+  \node [text width=3cm] at ($(Y)+(1.2,.8)$) {
+    $N$:1 mux usually needs $\log_{2}N$ select lines
+  };
+
+  \node [text width=3cm] at ($(Y)+(2,-.5)$) {
+    $2^N$-input mux can be programmed to perform any $N$-input logic function
+  };
+  % 2-input logic function
+  \node [mux4by1,anchor=west](mux2) at ($(Y)+(5,0)$) {};
+  \draw (mux2.lpin 1) -- +(-1,0) node(em1){} -- (em1 |- mux2.lpin 4) node[sground]{};
+  \draw (mux2.lpin 2) -- +(-1,0);
+  \draw (mux2.lpin 3) -- +(-1,0);
+  \draw (mux2.lpin 4) -- +(-.3,0) node[rground,yscale=-1]{};
+  \draw (mux2.blpin 1) +(.05,0) node[right]{00};
+  \draw (mux2.blpin 2) +(.05,0) node[right]{01};
+  \draw (mux2.blpin 3) +(.05,0) node[right]{10};
+  \draw (mux2.blpin 4) +(.05,0) node[right]{11};
+  \draw (mux2.tpin 1) -- +(0,0) node[above]{A};
+  \draw (mux2.tpin 2) -- +(0,.1) node[above]{B};
+  \draw (mux2.rpin 1) -- +(0,0) node[right]{Y};
+\end{circuitikz}
+
+\vspace{.5em}
+See ARM book (Example 2.12) for making 8:1 MUX $\rightarrow $ 3-input MUX
+
+% Decoder
+\begin{tabular}[h]{p{.2cm}p{.2cm}|p{.2cm}p{.2cm}p{.2cm}p{.2cm}}
+  $A_1$ & $A_0$ & $Y_3$ & $Y_2$ & $Y_1$ & $Y_1$\\
+  \hline
+  0 & 0 & 0 & 0 & 0 & 1\\
+  0 & 1 & 0 & 0 & 1 & \tikzmark{t}0\\
+  1 & 0 & 0 & 1 & 0 & 0\\
+  1 & 1 & 1 & 0 & 0 & \tikzmark{t2}0\\
+\end{tabular}
+\begin{circuitikz}[remember picture,overlay,scale=0.8,transform shape]
+  \tikzset{
+    decoder/.style={muxdemux, muxdemux def={Lh=3.5,Rh=3.5,NL=2,NB=0,NR=4, inset Rh=1,w=2.2}},
+  }
+  \ctikzset{
+    logic ports=ieee,
+    logic ports/scale=0.5,
+  }
+  \node [decoder](dec1) at ($(pic cs:t)+(2,0)$) {};
+  \node [text width=6cm] at ($(pic cs:t2)+(-.2,-.8)$) {
+    $N$-input fn with $M$ 1s in truth table $\rightarrow$ an $N$:$2^N$ decodr + $M$-input OR gate (attached to all minterms)
+  };
+  % 2:4 Decoder
+  \draw (dec1.lpin 1)  +(0,0) node[left](a1){$A_1$};
+  \draw (dec1.lpin 2)  +(0,0) node[left](b1){$A_0$};
+  \draw (dec1.rpin 1)  +(0,0) node[right](y3){$Y_3$};
+  \draw (dec1.rpin 2)  +(0,0) node[right](y2){$Y_2$};
+  \draw (dec1.rpin 3)  +(0,0) node[right](y1){$Y_1$};
+  \draw (dec1.rpin 4)  +(0,0) node[right](y0){$Y_0$};
+  \draw (dec1.brpin 1)  +(0,0) node[left]{$11$};
+  \draw (dec1.brpin 2)  +(0,0) node[left]{$10$};
+  \draw (dec1.brpin 3)  +(0,0) node[left]{$01$};
+  \draw (dec1.brpin 4)  +(0,0) node[left]{$00$};
+  \draw (dec1.top)  +(0,.4) node[below](ration){2:4 Decoder};
+
+  % logic function using 2:4 Decoder
+  \node [decoder](dec2) at ($(dec1.right)+(3,0)$) {};
+  \draw (dec2.top)  +(0,.4) node[below](name2){2:4 Decoder};
+  \draw (dec2.bottom)  +(-.2,-.2) node[below](logic){$Y=\overline{A\oplus B}$};
+  \draw (dec2.lpin 1)  +(0,0) node[left](a){$A$};
+  \draw (dec2.lpin 2)  +(0,0) node[left](b){$B$};
+  \draw (dec2.rpin 1) --  +(.8,0) node[right](o1){$AB$};
+  \draw (dec2.rpin 2) --  +(.8,0) node[right](o2){$A\overline{B}$};
+  \draw (dec2.rpin 3) --  +(.8,0) node[right](o3){$\overline{A}B$};
+  \draw (dec2.rpin 4) --  +(.8,0) node[right](o4){$\overline{AB}$};
+  \draw (o1)  +(0,.1) node[above](tip){Minterm};
+
+  \draw (dec2.brpin 1)  +(0,0) node[left]{$11$};
+  \draw (dec2.brpin 2)  +(0,0) node[left]{$10$};
+  \draw (dec2.brpin 3)  +(0,0) node[left]{$01$};
+  \draw (dec2.brpin 4)  +(0,0) node[left]{$00$};
+
+  \draw (dec2.bottom right) +(.5,-.5) node[or port,rotate=-90](or){};
+  \draw (or.in 2) -- (or.in 2 |- dec2.rpin 1);
+  \draw (or.in 1) -- (or.in 1 |- dec2.rpin 4);
+  \draw (or.out) +(0,0) node[below]{Y};
+\end{circuitikz} \\

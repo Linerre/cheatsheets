@@ -16,16 +16,16 @@
    \draw (-2,.6) node[nand port](nd1){}
    (nd1.in 1) -- +(0,0) node[left](A){A}
    (nd1.in 2) -- +(0,0) node[left](B){B}
-   (nd1.out) -- +(.3,0) node[right](o1){C$_{out}$};
-   \draw [-{Latex[length=3mm]}] (o1.east) -- ++(1,0)
+   (nd1.out) -- +(.2,0) node[right](o1){C$_{out}$};
+   \draw [-{Latex[length=2mm]}] (o1.east) -- ++(1,0)
    node[above](tip1){$\qquad\overline{A\cdot B} = \overline{A} + \overline{B}$} --
-   ++(2,0) node[](emp1){};
+   ++(1.5,0) node[](emp1){};
 
    \draw (emp1.east)  +(1.5,0) node[or port](or1){};
    \draw (or1.bin 1) -- +(-.05,0) node[ocirc]{};
    \draw (or1.bin 2) -- +(-.05,0) node[ocirc]{};
-   \draw (or1.in 1) -- +(-.15,0) node[left]{A};
-   \draw (or1.in 2) -- +(-.15,0) node[left]{B};
+   \draw (or1.in 1) -- +(-.1,0) node[left]{A};
+   \draw (or1.in 2) -- +(-.1,0) node[left]{B};
    \draw (or1.out) +(.2,0) node[right]{C$_{out}$};
 \end{circuitikz}
 
@@ -43,20 +43,21 @@
    \draw (-2,.6) node[nor port](nr2){}
    (nr2.in 1) -- +(0,0) node[left](A){A}
    (nr2.in 2) -- +(0,0) node[left](B){B}
-   (nr2.out) -- +(.3,0) node[right](o2){C$_{out}$};
-   \draw [-{Latex[length=3mm]}] (o2.east) -- ++(1,0)
+   (nr2.out) -- +(.2,0) node[right](o2){C$_{out}$};
+   \draw [-{Latex[length=2mm]}] (o2.east) -- ++(1,0)
    node[above](tip1){$\qquad\overline{A+B} = \overline{A} \cdot \overline{B}$} --
-   ++(2,0) node[](emp2){};
+   ++(1.5,0) node[](emp2){};
 
    \draw (emp2.east)  +(1.5,0) node[and port](ad1){};
    \draw (ad1.bin 1) -- +(-.05,0) node[ocirc]{};
    \draw (ad1.bin 2) -- +(-.05,0) node[ocirc]{};
-   \draw (ad1.in 1) -- +(-.15,0) node[left]{A};
-   \draw (ad1.in 2) -- +(-.15,0) node[left]{B};
+   \draw (ad1.in 1) -- +(-.1,0) node[left]{A};
+   \draw (ad1.in 2) -- +(-.1,0) node[left]{B};
    \draw (ad1.out) +(.2,0) node[right]{C$_{out}$};
  \end{circuitikz}
 
 \item Bubble canceling
+\end{enumerate}
 
 \begin{circuitikz}[framed]
   [transform shape,
@@ -81,9 +82,9 @@
    \draw ($(nd2.out)+(.5,.5)$) node [above](note1){push this bubble first};
    \draw [-{Latex[length=2mm]}] (note1.south) -- (nd2.bout);
 
-   \draw [-{Latex[length=2mm]}] (y1.east) -- ++(.5,0)
+   \draw [-{Latex[length=2mm]}] (y1.east) -- ++(.3,0)
    node[above,xshift=2em](tip1){$\overline{D\cdot C} = \overline{D} + \overline{C}$} --
-   ++(2,0) node(emp3){}
+   ++(1.5,0) node(emp3){}
    node[below,below of=tip1,yshift=.5cm](tip2){$D=\overline{A\cdot B}$};
 
 
@@ -133,4 +134,3 @@
    (emp7.center) -- +(0,-.3)node(emp8){} -- (ad1.in 2 |- emp8.center) node[left](c3){C}
    (or5.out) -- +(0,0) node[right](y2){Y};
 \end{circuitikz}
-\end{enumerate}

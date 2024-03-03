@@ -11,12 +11,10 @@
   1/HIGH/V$_{DD}$ & ON & OFF & 1 & pull-u\textbf{p}\\
   \hline
 \end{tabular}
-\item because ring inputs lead to falling outputs and vice-versa
 \item CMOS design prefers NANDs and NORs (\emph{not associative})
 \item wide NAND/NOR gates can't use chain/tree strategy
 \item Any logic function can be implemented using only NANDs/NORs
 \item Wide NANDs and NORs use trees of smaller devices
-\item NOTE: $\bar{A}\bar{B} \neq \overline{\rm AB}$
 \end{itemize}
 
 % Handy function to show the positions of nodes
@@ -60,8 +58,8 @@ pin edge={red, overlay}]45:#1}](){}}
 \end{circuitikz}
 \end{minipage}
 \begin{minipage}{0.55\linewidth}
-  The nMOS transistors n1 and n2 are connected in series;
-  The pMOS transistors p1 and p2 are in parallel.
+  The nMOS transistors n1 and n2 are connected in series;\\
+  The pMOS transistors p1 and p2 are in parallel.\\
   This acts as the base for multiple-input NAND gate schematic.
   For example, 4-input type would have 4 pMOS transistors in parallel
   and 4 nMOS transistors in series.
@@ -78,7 +76,7 @@ pin edge={red, overlay}]45:#1}](){}}
 \end{tabular}
 
 % Two-input NOR gate
-\begin{minipage}{\linewidth}
+\begin{minipage}{.4\linewidth}
 \begin{circuitikz}
   [scale=0.7,
     transform shape,
@@ -103,15 +101,10 @@ pin edge={red, overlay}]45:#1}](){}}
     (n1.S) -- (n2.S)
     (n1.G) -- (n1.G |- p1.G)
     (n2.G) -- (n2.G |- p2.G);
-
-    % Text information
-    \draw (Y.east) node[right, xshift=.3cm, text width=6cm, information text]
-    {\LARGE The NOR gate should produce a 0 output if either input is 1.
-
-      Hence, the pull-down network should have two nMOS transistors in parallel.
-
-      By the conduction complements rule, the pMOS transistors must be in series.
-    };
-
 \end{circuitikz}
+\end{minipage}
+\begin{minipage}{.55\linewidth}
+  The NOR gate should produce a 0 output if either input is 1.
+  Hence, the pull-down network should have two nMOS transistors in parallel.
+  By the conduction complements rule, the pMOS transistors must be in series.
 \end{minipage}
