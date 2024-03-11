@@ -144,13 +144,10 @@ Find decimal value of two's compl. number $1001_{2}$
 \end{align*}
 \end{minipage}
 
-\begin{itemize}
+\begin{enumerate}
 \item Adding 2 $N$-bit positive or negative numbers may cause overflow ($> 2^{N-1} \text{or} < -2^{N-1}$)
-\item Adding a positive to a negative \emph{never} cause overflow
-\item A carry out of most significant bit does \emph{not} indicate overflow
-\item Overflow occurs when two numbers have the same sign bit and result has the opposite sign bit
-\end{itemize}
-\begin{tabular}[h]{l|l|l}
+
+  \begin{tabular}[h]{l|l|l}
   \hline
   System & Min  & Max \\
   \hline
@@ -161,6 +158,42 @@ Find decimal value of two's compl. number $1001_{2}$
   Two's Complement & $-2^{N-1}$ & $2^{N-1} - 1$ \\
   \hline
 \end{tabular}
+\item Adding a positive to a negative \emph{never} cause overflow
+\item A carry out of most significant bit does \emph{not} indicate overflow
+\item Overflow occurs when two numbers have the same sign bit and result has the opposite sign bit
+\end{enumerate}
+\begin{minipage}{0.33\linewidth}
+\begin{tabular}{*{5}{c@{\,}}l}
+    & 1 & 0 & 0 & 0 & ($-8$) \\
+  + & 1 & 1 & 1 & 1 & ($-1$) \\
+  \hline
+  1 & 0 & 1 & 1 & 1 & (+7) \\
+  \multicolumn{6}{c}{overflow (4)}\\
+  \hline
+\end{tabular}
+\end{minipage}
+\begin{minipage}{0.33\linewidth}
+\begin{tabular}{*{5}{c@{\,}}l}
+    & 0 & 1 & 0 & 1 & (+5) \\
+  + & 0 & 1 & 0 & 0 & (+4) \\
+  \hline
+    & 1 & 0 & 0 & 1 & ($-7$) \\
+  \multicolumn{6}{c}{overflow (4)}\\
+  \hline
+\end{tabular}
+\end{minipage}
+\begin{minipage}{0.34\linewidth}
+\begin{tabular}{*{5}{c@{\,}}l}
+    & 1 & 1 & 0 & 0 & ($-4$) \\
+  + & 0 & 1 & 0 & 0 & (+4) \\
+  \hline
+  1 & 0 & 0 & 0 & 0 & (0) \\
+  \multicolumn{6}{c}{normal (1, 2)}\\
+  \hline
+\end{tabular}
+\end{minipage}
+
+
 
 % Extension and truncation
 \textbf{Sign extension}: Extend $w$-bit signed integer to \emph{w}+\emph{k}-bit integer with same value:

@@ -15,115 +15,35 @@
 % Notes begin
 \begin{multicols*}{3}
 
-% \section*{Decimal $\iff$ Binary (Unsigned, U)}
-% \input{topics/binary_num}
+\section*{Decimal $\iff$ Binary (Unsigned, U)}
+\input{topics/binary_num}
 
-% \pagebreak
+%TODO: Full adder here?
+\pagebreak
 
 \section*{Combinational v.s. Sequential}
 \input{topics/combvsseq}
 
-\section*{MOSFETS (pMOS, nMOS, CMOS)}
-\input{topics/cmos}
+% \section*{MOSFETS (pMOS, nMOS, CMOS)}
+% \input{topics/cmos}
 
 \section*{Functional Specifications (Boolean Equations)}
 \input{topics/fnspec}
 
-\section*{Bubble Pushing (backward: inputs $\leftarrow$ output)}
-\input{topics/bubpush}
+% \section*{Bubble Pushing (backward: inputs $\leftarrow$ output)}
+% \input{topics/bubpush}
 
-\section*{Karnaugh Maps (K-Maps works well for up to 4 vars)}
-\input{topics/kmap}
+% \section*{Karnaugh Maps (K-Maps works well for up to 4 vars)}
+% \input{topics/kmap}
 
-\section*{Multiplexer(MUX), Decoder, Timing, Glitches}
+% \section*{Multiplexer(MUX), Decoder, Timing, Glitches}
 \input{topics/demux}
 
 \vspace{1cm}
-\input{topics/timing}
+% \input{topics/timing}
+% \input{topics/glitch}
 
-\begin{tikzpicture}
-  \tikzset{
-    circle/.style={line width=.5pt,color=cyan!60,rounded corners=4pt},
-  }
+\pagebreak
 
-  % K-map Table
-  \foreach \x in {0,0.5,1,1.5}{
-    \draw (\x,0) rectangle (\x+0.5,0.5);
-    \draw (\x,0.5) rectangle (\x+0.5,1);
-  }
-
-  \draw (0,1) -- +(-0.3,0.3) node[above]{\footnotesize $Y$};
-  \draw (0,1) +(-0.1,0) node[left]{\footnotesize$C$};
-  \draw (0,1) +(0.1,0.15) node[above]{\footnotesize$AB$};
-
-  \node [left] at (0,0.25) {1};
-  \node [left] at (0,0.75) {0};
-
-  \node at (0.25,0.25) {1};
-  \node at (0.75,0.25) {1};
-  \node at (1.25,0.25) {1};
-  \node at (1.75,0.25) {0};
-  \node at (0.25,0.75) {1};
-  \node at (0.75,0.75) {0};
-  \node at (1.25,0.75) {0};
-  \node at (1.75,0.75) {0};
-  \node at (0.25,1.1) {\footnotesize 00};
-  \node at (0.75,1.1) {\footnotesize 01};
-  \node at (1.25,1.1) {\footnotesize 11};
-  \node at (1.75,1.1) {\footnotesize 10};
-
-  % Circles (prime implicants)
-  \draw[circle] (0.05,0.05) rectangle (0.45,0.95);
-  \draw[circle] (0.55,0.05) rectangle (1.45,0.45);
-
-  % Boolean function
-  \draw (0,-0.2) node[right]{\footnotesize$Y=\overline{A}\overline{B} + BC$};
-  % Arrow
-  \draw[cyan,-{Latex[length=1mm]}] (0.7,0.25) -- (0.3,0.25);
-  % Text
-  \draw (2,0.5) node[text width=2.2cm,right]{
-    \footnotesize K-map A with possible glitch
-  };
-
-
-  % K-map without glitch
-  \foreach \x in {5,5.5,6,6.5}{
-    \draw (\x,0) rectangle (\x+0.5,0.5);
-    \draw (\x,0.5) rectangle (\x+0.5,1);
-  }
-
-  \draw (5,1) -- +(-0.3,0.3) node[above]{\footnotesize $Y$};
-  \draw (5,1) +(-0.1,0) node[left]{\footnotesize$C$};
-  \draw (5,1) +(0.1,0.15) node[above]{\footnotesize$AB$};
-  \node [left] at (5,0.25) {1};
-  \node [left] at (5,0.75) {0};
-
-  \node at (5.25,0.25) {1};
-  \node at (5.75,0.25) {1};
-  \node at (6.25,0.25) {1};
-  \node at (6.75,0.25) {0};
-  \node at (5.25,0.75) {1};
-  \node at (5.75,0.75) {0};
-  \node at (6.25,0.75) {0};
-  \node at (6.75,0.75) {0};
-  \node at (5.25,1.1) {\footnotesize 00};
-  \node at (5.75,1.1) {\footnotesize 01};
-  \node at (6.25,1.1) {\footnotesize 11};
-  \node at (6.75,1.1) {\footnotesize 10};
-
-  % Circles (prime implicants)
-  \draw[circle] (5.05,0.05) rectangle (5.45,0.95);
-  \draw[circle] (5.55,0.05) rectangle (6.45,0.45);
-  \draw[circle,cyan] (5.05,0.05) rectangle (5.95,0.45);
-  \draw[-{Latex[length=1.1mm]},cyan] (4.8,-0.1) node[left]{\footnotesize$\overline{A}C$}
-  -- (5.1,0.1);
-  \draw (4.8,-0.2) node[right]{\footnotesize$Y=\overline{A}\overline{B} + BC + \textcolor{cyan}{\overline{A}C}$};
-  \draw (7,0.5) node[text width=2.2cm,right]{
-    \footnotesize K-map B without glitch
-  };
-\end{tikzpicture}
-\begin{itemize}
-\item input change crosses the boundary of two prime implicants indicates possible glitch; not to eliminate them but to know they exist
-\end{itemize}
 \end{multicols*}
 \end{document}
