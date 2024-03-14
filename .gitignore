@@ -5,6 +5,7 @@
 *.brf
 *.dvi
 *.log
+*.jou
 *.nav
 *.out
 *.pdf
@@ -18,6 +19,7 @@
 *_latexmk
 tlmgr.html
 auto/
+tmp/
 comp6710/
 Digital/
 comp6300/lab_pack_1/
