@@ -15,20 +15,20 @@
 % Notes begin
 \begin{multicols*}{3}
 
-\section*{Decimal $\iff$ Binary (Unsigned, U)}
-\input{topics/binary_num}
+% \section*{Decimal $\iff$ Binary (Unsigned, U)}
+% \input{topics/binary_num}
 
 %TODO: Full adder here?
-\pagebreak
+% \pagebreak
 
-\section*{Combinational v.s. Sequential}
-\input{topics/combvsseq}
+% \section*{Combinational v.s. Sequential}
+% \input{topics/combvsseq}
 
 % \section*{MOSFETS (pMOS, nMOS, CMOS)}
 % \input{topics/cmos}
 
-\section*{Functional Specifications (Boolean Equations)}
-\input{topics/fnspec}
+% \section*{Functional Specifications (Boolean Equations)}
+% \input{topics/fnspec}
 
 % \section*{Bubble Pushing (backward: inputs $\leftarrow$ output)}
 % \input{topics/bubpush}
@@ -37,13 +37,70 @@
 % \input{topics/kmap}
 
 % \section*{Multiplexer(MUX), Decoder, Timing, Glitches}
-\input{topics/demux}
+% \input{topics/demux}
 
 \vspace{1cm}
 % \input{topics/timing}
 % \input{topics/glitch}
 
-\pagebreak
+% \pagebreak
+
+\section*{Bistable (cross-coupled inverter pair)}
+\begin{circuitikz}
+  \ctikzset {
+    logic ports=ieee,
+    logic ports/scale=0.7,
+  }
+
+  % coupled-inverter pair
+  \node [not port,anchor=in] (i2) at(.3,1) {I2} ;
+  \node [not port,anchor=in] (i1) at($(i2.out)+(0.5,0)$) {I1};
+  \draw (0,0) |- (i2.in);
+  \draw (i2.out) -- +(.2,0) node[above] (qcomp) {$\overline{Q}$} -- (i1.in);
+  \draw (i1.out) -- +(.2,0) node[above] (q) {$Q$};
+  \draw (0,0) -| (q);
+
+  \node[text width=3.5cm,right] at (0,1.8) {
+    When power first applied, initial state is unknown
+  };
+
+  % cross-coupled inverter pair
+  \node [not port,anchor=south west] (ib2) at(4.5,0) {I2};
+  \node [not port,anchor=south west] (ib1) at(4.5,1.6) {I1};
+
+  \node [left,blue,xshift=-.3,yshift=-.2] at (ib1.in) {1};
+  \node [above,blue,xshift=.25] at (ib1.out) {0};
+  \node [left,blue,xshift=-.3,yshift=.2] at (ib2.in) {0};
+  \node [above,blue,xshift=.25] at (ib2.out) {1};
+
+  \draw (ib2.in) -- ++(-.1,0) -- ++(0,.6) -- ($(ib1.out)+(.2,-.6)$) |- (ib1.out);
+  \draw (ib2.out) -- ++(.2,0) -- +(0,.6) -- ($(ib1.in)+(-.1,-.6)$) |- (ib1.in);
+  \draw (ib1.out) -- ++(.5,0) node[right]{$Q$};
+  \draw (ib2.out) -- ++(.5,0) node[right]{$\overline{Q}$};
+
+  % Cross-coupled inverter pair
+  \node [not port,anchor=south west] (ic2) at(7.5,0) {I2};
+  \node [not port,anchor=south west] (ic1) at(7.5,1.6) {I1};
+
+  \node [left,blue,xshift=-.3,yshift=-.2] at (ic1.in) {0};
+  \node [above,blue,xshift=.25] at (ic1.out) {1};
+  \node [left,blue,xshift=-.3,yshift=.2] at (ic2.in) {1};
+  \node [above,blue,xshift=.25] at (ic2.out) {0};
+
+  \draw (ic2.in) -- ++(-.1,0) -- ++(0,.6) -- ($(ic1.out)+(.2,-.6)$) |- (ic1.out);
+  \draw (ic2.out) -- ++(.2,0) -- +(0,.6) -- ($(ic1.in)+(-.1,-.6)$) |- (ic1.in);
+  \draw (ic1.out) -- ++(.5,0) node[right]{$Q$};
+  \draw (ic2.out) -- ++(.5,0) node[right]{$\overline{Q}$};
+\end{circuitikz}
+\section*{SR Latch}
+
+\section*{D Latch (transparent/level-sensitive)}
+
+\section*{D FlipFlop}
+N-bit register needs a bank of N (D) flip-flops with a shared CLK.
+
+
+
 
 \end{multicols*}
 \end{document}
