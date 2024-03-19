@@ -13,7 +13,7 @@ if { [file isdirectory $srcdir] > 0 } {
     file mkdir $srcdir
 }
 
-set logdir ./logs
+set logdir ./log
 if { [file isdirectory $logdir] > 0 } {
     puts "$logdir already exists; skipping ... \n"
 } else {
@@ -22,9 +22,9 @@ if { [file isdirectory $logdir] > 0 } {
 }
 
 # Testbench files for simulation
-set testdir ./testdir
+set testdir ./test
 if { [file isdirectory $testdir] > 0 } {
-    puts "$test already exists; skipping ... \n"
+    puts "$testdir already exists; skipping ... \n"
 } else {
     puts "Creating $testdir ... \n"
     file mkdir $testdir
@@ -96,8 +96,16 @@ proc flycheck {} {
     check_syntax -fileset [glob ./src/*.v]
 }
 
-# Simulate with given testbenches
-proc simu {} {
-    # Set target simulator (default Vivado simulator) for current in-mem project
-    set_property TARGET_SIMULATOR XSim [current_project]
+# Elaborate the design (see gates, registers, etc described in
+# verilog). This style of system visualisation is called RTL
+# framework. This needs start_gui after running the commands.
+proc rtl { top } {
+    close_project
+
+    read_verilog [glob ./src/$top.v]
+    read_verilog -quiet [glob -nocomplain ./src/$top.xdc]; # constraints could be absent
+    synth_design -top $top -part xc7a35tcpg236-1 -rtl
+    start_gui
+
+    # In the GUI, at the bottom, type in `stop_gui` in the Tcl console to close it
 }
