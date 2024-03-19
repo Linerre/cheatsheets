@@ -92,13 +92,59 @@
   \draw (ic1.out) -- ++(.5,0) node[right]{$Q$};
   \draw (ic2.out) -- ++(.5,0) node[right]{$\overline{Q}$};
 \end{circuitikz}
-\section*{SR Latch}
+\section*{SR Latch (not synchronous)}
 
 \section*{D Latch (transparent/level-sensitive)}
-
-\section*{D FlipFlop}
+\begin{itemize}
+\item Enable (maybe with a CLK) controls \emph{when} data flows through the latch
+\item Enable determines whether or nor to block the circuit
+\item Avoid gating Enable with Clock!
+\item $E = 1$, latch is \textbf{transparent} and D flows to Q
+\item $E = 0$, latch is \textbf{opaque} and blocks D from flowing to Q
+\end{itemize}
+\section*{D Flip Flop (synchronous)}
+\begin{itemize}
+\item it copies input \emph{D} to output \emph{Q} \textbf{only} on the rising edge of clock
+\item it remembers its state at all other time
+\item \emph{D} input specifies what the new state will be
+\item clock edge indicates when the old should be updated
+\end{itemize}
 N-bit register needs a bank of N (D) flip-flops with a shared CLK.
 
+
+
+\section*{Synchronous vs Asynchronous}
+\begin{minipage}[h]{0.5\linewidth}
+\begin{itemize}
+\item no cyclic paths
+\item stable (or bistable, metastable)
+\item outputs settle after t$_{pd}$
+\item use/insert registers to break cyclic path
+\item states of registers \textbf{synchronized} to CLK; easier to design/analyze
+\item virtually all digital systems are synchronous
+\end{itemize}
+\end{minipage}
+\begin{minipage}[h]{0.5\linewidth}
+\begin{itemize}
+\item with cyclic paths
+\item non-stable (astable)
+\item infamous for race conditions, oscillations
+\item Hard to analyze (depending on which path through logic gates is faster)
+\item more general (only) in theory
+\end{itemize}
+\end{minipage}
+
+\section*{Synchronous sequential circuits composition rule}
+\begin{itemize}
+\item Each circuit element is either a register or a combinational circuit (notation: C\kern-.4em\raisebox{-.3em}{L}, combinational logic)
+\item At least one circuit element is a register
+\item All registers receive the \textbf{same} clock signal
+\item Every cyclic path contains least one register
+\end{itemize}
+
+\section*{Finite State Machine (FSM, Deterministic)}
+All FSMs in circuit design courses are deterministic: \textbf{only one} path from current state to the next.
+There should be no ambiguity.
 
 
 
