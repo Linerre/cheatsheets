@@ -15,12 +15,15 @@
 *.fls
 *.drawio
 *.bkp
+*.bit
 *.zip
 *_latexmk
 tlmgr.html
 fitch.sty
 auto/
 tmp/
+log/
+simulation/
 comp6710/
 comp4300*/
 comp6300/lab_pack_1/
