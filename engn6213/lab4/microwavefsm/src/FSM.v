@@ -17,8 +17,9 @@ module FSM (
    reg [1:0]        state, nextState;
    wire             beat;
    reg [15:0]       ledcount;
-   reg [15:0]       ledtoggle;
+   reg [15:0]       ledtoggle = 16'd0;
    reg [6:0]        cathode;
+
    // Create 1Hz beat, using the default THRESHOLD
    clockDividerHB clkfsm (
      .clk(clk),
@@ -64,22 +65,22 @@ module FSM (
    end
 
    // Counter - sequential
-   always @(posedge clk)
+   always@ (posedge clk)
      begin
         if (state == SET_TIMER) ledcount <= SW;
-        else if (beat && state == COOK) ledcount <= ledcount >> 1;
+        else if (beat) ledcount <= ledcount >> 1;
         // In sequential logic, ok to leave out the else branch
      end
 
    // Toggle - sequential
-   always @(posedge clk)
+   always@ (posedge clk)
      begin
         if (beat) ledtoggle <= 16'b1111_1111_1111_1111;
-        else ledtoggle <= 16'd0;
+        else ledtoggle <= ~ledtoggle;
      end
 
    // Output logic - combinational
-   always @(*)
+   always@ (*)
      begin
         case (state)
           IDLE : begin
