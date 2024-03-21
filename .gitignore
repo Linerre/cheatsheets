@@ -18,12 +18,15 @@
 *.bit
 *.zip
 *_latexmk
+*.txt
 tlmgr.html
 fitch.sty
 auto/
 tmp/
+temp/
 log/
 simulation/
+.Xil/
 comp6710/
 comp4300*/
 comp6300/lab_pack_1/
