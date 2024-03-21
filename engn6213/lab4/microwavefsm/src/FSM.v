@@ -4,9 +4,8 @@ module FSM (
   input wire        reset,
   input wire [15:0] SW,
   output reg [15:0] LED,
-  output reg [6:0]  CATHODE,
-  output reg [3:0]  ANODE
-
+  output wire [6:0] ssd_cathode // ssd for indicating current state
+  // output reg [3:0]  ssd_anode
 ) ;
 
    // States encoding
@@ -19,11 +18,7 @@ module FSM (
    wire             beat;
    reg [15:0]       ledcount;
    reg [15:0]       ledtoggle;
-
-   // SSD for indicating current state
-   wire [6:0]       ssd_cathod;
-   wire [3:0]       ssd_anode;
-
+   reg [6:0]        cathode;
    // Create 1Hz beat, using the default THRESHOLD
    clockDividerHB clkfsm (
      .clk(clk),
@@ -63,10 +58,8 @@ module FSM (
         ALARM: begin
            if (enter) nextState = IDLE;
            else nextState = ALARM;
-
         end
         default: nextState = IDLE;
-
       endcase // case (state)
    end
 
@@ -90,22 +83,30 @@ module FSM (
      begin
         case (state)
           IDLE : begin
+             cathode = 7'b0000001; // display number 0
              LED = 16'd0;
           end
           SET_TIMER: begin
+             cathode = 7'b1001111; // display number 1
              LED = SW;
           end
           COOK : begin
+             cathode = 7'b0010010; // display number 2
              LED = ledcount;
           end
           ALARM : begin
+             cathode = 7'b0000110; // display number 3
              LED = ledtoggle;
           end
 
-          default: LED = 16'b1111_1111_1111_1111;
+          default: begin
+             cathode = 7'b0000001; // display number 0
+             LED = 16'b1111_1111_1111_1111;
+          end
 
         endcase // case (state)
-
      end
+
+   assign ssd_cathode = cathode;
 
 endmodule // FSM
