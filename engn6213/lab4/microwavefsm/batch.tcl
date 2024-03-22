@@ -37,7 +37,7 @@ if { [file isdirectory $testdir] > 0 } {
 # [expr] returns a value
 # read_verilog [ glob -directory ./src/ *.v ]; #
 
-proc compile { top } {
+proc deploy { top } {
     puts "Closing the current in-memory design ... \n"
     close_project -quiet
 
@@ -164,4 +164,29 @@ proc close_all {} {
     disconnect_hw_server
     close_hw_manager
     close_project
+}
+
+# Just compile (synth) the verilog files
+proc compile { top } {
+
+    close_project -quiet
+
+    set srcdir ./src
+    set logdir ./log
+
+    # Assign part (board) to the current in-memory project
+    puts "Creating a new in-mem design with part xc7a35tcpg236-1 ... \n"
+    link_design -part xc7a35tcpg236-1; # or set_part <part>
+
+    # Read and compile verilog (*.v) or system-verilog (*.sv) files
+    puts "Reading verilog source files ... \n"
+    read_verilog [glob $srcdir/*.v]
+
+    set_param general.maxThreads 4
+    synth_design -top $top -flatten_hierarchy rebuilt
+
+    if { [glob -nocomplain $srcdir/*.xdc] != "" } {
+        read_xdc $srcdir/$top.xdc
+    }
+
 }
