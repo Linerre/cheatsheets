@@ -21,6 +21,7 @@
 *.txt
 tlmgr.html
 fitch.sty
+**/src/test
 auto/
 tmp/
 temp/
