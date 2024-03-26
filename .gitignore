@@ -19,12 +19,17 @@
 *.zip
 *_latexmk
 *.txt
+*.pb
+*.sdb
+*.rlx
+
 tlmgr.html
 fitch.sty
 **/src/test
 auto/
 tmp/
 temp/
+simulator/
 log/
 simulation/
 .Xil/
