@@ -1,0 +1,49 @@
+% Hardware
+\section*{Amdahl's law (strong scaling law, \textbf{L5P5})}
+\(S_p = \frac{T_{seq}}{T_{par}} = \frac{p}{pf + (1-f)} = \frac{1}{f + \frac{1-f}{p}}\)  where $f$ is the serial portion
+\begin{tabular}{c|c}
+  \hline
+  \multicolumn{2}{l}{$S_{ser} \rightarrow ? $ if run on 1000 CPU and 10\% ($f$) remains sequential} \\
+  \hline
+  $S_{ser} \quad p = 1$ & $S_{par} \quad p = 1000$  \\
+  \hline
+  2GFLOP/s  & $S_{ser} \times \frac{1}{0.1 + \frac{1-0.1}{1000}} \approx 9.91 \times S_{ser} = 19.82$ GFLOP/s \\
+  \hline
+\end{tabular}
+
+\section*{Gustafson's law (weak scaling law, \textbf{L5P7})}
+\(S_p = p - f(p-1)\) where $f$ is the serial portion (independent of $p$)\\
+problem size scaled in proportion with $p$
+\section*{Moore's Law and Dennard Scaling (\textbf{L1P17})}
+
+\begin{itemize}
+  \item the two laws (\emph{underpin} exponential perf. increase of microprocessors)
+  \item \textbf{Moore's} law (transistors doubles $\ne$ perf. doubles, \textbf{L1P17})
+  \item \textbf{Dennard} Scaling (\textbf{L1P18-19}, examples below)
+  \item[] $P = QfCV^{2}$ ($Q$: \# of transistors, $f$ frequency)
+  \begin{tabular}{c|ccc}
+    \hline
+    \multicolumn{4}{l}{scale down feature size by  $\frac{1}{k}\approx 0.7$, then $k\approx 1.42, k^{2}\approx 2$} \\
+    \hline
+    & \# of trans. $Q$ & freq. $f$ & power usage $P$  \\
+    \hline
+    $Q_{0} = Q_{k}$ & unchanged & $f_k = k \cdot f_0$ & $P_k = (\frac{1}{k})P_0$\\
+    $P_{0} = P_{k}$ & $Q_k = k^{2} \cdot Q_0$ & $f_k = k \cdot f_0$ & unchanged  \\
+    \hline
+    \multicolumn{4}{l}{feature size $\geq$ 100nm or $VI_{\text{leakage}}$  dominates power consumption} \\
+    \hline
+  \end{tabular}
+\item these two also \emph{undermine} parallel computing however (\textbf{L1P21})
+\item end of Dennard scaling $\rightarrow$ multicore era (\textbf{L1P23-24})
+\end{itemize}
+\section*{Flynn's Taxonomy (\textbf{L2-3P12-14})}
+\begin{tabular}{l|p{4cm}p{4cm}}
+  \hline
+  Type & Note & Example \\
+  \hline
+  SISD & 1 ix process a stream data  & common von Neumann model \\
+  SIMD & 1 ix stream broadcast to many & vector processor; Quardrics Apemille \\
+  MISD & no such machines  & - \\
+  MIMD & each proc with its own ix/data & Gadi; most of top 500 \\
+  \hline
+\end{tabular}

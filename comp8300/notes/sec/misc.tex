@@ -1,0 +1,26 @@
+\section*{Message Passing}
+% \input{topics/binary_num}
+% \pagebreak
+\section*{Misc}
+\begin{itemize}
+\item One input element to one processor: \emph{inefficient}/\emph{unrealistic}
+\item Multiple input elements to one processor: efficient/realistic
+\item \textbf{scability}: ability of parallel algorithm to use increasing \num of procs efficiently
+\end{itemize}
+
+% Table (week1 Lecture 2, pp27)
+\section*{Basic Communication Assumptions}
+\textbf{communication latency}, noted as $t_{\text{comm}}$ is the time taken to communicate a message between two processors in the network
+\label{comm}
+\begin{itemize}
+\item two directly-connected procs(nodes) can send message of size $m$ to each other simultaneously (bidirectional) in time $t_{s} + t_{w}m$
+\item one processor can send a message on \emph{only one} of its links at a time
+\item one processor can recv a message on \emph{only one} of its links at a timex
+\item Given a processor and its links A and B, it can
+  \begin{enumerate}
+  \item send/recv messages on A or B at the same time or
+  \item send message on A while recv message on B
+  \end{enumerate}
+\item messages sent on the shortest path
+\item $t_h$ is sometimes ignored, i.e. $t_s + t_{w}m + t_h$ often becomes ($t_s + t_{w}m$)
+\end{itemize}

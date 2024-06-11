@@ -1,0 +1,30 @@
+\section*{Jargon}
+\begin{itemize}
+\item \textbf{synchronous iteration}: several processes start together at the beginning of each iteration and the next iteration must wait for all processors to finish current iteration, \textbf{L2P2}
+\item \textbf{SPMD}: all UEs execute the same program (Single Program, SP) in parallel, but each has its own set of data (Multiple Data). In src code, usually a proc ID is used to uniquely label a UE
+\item \textbf{Motivation} for parallelism (\textbf{L1P10}-\textbf{P11}):
+  \begin{enumerate}
+  \item speed/performance (1h vs 1w)
+  \item tackle larger-scale problems
+  \item keep power consumption and heat dissipation under control
+  \item more $\cdots$ (see L1P11)
+  \end{enumerate}
+\item \textbf{Scales} of parallelism (\textbf{L1P12})
+\item \textbf{peak flops/sec}$ = \# \text{cores} \times [\# \text{sockets}] \times \# \text{flops} \times \text{freq}$ (\textbf{L2-3P3})
+\item ideal \textbf{speedup} is hard due to overheads (\textbf{L1P30})
+  \begin{enumerate}
+  \item idling (unbalanced load, sync, serial parts, etc)
+  \item splitting computation into tasks
+  \item communications among processes
+  \end{enumerate}
+\item \textbf{speedup}: $S_p = \frac{T_{seq}}{T_{par}} (\geq 1)$ (fixed problem size \textbf{L5P2})
+\item \textbf{efficiency}: $E_p = \frac{S_{p}}{p} (0 < E_p \leq 1)$ (\textbf{L5P2})
+\item \textbf{embarrassingly parallel}: problem solved without communication (\textbf{L5P3, L6P2})
+\item \textbf{strong scalability}: fixed problem size + increasing $\# p \rightarrow$ perf. $\downarrow$
+\item \textbf{weak scalability}: increasing $\# p$ and problem size $\rightarrow$ perf. $\downarrow$
+\item \textbf{communication latency} time taken to communicate a message between 2 processors in a network
+\item \textbf{minimal routing} takes 1 of shortest paths (XY-routing; E-cube)
+\item \textbf{non-minimal} routing route the message along a longer path to avoid network congestion
+\item \textbf{deterministic} routing determines a unique path \emph{solely} based on src and dest nodes
+\item \textbf{adaptive} routing uses info on network state to determine message path (\textbf{L7P3})
+\end{itemize}

@@ -1,0 +1,60 @@
+\section*{Amdahl's law (strong scaling law, \textbf{L5P5})}
+\begin{equation}
+  \label{eq:amdahl}
+  S_p = \frac{T_{seq}}{T_{par}} = \frac{p}{pf + (1-f)} = \frac{1}{f + \frac{1-f}{p}}
+\end{equation}
+where $f$ is the serial portion that cannot be parallelized
+\begin{tabular}{c|c}
+  \hline
+  \multicolumn{2}{l}{$S \rightarrow ? $ if run on 1000 CPU and 10\% ($f$) remains sequential} \\
+  \hline
+  $S_{ser} \quad p = 1$ & $S_{par} \quad p = 1000$  \\
+  \hline
+  2GFLOP/s  & $S_{ser} \times \frac{1}{0.1 + \frac{1-0.1}{1000}} \approx 9.91 \times S_{ser} = 19.82$ GFLOP/s \\
+  \hline
+\end{tabular}
+\begin{tabular}{l|r}
+  \hline
+  \multicolumn{2}{l}{Calc $Ax=b$ where $A$ is $M \times N$ matrix} \\
+  \multicolumn{2}{l}{$T_{ser} = 2MNT$ where $T$ is time for single float op} \\
+  \multicolumn{2}{l}{$T_{sort} = 2M\log_2(M)T$ where sorting can only be sequential} \\
+  \hline
+  $T_{ser} \quad p = 1$ & $T_{par} \quad p = P \rightarrow \infty$ \\
+  \hline
+  $2MNT + 2M\log_2(M)T$ & $\frac{2MNT}{P} + 2M\log_2(M)T$ \\
+  \hline
+\end{tabular}
+\begin{align*}
+  S & = \frac{T_{ser}}{T_{par}} = \frac{2MNT + 2M\log_2(M)T}{\frac{2MNT}{P} + 2M\log_2(M)T} \\
+    & = \frac{2MNT + 2M\log_2(M)T}{2M\log_2(M)T} \quad (P \rightarrow \infty \therefore \frac{2MNT}{P} \rightarrow 0) \\
+    & = \frac{N}{\log_2(M)} + 1
+\end{align*}
+\section*{Gustafson's law (weak scaling law, \textbf{L5P7})}
+\(S_p = p - f(p-1)\) where $f$ is the serial portion (independent of $p$ and problem size) and has the following assumptions:
+\begin{enumerate}
+\item the serial portion is kept constant when scaling problem size ($N$)
+\item the perfectly parallelizable portion scales linearly with $\#p$ if $N$ scales linearly, then $T_{par}$ is kept constant.
+\end{enumerate}
+
+\section*{Moore's Law and Dennard Scaling (\textbf{L1P17})}
+
+\begin{itemize}
+  \item the two laws (\emph{underpin} exponential perf. increase of microprocessors)
+  \item \textbf{Moore's} law (transistors doubles $\ne$ perf. doubles, \textbf{L1P17})
+  \item \textbf{Dennard} Scaling (\textbf{L1P18-19}, examples below)
+  \item[] $P = QfCV^{2}$ ($Q$: \# of transistors, $f$ frequency)
+  \begin{tabular}{c|ccc}
+    \hline
+    \multicolumn{4}{l}{scale down feature size by  $\frac{1}{k}\approx 0.7$, then $k\approx 1.42, k^{2}\approx 2$} \\
+    \hline
+    & \# of trans. $Q$ & freq. $f$ & power usage $P$  \\
+    \hline
+    $Q_{0} = Q_{k}$ & unchanged & $f_k = k \cdot f_0$ & $P_k = (\frac{1}{k})P_0$\\
+    $P_{0} = P_{k}$ & $Q_k = k^{2} \cdot Q_0$ & $f_k = k \cdot f_0$ & unchanged  \\
+    \hline
+    \multicolumn{4}{l}{feature size $\geq$ 100nm or $VI_{\text{leakage}}$  dominates power consumption} \\
+    \hline
+  \end{tabular}
+\item these two also \emph{undermine} parallel computing however (\textbf{L1P21})
+\item end of Dennard scaling $\rightarrow$ multicore era (\textbf{L1P23-24})
+\end{itemize}

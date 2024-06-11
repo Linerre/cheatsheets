@@ -1,0 +1,44 @@
+\section*{Store-and-Forward (SF) routing (\textbf{L7P5})}
+\begin{equation*}
+  t_{\text{comm}} = t_{s} + l(t_h + mt_w) \text{where} m \text{is message size}; l \text{is link \#}
+\end{equation*}
+\begin{equation*}
+  t_{\text{comm}} \approx t_{s} + lmt_w (\because t_h \ll mt_w \text{even for small} m)
+\end{equation*}
+\section*{Cut-Through (CT) routing (\textbf{L7P6})}
+\begin{equation*}
+  t_{\text{comm}} = t_{s} + lt_h + mt_w
+\end{equation*}
+
+\section*{One-to-all SF on different networks (\textbf{L7P9-10})}
+\begin{tabular}{c|lc}
+  \hline
+  Network & Communication Cost & Source \\
+  \hline
+  Ring & $T_{\text{one-all}} = (t_s + t_{w}m) \frac{p}{2}$  & \textbf{L7P9} \\
+  2D Mesh & $T_{\text{one-all}} = 2(t_s + t_{w}m) \frac{\sqrt{p}}{2}$ & \\
+  3D Mesh & $T_{\text{one-all}} = 3(t_s + t_{w}m) \frac{\sqrt[3]{p}}{2}$ &  \\
+  Hypercude & $T_{\text{one-all}} = (t_s + t_{w}m) \log_2 p$ & \textbf{L7P10} \\
+  \hline
+\end{tabular}
+\section*{One-to-all CT on different networks (\textbf{L7P11-13})}
+\begin{tabular}{c|l|c}
+  \hline
+  Network & Communication Cost & Source \\
+  \hline
+  Ring & $T_{\text{one-all}} = \log_2 p(t_s + mt_{w}) + t_h(p-1)$ & \textbf{L7P11} \\
+  2D Mesh & $T_{\text{one-all}} = 2\log_2 (\sqrt{p})(t_s + mt_{w}) + 2t_h(\sqrt{p}-1) $ & \textbf{L7P12}\\
+  Binary Tree & $T_{\text{one-all}} = \log_2(p)(t_s + mt_{w})+(\sum^{\log_2(p)}_{i=1}2i)t_h$ & \textbf{L7P13} \\
+  \hline
+\end{tabular}
+
+\section*{All-to-All Store-and-Forward (SF) Routing (\textbf{L7P14-16})}
+\begin{tabular}{c|l|c}
+  \hline
+  Network & Communication Cost & Source \\
+  \hline
+  Ring & $T_{\text{all-all}} = (p-1)(t_s + t_h mt_{w})$ & \textbf{L7P14} \\
+  2D Torus & $T_{\text{all-all}} = 2(t_s + t_h)(\sqrt{p} - 1)+mt_{w}(p-1)$ & \textbf{L7P15}\\
+  Hypercube & $T_{\text{all-all}} = 2\log_2(p)(t_s + t_h)+2(p-1)mt_w$ & \textbf{L7P16} \\
+  \hline
+\end{tabular}
