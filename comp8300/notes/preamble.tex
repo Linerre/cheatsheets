@@ -1,0 +1,82 @@
+% -- Layout ----
+\usepackage[top=0.6cm, bottom=0.6cm, left=0.5cm, right=0.5cm, landscape]{geometry}
+
+% -- Titles ----
+\usepackage[
+  tiny,                     % text size title
+  compact                   % reduce vertical space before/after title
+]{titlesec}
+% \titlespacing*
+\titleformat{\section}{\normalfont\small\bfseries}{\thesection}{0em}{} % Remove space before and after section titles
+\titleformat{\subsection}{\normalfont\small\bfseries}{\thesubsection}{0em}{} % Remove space before and after subsection titles
+\titlespacing*{\section}{0pt}{0pt}{0pt} % Remove space before/after section titles
+\titlespacing*{\subsection}{0pt}{0pt}{0pt} % Remove space before/after subsec titles
+
+% -- Colors ----
+\usepackage[dvipsnames]{xcolor}
+\definecolor{dmm}{RGB}{192,192,192} % Define a custom dimmed text color
+\definecolor{cmt}{RGB}{61,123,123}
+
+% -- Math ------
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{turnstile}%better vdash
+
+% -- Lists -----
+\usepackage[inline]{enumitem}
+\setlist{noitemsep}% Remove vspace between items
+% Set vspace before and after  list environments as well as the left margin
+\setlist[itemize,1]{leftmargin=1em,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[itemize,2]{leftmargin=0.3em,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[enumerate,1]{leftmargin=1em,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[enumerate,2]{leftmargin=0.3em,labelindent=1pt,topsep=1pt,partopsep=1pt}
+
+% -- Code listing ---
+\usepackage{listings}
+\lstset{
+  aboveskip=3pt,
+  belowskip=3pt,
+  basicstyle=\small\ttfamily,
+  % commentstyle=\upshape\ttfamily,
+  captionpos=b,
+  commentstyle=\color{cmt},
+  frame=single,
+  keepspaces=false,
+  language=c,
+  tabsize=2
+}
+
+% Parse Trees
+\usepackage{tikz}
+\usetikzlibrary{ arrows, automata, bbox, calc, positioning,  decorations.pathmorphing, decorations.pathreplacing, decorations.shapes, }
+\tikzset{
+% ->, % makes the edges directed
+>=stealth', % makes the arrow heads bold
+node distance=1cm, % specifies minimum distance between two nodes
+% small/.style={},
+every state/.style={thick}, % sets the properties for each ’state’ node
+every node/.style={inner sep=1pt},
+initial text=start, % sets the text that appears on the start arrow
+}
+
+% Place a figure env right here via [H] option
+\usepackage{float}
+
+% Side by side figure
+\usepackage{subcaption}
+% \usepackage{caption}
+% \captionsetup{belowskip=0pt, aboveskip=0pt}
+
+
+% -- Multi-Col layout --
+\usepackage{multicol}
+
+% No indentation
+\setlength\parindent{0pt}
+\setlength\abovedisplayskip{-5pt}
+\setlength\belowdisplayskip{-5pt}
+\setlength\abovedisplayshortskip{-4pt}
+\setlength\belowdisplayshortskip{-4pt}
+\newcommand{\gor}{\;|\;}
+\newcommand{\num}{\texttt{\#}~}
+\renewcommand{\arraystretch}{1.2}

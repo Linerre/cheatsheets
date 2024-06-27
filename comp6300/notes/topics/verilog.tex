@@ -1,0 +1,20 @@
+\begin{tabular}[h]{llll}
+  Frequency & Clock Period & =? s & =? ns \\
+  \hline
+  1 Hz & 1 second & 1s & $10^{9}$ \\
+  1 KHz & 1 millisecond (ms) & $10^{-3}$s & $10^6$ \\
+  1 MHz & 1 microsecond ($\mu$s or us) &  $10^{-6}$s & $10^3$ \\
+  1 GHz & 1 nanosecond (ns) & $10^{-9}$s & 1
+\end{tabular}
+\begin{itemize}
+\item 1 Hz clock means 1 clock cycle per second
+\item 100 MHz clock means $100\_000\_000$ cycles/s: how long per cycle?
+  \[
+    T_{cycle} = \frac{1}{\text{freq}} = \frac{1\text{s}}{(100 * 10^{6})} = 10^{-8}\text{s} = 10\text{ns}
+  \]
+  That is, 100 MHz clock has a clock period of 10ns or 1 clock cycle needs 10ns to complete
+\item One clock period is the time taken to complete 1 clock cycle.
+\item Given a clock cycle, the amount of time during which CLK is HIGH.
+\item \textbf{Slower} clock means \textbf{longer} clock period and \textbf{smaller/lower} freq
+\end{itemize}
+Use an overflow counter to divide clock. Counter overflows and resets to zero automatically. The MSB connects to a LED port so it increases at the slowest speed as the counter increases.

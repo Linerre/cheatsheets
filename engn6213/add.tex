@@ -1,0 +1,62 @@
+\documentclass[4apaper,12pt]{article}
+\usepackage[top=2cm,bottom=2cm,left=2.5cm,right=2.5cm]{geometry}
+\usepackage[
+backend=biber,
+style=ieee,
+]{biblatex}
+\usepackage[compact]{titlesec}
+\titlespacing*{\section}{0pt}{3pt}{0pt}
+\titlespacing*{\subsection}{0pt}{2pt}{0pt}
+\titlespacing*{\subsubsection}{0pt}{2pt}{0pt}
+\usepackage[inline]{enumitem}
+\setlist{noitemsep,topsep=5pt}
+
+\title{Key Design Choices Discussed}
+\date{2024 April}
+\author{Zhiren Lin u7753813@anu.edu.au}
+\begin{document}
+\maketitle
+\section{Beats}
+The two components all need at least 2 types of beat signals: 0.5s and 2s.  Therefore, it is natural to create one beat module, with the possibility to customize the pulse duration, for both the components to share.  Such design will avoid issues caused by clock domain crossing.
+
+Another consideration with regard to beats is where to instantiate those beats? At the ultimate top-level module or inside each sub-module that needs the beats?  We decided to use the first option as this will make each sub-module explicitly requires what types of beats it needs among the input signals, making it easier to debug.
+
+\section{Counting}
+There are quite some numbers we need to count and properly keep for a while, such as the number of people in the vault, the times the MORSE button is pressed, etc.  It is not those counters, but the a limited number of available output ports, that challenges most.  For example, after setting up the door status and alarm, there were only 8 LEDs left, not really useful for the 10-signal Morse code.
+
+At first, 7 of the above 8 LEDs were wasted, because I decided to connected them with the 7-digit pin switches. This made debugging the \texttt{morse} module nearly impossible.  What's worse, since my group number contains 3 zeros, that means 3 LEDs were wasted for no good at all!
+
+After rethinking on this, I decided to use 4 LEDs for the \texttt{morse} module:
+\begin{itemize}
+\item One to indicate if the MORSE button is pressed, as if there was a bee sound
+\item Two to indicate which type of Morse signal is produced, i.e., a dit or a dah
+\item One to turn on for 1s as the signal that the input Morse pin is valid
+\end{itemize}
+This redesign makes the interface much more user-friendly and debugging much easier.
+
+The \texttt{morse} module ends up being a rather independent one; the only important signal it outputs becomes whether the user's input Morse pin matches anyone in the given set.
+
+\section{Communications}
+The two components must communicate with each other about the people number in the vault. The temperature control system only needs to know if there is any person in the secure room.  At first, \texttt{headcount} module was completely embedded in the \texttt{vault\_door} module, but it saved almost nothing.  The door still needs to output the headcount result and also take on the burden of two more inputs -- enter and exit -- to update the headcount.
+
+We decided later on to move this module one level up and instantiated it inside the top module.  Then the door simply needs to tell the \texttt{headcount} module when it is able to count people.  The lesson here is, only passing absolutely necessary signals between modules and do consider a separate module whenever one needs more inputs for only fewer outputs
+
+\section{State encoding}
+When synthesizing the design, I noticed that Vivado re-encoded our state machines.  For the \texttt{morse} FSM and \texttt{vault\_door}, it just reordered the states.  Yet for the climate control FSM, it changed encoding from the simplest binary form (i.e., $n$ states use $n$ of $2^{n}$ possible states) to one-hot approach:
+
+\begin{table}[h]
+  \centering
+\begin{tabular}{rrr}
+ \hline
+  State &    New Encoding &  Previous Encoding  \\
+  \hline
+  IDLE &      00001 &         001 \\
+  COOLING &   00010 &         011 \\
+  HEATING &   00100 &         010 \\
+  CLOSING &   01000 &         100 \\
+      OFF &   10000 &         101 \\
+  \hline
+\end{tabular}
+\end{table}
+My understanding is that Vivado will optimize a state machine with more than 4 states. Using one-hot encoding is likely to reduce or even eliminate any possible glitches.
+\end{document}
