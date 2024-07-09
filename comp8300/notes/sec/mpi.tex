@@ -1,0 +1,245 @@
+\section*{MPI}
+Message-passing programming paradigm has 2 key attributes:
+\begin{enumerate}
+\item partitioned address space (not shared), which implies
+  \begin{itemize}
+  \item each data element must belong to 1 partitioned space
+  \item interactions (read-only/read-write) require coop of 2 procs
+  \end{itemize}
+\item supports only \emph{explicit} parallelization
+\end{enumerate}
+Two common causes of \textbf{deadlock} in MPI:
+\begin{enumerate}
+\item false order or \texttt{send} and \texttt{recv}
+\item system send-buffer fill-up
+\end{enumerate}
+
+\subsection*{Starting and terminating MPI}
+\begin{minipage}{0.5\linewidth}
+  \begin{itemize}
+  \item All the following snippets have a surrounding pair of \texttt{MPI\_Init} and \texttt{MPI\_Finalize}.
+  \item After \texttt{MPI\_Finalize}, even another \texttt{MPI\_Init} is \emph{not} allowed.
+  \item Both \texttt{Init} and \texttt{Finalize} must be called by all processes.
+  \item In the end, \texttt{MPI\_SUCCESS} returned if nothing goes wrong.
+  \end{itemize}
+\end{minipage}
+\begin{minipage}{0.48\linewidth}
+  \centering
+\begin{lstlisting}[language=c,xleftmargin=1pt]
+// argc, argv from main
+// No MPI calls can be here
+MPI_Init(&argc, &argv);
+// parallel computation
+// .
+// .
+// .
+// commu betwn procs
+MPI_Finalize();
+// No MPI calls can be here
+\end{lstlisting}
+\end{minipage}
+
+\subsection*{Getting information}
+\begin{minipage}{0.5\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item Each proc will call these two fns to get the info for comm.
+  \item Output vars are \texttt{size} and \texttt{rank}.
+  \item \texttt{size}/\texttt{rank} can be declared before \texttt{Init}.
+  \item \textbf{in} args will be passed-by-value to MPI fns
+  \item \textbf{out} args will be assigned values.
+  \item \textbf{in}/\textbf{out} args must be declared before any usage.
+  \end{itemize}
+\end{minipage}
+\begin{minipage}{0.48\linewidth}
+  \centering
+\begin{lstlisting}[language=c,xleftmargin=1pt,identifierstyle=]
+// before any MPI comm
+// get how many processors
+int size; // or world_size
+MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+// get the current proc rank
+int myrank;
+MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+\end{lstlisting}
+\end{minipage}
+
+\subsection*{Sending and receiving messages (blocking commu)}
+\begin{itemize}
+\item commonly used for point-to-point communications.
+\item blocking send blocks until msg gets copied out of the send buffer (either into a system buffer at src process or sent to dest process)
+\item blocking recv returns only after msg gets received and copied into the recv buffer
+\end{itemize}
+\begin{lstlisting}[language=c]
+// MPI defined const MPI_TAG_UB with guaranteed range [0,32767]
+// data of type dt will be stored in `buf' (consecutive in mem)
+// `buf' len is specified by `count'
+int MPI_Send(void *buf,            /* in, data buffer  */
+             int count,            /* in, data count   */
+             MPI_Datatype dt,      /* in, data type    */
+             int dest,             /* in, dest rank    */
+             int tag,              /* in, msg type tag */
+             MPI_Comm, comm        /* in, communicator */
+);
+
+// Recv can accept at most count data otherwise overflow
+// with MPI_ERR_TRUNCATE.  So Recv needs not know the
+// exact size of messages being sent
+int MPI_Recv(void *buf,            /* out,data buffer  */
+             int count,            /* in, data count   */
+             MPI_Datatype dt,      /* in, data type    */
+             int source,           /* in, source rank  */
+             int tag,              /* in, msg type tag */
+             MPI_Comm comm,        /* in, communicator */
+             MPI_Status *status    /* out, recv status */
+);
+\end{lstlisting}
+\subsection*{Non-blocking communication}
+\begin{itemize}
+\item commonly used to overlap communications with computation.
+\item need appropriate hardware support.
+\item \texttt{MPI\_Isend} returns before data copied out of the buffer.
+\item \texttt{MPI\_Irecv} returns before data received and copied into the buffer.
+\item later in the program, must check if send/recv is complete.
+\item \texttt{MPI\_Irecv} not take \texttt{status} arg
+\item \texttt{status} of recv is returned by \texttt{Test}/\texttt{Wait}
+\item \texttt{req} (non-blocking) is different than \texttt{status} (blocking).
+\item \texttt{req} is also returned by \texttt{MPI\_Test} and \texttt{MPI\_Wait}
+\item \texttt{MPI\_Wait} until a non-blocking operation actually finishes.
+\end{itemize}
+\begin{lstlisting}[language=c]
+// ISend returns immediately w/t blocking current proc
+// Sending goes on in the background and later the proc
+// must Wait/Test for completion of sending.  Only after
+// that it's safe to reuse the `buf' (to overwrite it)
+int MPI_Isend(void *buf,           /* in, data buffer  */
+             int count,            /* in, data count   */
+             MPI_Datatype dt,      /* in, data type    */
+             int dest,             /* in, dest rank    */
+             int tag,              /* in, msg type tag */
+             MPI_Comm comm,        /* in, communicator */
+             MPI_Request *req,     /* out,handler      */
+);
+
+// Irecv returns immediately w/t blocking current proc
+// Receiving goes on in the background and later the proc
+// must Wait/Test for completion of receiving.  Only after
+// that it's safe to use received data (to compute)
+// NOTE: no status arg needed for non-blocking Irecv
+// status is returned by MPI_Test and MPI_Wait instead
+int MPI_Irecv(void *buf,           /* out,data buffer  */
+             int count,            /* in, data count   */
+             MPI_Datatype dt,      /* in, data type    */
+             int source,           /* in, source rank  */
+             int tag,              /* in, msg type tag */
+             MPI_Comm comm,        /* in, communicator */
+             MPI_Request *req      /* out,handler      */
+);
+\end{lstlisting}
+
+% \subsection*{MPI Test and Wait}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c,xrightmargin=2pt]
+// test if a non-blocking
+// operation has finished
+// this fn is non-blocking
+int MPI_Test(
+ MPI_Request *request,/*in */
+ int *flag,           /*out*/
+ MPI_Status *status   /*out*/
+);
+
+// this fn is blocking
+// it will return only when
+// request indicates finish
+int MPI_Wait(
+ MPI_Request *request,/*in */
+ MPI_Status *status   /*out*/
+);
+// Ok to Isend with blk Recv
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+  \flushleft
+  \begin{enumerate}[leftmargin=.8em]
+  \item if a non-blocking op finished
+    \begin{itemize}
+    \item allowed periodical checking for completion
+    \item \texttt{flag} set to \texttt{true} (non-zero in C)
+    \item request object deallocated
+    \item \texttt{*request} $\rightarrow$ \texttt{MPI\_REQUEST\_NULL}
+    \item \texttt{status} object gets info about op
+    \end{itemize}
+  \item if a non-blocking op not finished
+    \begin{itemize}
+    \item \texttt{flag} set to \texttt{false} (zero in C)
+    \item \texttt{*request} not modified
+    \item \texttt{status} undefined
+    \item \texttt{MPI\_Wait} blocks until \texttt{*request} indicates finish (see 1)
+    \end{itemize}
+  \item mix of blk \& non-blk is OK
+  \end{enumerate}
+\end{minipage}
+
+\subsection*{Collective Communication \& Computation}
+\begin{itemize}
+\item Collective comm typically outperforms point-to-point comm
+\item Code becomes more compact and easier to read
+\item All collective comm fns in MPI take a communicator arg that defines the group of procs participating in the collective operation
+\item All the procs belonging to this communicator participate in the op
+\item All of them \textbf{must} call the collective comm fns (see below)
+\item Collective comm ops \emph{do not} act like barriers (a proc could go past its call for the collective communication operation, even before other processes have reached it)
+\item Collective comm ops acts like a \emph{virtual} sync step (no need for tags)
+\item All procs in group (communicator) must specify same src-/target-proc
+\item For most collective comm ops, MPI provides two different variants:
+  \begin{enumerate}
+  \item transfers equal-size data to or from each process
+  \item transfers data that can be of different sizes
+  \end{enumerate}
+\end{itemize}
+
+% Barrier
+% \subsection*{Barrier}
+\begin{minipage}{0.5\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item only arg is communicator
+  \item returns only after all procs in group have called this fn
+  \end{itemize}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=1pt]
+// comm defines the group
+// of procs that are synced
+int MPI_Test(MPI_Comm comm);
+\end{lstlisting}
+\end{minipage}
+
+% Broadcast
+% \subsection*{Broadcast}
+\begin{minipage}{0.5\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item only arg is communicator
+  \item returns only after all procs in group have called this fn
+  \item data stored in root (aka. src) buf
+  \item data totaling count entries of \texttt{dt}
+  \item root data amount \texttt{==} amount recv by each proc
+  \item \texttt{count} and \texttt{dt} fields must match on all procs
+  \end{itemize}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=1pt]
+// for root, data goes out
+// for others, data comes in
+int MPI_Bcast(
+  void *buf,       /*inout*/
+  int count,       /*in   */
+  MPI_Datatype dt, /*in   */
+  int root,        /*in   */
+  MPI_Comm comm    /*in   */
+);
+// each proc gets same data
+\end{lstlisting}
+\end{minipage}

@@ -26,24 +26,30 @@
 \usepackage[inline]{enumitem}
 \setlist{noitemsep}% Remove vspace between items
 % Set vspace before and after  list environments as well as the left margin
-\setlist[itemize,1]{leftmargin=1em,labelindent=1pt,topsep=1pt,partopsep=1pt}
-\setlist[itemize,2]{leftmargin=0.3em,labelindent=1pt,topsep=1pt,partopsep=1pt}
-\setlist[enumerate,1]{leftmargin=1em,labelindent=1pt,topsep=1pt,partopsep=1pt}
-\setlist[enumerate,2]{leftmargin=0.3em,labelindent=1pt,topsep=1pt,partopsep=1pt}
-
+\setlist[itemize,1]{leftmargin=.6em,labelindent=0pt,labelsep=2pt,
+  topsep=1pt,partopsep=1pt}
+\setlist[enumerate,1]{leftmargin=1em,labelindent=0pt,labelsep=2pt,
+  topsep=1pt,partopsep=1pt}
+\setlist[itemize,2]{leftmargin=.3em,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[enumerate,2]{leftmargin=0.2em,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[description]{labelwidth=\linewidth,font=\small\bfseries,leftmargin=1em,topsep=1pt,partopsep=1pt}
 % -- Code listing ---
 \usepackage{listings}
 \lstset{
   aboveskip=3pt,
   belowskip=3pt,
   basicstyle=\small\ttfamily,
+  breaklines=true,
   % commentstyle=\upshape\ttfamily,
   captionpos=b,
   commentstyle=\color{cmt},
   frame=single,
   keepspaces=false,
-  language=c,
-  tabsize=2
+  keywordstyle=\bfseries,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
 }
 
 % Parse Trees
