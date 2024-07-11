@@ -1,8 +1,11 @@
 \section*{Overhead and resolution of timer}
 \begin{itemize}
-\item Overhead = $\text{Avg}(\text{overhead}_1,\text{overhead}_2,\cdots,\text{overhead}_n)$
-\item Resolution = Smallest diff between any 2 watched times
-  \begin{enumerate}
-  \item
-  \end{enumerate}
+\item Timer \emph{overhead} is the amount of time it takes to call the timer function
+\item Usually to measure the overhead for $n$ times and calc. the average
+\item[] $T_{\text{overhead}} = \text{Average}(\text{overhead}_1,\text{overhead}_2,\cdots,\text{overhead}_n)$
+\item The total time to run a program will be increased by $T_{\text{ overhead}} * m$ where $m$ is the number of times the timer is called
+\item Timer \emph{resolution} is the period of time below which the timer will sometimes report a value of zero
+\item[] $T_{\text{res}} = \texttt{MPI\_Wtime()/*end*/} - \texttt{MPI\_Wtime()/*start*/}$ (of type \texttt{double})
+\item \texttt{MPI\_Wtick()} also gives the time resolution (of type \texttt{double})
+\item The latency is the time to send an empty message but in some cases the smallest-sized message can be used to that end
 \end{itemize}

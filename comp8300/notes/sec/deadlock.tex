@@ -1,0 +1,248 @@
+\section*{Avoiding Deadlocks}
+In case of (blocking mutual) comm there 3 possibilities.
+\subsection*{1. Both procs start with \texttt{send} followed by \texttt{recv}}
+\begin{itemize}
+\item For blocking non-buffered protocol, $P_0$ waits for matching \texttt{Recv} from $P_1$ (blocked by \texttt{Send}) $\rightarrow$ deadlock
+\item For blocking buffered protocol, if msg size is smaller than sys buf, $P_0$ blocks only for the time data copied to sys buf
+\item For blocking buffered protocol, large msg size will cause deadlock
+\end{itemize}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=2pt]
+// suppose 2 procs
+// _not_ safe; may deadlock
+if (rank==0) {
+  Send(&a, 1, CHAR, 1);
+  Recv(&b, 1, CHAR, 1, &st);
+} else {
+  Send(&b, 1, CHAR, 0);
+  Recv(&a, 1, CHAR, 0, &st);
+}
+// swap send/recv order for
+// one proc would work
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=2pt]
+// suppose 2 procs
+// this is deadlock-free
+if (rank==0) {
+  Isend(&a, 1, CHAR, 1);
+  Recv(&b, 1, CHAR, 1, &st);
+  Wait(&request);
+} else {
+  Isend(&b, 1, CHAR, 0);
+  Recv(&a, 1, CHAR, 0, &st);
+  Wait(&request);
+}
+\end{lstlisting}
+\end{minipage}
+
+\subsection*{2. Both procs start with \texttt{recv} followed by \texttt{send}}
+Ok to mix \texttt{Isend} with blocking \texttt{Recv} as shown in right snippet\\
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=2pt]
+// suppose 2 procs
+// this always deadlock
+if (rank==0) {
+  Recv(&b, 1, CHAR, 1, &st);
+  Send(&a, 1, CHAR, 1);
+} else {
+  Recv(&a, 1, CHAR, 0, &st);
+  Send(&b, 1, CHAR, 0);
+}
+// regardless of whatever
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=2pt]
+// deadlock-free
+if (rank==0) {
+  Irecv(&b, 1, CHAR, 1, &st);
+  Send(&a, 1, CHAR, 1);
+  Wait(&request);
+} else {
+  Irecv(&a, 1, CHAR, 0, &st);
+  Send(&b, 1, CHAR, 0);
+  Wait(&request);
+}
+\end{lstlisting}
+\end{minipage}
+
+% \input{sec/progring}
+\subsection*{3. One proc starts with \texttt{send} followed by \texttt{recv}, another vica versa}
+proc $i$ sends a msg to proc $i+1$ (modulo the number of processes) and receives a msg from proc $i-1$ (module the number of processes)
+\begin{lstlisting}[language=C,xleftmargin=2pt,xrightmargin=0pt]
+// code is _safe_ and deadlock-free
+int a[10], b[10], npes, myrank;
+MPI_Status status;
+// find out # of procs and my rank
+MPI_Comm_size(MPI_COMM_WORLD, &npes);
+MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+if (myrank%2 == 1) {
+  // odd proc i sends 10 ints to proc i + 1
+  // then recvs 10 ints from proc i -1
+  MPI_Send(a,10,INT,(myrank+1)%npes,1,MPI_COMM_WORLD);
+  MPI_Recv(b,10,INT,(myrank-1+npes)%npes,1,MPI_COMM_WORLD);
+}
+else {
+  // even proc i recvs 10 ints from proc i - 1
+  // then sends 10 ints to proc i + 1
+  MPI_Recv(b,10,INT,(myrank-1+npes)%npes,1,MPI_COMM_WORLD);
+  MPI_Send(a,10,INT,(myrank+1)%npes,1,MPI_COMM_WORLD);
+}
+\end{lstlisting}
+When \texttt{Send} is implemented using buffering, the code works correctly, since every call to \texttt{Send} will get buffered, allowing \texttt{Recv} to be performed. However, if \texttt{Send} blocks until the matching receive issued $\rightarrow$ deadlock (even for only two processes). \textbf{Unsafe version}:
+\begin{lstlisting}[language=C,xleftmargin=2pt,xrightmargin=0pt]
+int a[10], b[10], npes, myrank;
+MPI_Status status;
+MPI_Comm_size(MPI_COMM_WORLD, &npes);
+MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+MPI_Send(a,10,INT,(myrank+1)%npes,1,MPI_COMM_WORLD);
+MPI_Recv(b,10,INT,(myrank-1+npes)%npes,1,MPI_COMM_WORLD);
+\end{lstlisting}
+% Status and Probe
+\subsection*{Dynamic message size with \texttt{MPI\_Status} and \texttt{MPI\_Probe}}
+\begin{minipage}{0.5\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item \texttt{MPI\_SOURCE} is rank of sender
+  \item \texttt{MPI\_TAG} is tag of message
+  \item \texttt{MPI\_ERROR} stores error-code of received message
+  \item If \texttt{MPI\_Recv} gets \texttt{MPI\_ANY\_SOURCE} and \texttt{MPI\_ANY\_TAG}, \texttt{status} is only way to find out sender/msg tag
+  \end{itemize}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=0pt]
+// *status when declared
+// &status when passed as arg
+typedef struct MPI_Status {
+  int MPI_SOURCE;
+  int MPI_TAG;
+  int MPI_ERROR;
+};
+\end{lstlisting}
+\end{minipage}
+\textbf{No} need to check status if src, tag, and $\#$ of received elements are known\\
+Saves memory in user program and allows optimizations in MPI library
+
+% MPI_Get_count and Probe
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=1pt,xrightmargin=5pt]
+MPI_Get_count(
+  MPI_Status* status, // in
+  MPI_Datatype dt,    // in
+  int* count          // out
+);
+MPI_Probe(
+  int source,        // in
+  int tag,           // in
+  MPI_Comm comm,     // in
+  MPI_Status* status // out
+);
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item user passed \texttt{MPI\_Status} and \texttt{dt}
+  \item \texttt{count} is the total number of \texttt{dt} elements received
+  \item this fn is used to determine actual receive amount
+  \item query msg size before actually recv it
+  \item will block for a msg with a matching tag and sender
+  \item \texttt{MPI\_Probe} \emph{not} actually recv msg
+  \end{itemize}
+\end{minipage}
+
+\subsubsection*{Sending and Receiving Messages Simultaneously}
+\begin{itemize}
+\item \texttt{MPI\_Sendrecv} does \emph{not} suffer from circular deadlock problems (left, 3)
+\item \texttt{MPI\_Sendrecv} allows data to travel for both send and recv
+\item \texttt{MPI\_Sendrecv} args combines those of \texttt{MPI\_Send} and \texttt{MPI\_Recv}
+\item send and receive buffers must be disjoint (different in memory)
+\item source and dest of messages can be the same or different
+\item \textbf{disjoint} buffers may force the use a temporary buffer and increase memory usage and the overall run time due to extra copy
+\end{itemize}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=0pt,xrightmargin=1pt]
+int MPI_Sendrecv(
+  void *sendbuf,      // in
+  int sendcount,      // in
+  MPI_Datatype senddt,// in
+  int dest,           // in
+  int sendtag,        // in
+  void *recvbuf,      // out
+  int recvcount,      // in
+  MPI_Datatype recvdt,// in
+  int source,         // in
+  int recvtag,        // in
+  MPI_Comm comm,      // in
+  MPI_Status *status  // out
+);
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=2pt,xrightmargin=0pt]
+// Send and Recv use same buf
+// data must be of same type
+int MPI_Sendrecv_replace(
+  void *buf,         // inout
+  int count,         // in
+  MPI_Datatype dt,   // in
+  int dest,          // in
+  int sendtag,       // in
+  int source,        // in
+  int recvtag,       // in
+  MPI_Comm comm,     // in
+  MPI_Status *status // out
+  );
+// recved replaces sent
+\end{lstlisting}
+\end{minipage}
+\subsection*{Coping with boundaries}
+\begin{lstlisting}[language=C]
+// when boundary procs need NOT to send or recv:
+if (myid == 0)
+  src = MPI_PROC_NULL; // to make send/recv dummy
+if (myid == ntasks - 1)
+  dst = MPI_PROC_NULL;
+MPI_Send(msg, msgsize, MPI_INTEGER, dst, tag, ...);
+MPI_Recv(msg, msgsize, MPI_INTEGER, src, tag, ...);
+\end{lstlisting}
+
+% Drop if-else when possible
+\textbf{Safe version} of the left example using \texttt{MPI\_Sendrecv}:
+\begin{lstlisting}[language=C,]
+// common practice: place MPI calls outside if-else when possible
+int a[10], b[10], npes, myrank;
+MPI_Status status;
+MPI_Comm_size(MPI_COMM_WORLD, &npes);
+MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+MPI_SendRecv(a, 10, MPI_INT, (myrank+1)%npes, 1,
+             b, 10, MPI_INT, (myrank-1+npes)%npes, 1,
+             MPI_COMM_WORLD, &status);
+\end{lstlisting}
+
+\subsection*{Root rank (\texttt{== 0})}
+\begin{lstlisting}[language=C]
+// rank 0 (aka. root) often chosen for special tasks
+// in this case it acts like MPI_Bcast in an naive way
+// in practice, MPI_Bcast uses a faster tree algorithm
+if (0 == myid)
+  for (int i=1; i < ntasks; i++)
+    MPI_Send(&data, 1, MPI_INT, i, 22, MPI_COMM_WORLD);
+else
+   MPI_Recv(&data, 1, MPI_INT, 0, 22, MPI_COMM_WORLD, &status);
+\end{lstlisting}
+\subsection*{Arbitrary recvs}
+\begin{lstlisting}[language=C]
+// ANY_SOURCE and ANY_TAG often intro perf overhead
+// use only for clear benefit like load balancing
+if (0 == myid) {
+  for (int i=1; i < ntasks; i++) {
+    MPI_Recv(&data, process(data) 1, MPI_INT,
+             MPI_ANY_SOURCE, 22, MPI_COMM_WORL);
+    process(data);
+  } else
+    MPI_Send(&data, 1, MPI_INT, 0, 22, MPI_COMM_WORLD, &status);
+}
+\end{lstlisting}

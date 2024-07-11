@@ -24,7 +24,6 @@ Two common causes of \textbf{deadlock} in MPI:
   \end{itemize}
 \end{minipage}
 \begin{minipage}{0.48\linewidth}
-  \centering
 \begin{lstlisting}[language=c,xleftmargin=1pt]
 // argc, argv from main
 // No MPI calls can be here
@@ -46,14 +45,13 @@ MPI_Finalize();
   \item Each proc will call these two fns to get the info for comm.
   \item Output vars are \texttt{size} and \texttt{rank}.
   \item \texttt{size}/\texttt{rank} can be declared before \texttt{Init}.
-  \item \textbf{in} args will be passed-by-value to MPI fns
+  \item \textbf{in} args are passed to MPI fns
   \item \textbf{out} args will be assigned values.
   \item \textbf{in}/\textbf{out} args must be declared before any usage.
   \end{itemize}
 \end{minipage}
 \begin{minipage}{0.48\linewidth}
-  \centering
-\begin{lstlisting}[language=c,xleftmargin=1pt,identifierstyle=]
+\begin{lstlisting}[language=c,xleftmargin=1pt]
 // before any MPI comm
 // get how many processors
 int size; // or world_size
@@ -243,3 +241,85 @@ int MPI_Bcast(
 // each proc gets same data
 \end{lstlisting}
 \end{minipage}
+
+\begin{minipage}{0.5\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item src (aka. root) proc sends a diff. part of \texttt{sendbuf} to each procs, including itself
+  \item received data stored in \texttt{recvbuf}
+  \item proc $i$ recv \texttt{sendcount} contiguous \texttt{senddt} eles from $i*\texttt{sendcount}$ location of \texttt{sendbuf} of src proc
+  \item assume that \texttt{senddt* sendbuf}
+  \item \texttt{MPI\_Scatter} must be called by all procs with same vals for the \texttt{sendcount}, \texttt{senddt}, \texttt{recvcount}, \texttt{recvdt}, \texttt{source}, and \texttt{comm} args
+  \item \texttt{sendcount} is $\#$ elements sent to each individual procs.
+  \end{itemize}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=1pt]
+// source is the root proc
+// root sends parts of data
+// to all procs  + itself
+int MPI_Scatter(
+  void *sendbuf,      // in
+  int sendcount,      // in
+  MPI_Datatype senddt,// in
+  void *recvbuf,      // out
+  int recvcount,      // in
+  MPI_Datatype recvdt,// in
+  int source,         // in
+  MPI_Comm comm       // in
+);
+// each proc gets diff data
+// it's usually the case:
+// sendcnt = sendbuf.len / p
+\end{lstlisting}
+\end{minipage}
+
+% Gather
+\begin{minipage}{0.5\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item with $p$ procs in \texttt{comm}, \texttt{target} recv totaling $p$ bufs ($p-1+1$)
+  \item gathered data stored in \texttt{recvbuf} of \texttt{target} in a rank order
+  \item data from rank $i$ stored in \texttt{recvbuf} starting at location $i* \texttt{sendcount}$
+  \item assume that \texttt{recvdt* recvbuf}
+  \item data sent by each proc \textbf{must} be of same size and type
+  \item \texttt{MPI\_Gather} must be called with same vals for \texttt{sendcount}, \texttt{senddt} at each proc
+  \item only root proc needs to have a valid receive buffer
+  \item \texttt{recvcount} specifies $\#$ of eles recv by each proc; \textbf{not} total $\#$ of eles it recv
+  \end{itemize}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=1pt]
+// target is the root proc
+// root recv data from
+// all other procs + itself
+MPI_Gather(
+  void* sendbuf,       // in
+  int sendcount,       // in
+  MPI_Datatype senddt, // in
+  void* recvbuf,       // out
+  int recvcount,       // in
+  MPI_Datatype recvdt, // in
+  int target,          // in
+  MPI_Comm comm        // in
+);
+// all other procs can pass
+// NULL for recvbuf
+// it must be the case:
+// recvcount == sendcount
+// typeof sendbuf ==
+// typeof recvbuf
+\end{lstlisting}
+\end{minipage}
+
+\begin{itemize}
+  \item data gathered to all processes; not only at the \texttt{target} process
+  \item The meanings of various parameters are similar to those for \texttt{MPI\_Gather}
+  \item each process must now supply a \texttt{recvbuf} that will store gathered data
+  \end{itemize}
+
+\begin{lstlisting}[language=C]
+int MPI_Allgather(void *sendbuf, int sendcount,
+        MPI_Datatype senddt, void *recvbuf, int recvcount,
+        MPI_Datatype recvdt, MPI_Comm comm)
+\end{lstlisting}
