@@ -1,39 +1,59 @@
 \section*{Jargon}
 \begin{description}
-\item[synchronous iteration] several processes start together at the beginning of each iteration and the next iteration must wait for all processors to finish current iteration
+
+\item[synchronous iteration] several procs start together at the beginning of each iteration and the next iteration must wait for all procs to finish current iteration
+
 \item[SPMD] all procs execute the same program (Single Program, SP) in parallel (except for a small number of procs such as root), but each has its own set of data (Multiple Data). In src code, usually a proc ID is used to uniquely label a proc
-\item[Motivation for parallelism (\textbf{L1P10}-\textbf{P11})]
+
+\item[Motivation for parallelism]
   \begin{enumerate*}
   \item speed/performance (1h vs 1w)
   \item tackle larger-scale problems
   \item keep power consumption and heat dissipation under control
   \item more $\cdots$
   \end{enumerate*}
-\item[peak flops/sec (\textbf{L2-3P3})] $ = \# \text{cores} \times [\# \text{sockets}] \times \# \text{flops} \times \text{freq}$
-\item[speedup (hard due to overheads \textbf{L1P30})]
+
+\item[peak flops/sec] $ = \# \text{cores} \times [\# \text{sockets}] \times \# \text{flops} \times \text{freq}$
+
+\item[speedup (hard due to overheads)]
   \begin{enumerate*}
   \item idling (unbalanced load, sync, serial parts, etc)
   \item splitting computation into tasks
   \item communications among processes
   \end{enumerate*}
-\item[speedup (fixed problem size \textbf{L5P2})] $S_p = \frac{T_{seq}}{T_{par}} (\geq 1)$
-\item[efficiency (\textbf{L5P2})] $E_p = \frac{S_{p}}{p} (0 < E_p \leq 1)$
-\item[embarrassingly (easy) parallel (\textbf{L5P3, L6P2})] aka. perfectly parallel, delightfully parallel or pleasingly parallel, where problem can be easily divided into independent parts and solved without communication
+
+\item[speedup (fixed problem size)] $S_p = \frac{T_{seq}}{T_{par}} (\geq 1)$
+
+\item[efficiency] $E_p = \frac{S_{p}}{p} (0 < E_p \leq 1)$
+
+\item[embarrassingly (easy) parallel] aka. perfectly parallel, delightfully parallel or pleasingly parallel, where problem can be easily divided into independent parts and solved without communication
+
 \item[strong scalability] fixed problem size + increasing $\# p \rightarrow$ perf $\downarrow$
+
 \item[weak scalability] increasing $\# p$ and problem size $\rightarrow$ perf $\downarrow$
-\item[communication latency] time taken to communicate a message between 2 processors in a network
+
+\item[communication latency] time taken to communicate a msg between 2 procs in a network
+
 \item[minimal routing] takes 1 of shortest paths (XY-routing; E-cube)
-\item[non-minimal] routing route the message along a longer path to avoid network congestion
+
+\item[non-minimal routing] route the message along a longer path to avoid network congestion
+
 \item[deterministic] routing determines a unique path \emph{solely} based on src and dest nodes
-\item[adaptive] routing uses info on network state to determine message path (\textbf{L7P3})
+
+\item[adaptive] routing uses info on network state to determine message path
+
 \item[walltime] the actual time taken from the start of a computer program to the end. aka. elapsed real time, real time, wall-clock time
 \item[flops] floating-point operations (add, subtract, multiply, divide) per second
 \item[ceil] ceil(n,p) = $(n + p - 1) / p$ especially when $n$ isn't evenly divisible by $p$
 
-\item[synchronous] 2 procs A, B. A will only start sending when B explicitly signals it is ready to receive.  If not, A just waits (also blocks).  In such mode, two procs communicate with each other directly.  This is \emph{similar} but not the same as \textbf{blocking}
+\item[synchronous] 2 procs A, B. A will only start sending when B explicitly signals it is ready to receive.  If not, A just waits (also blocks).  In such mode, two procs communicate with each other directly.
+
 \item[asynchronous] All concurrent tasks execute asynchronously; possible to implement any parallel algorithm.  However, it is hard to reason about the program because of non-deterministic behavior due to race conditions.
+
 \item[loosely synchronous] a good compromise between aysnc and sync.  Tasks and subtasks synchronize to perform interactions (easy to debug), while between interactions, tasks execute completely asynchronously.
+
 \item[blocking, non-buffered] A sends and B recvs, no system buffer available.  A must hold the data (A being idle and blocking) until B is ready to receive.
+
 \item[blocking, buffered] data/message can be copied into a system-controlled block of memory (buffer on A or B or both) so A can continue to execute.  When B is ready, it copies the buffered data into its own appropriate memory.  A \textbf{common} implementation is to buffer relatively small messages and switch to non-buffered mode for large messages (blocking too).  In general, better to write programs with bounded buffer requirements.  This blocking time is only the period of copying data into/from buffer.
 \item[non-blocking] generally accompanied by a \texttt{check-status} operation.  Upon return from non-blocking send/recv, the proc is free to perform any computation that doesn't require communication.  Later the proc \textbf{checks} if non-blocking op has completed and wait for its completion if needed.
 \item[communication domain] a set of processes allowed to communicate with each other.  Info about this domain is stored in vars of type \texttt{MPI\_Comm} aka \textbf{communicators} (used as arg to all message transfer MPI routines and they uniquely identify procs). One proc can belong to many different (possibly overlapping) communication domains.  \texttt{MPI\_COMM\_WORLD} includes all procs in parallel execution as they all may need to talk to each other.
@@ -41,4 +61,17 @@
 \item[one-to-all broadcast] a single process sends \textbf{identical} data to all other processes or to a subset of them.  Initially, only the source process has the data of size $m$ that needs to be broadcast.  At the termination of the procedure, there are $p$ copies of the initial data --- one belonging to each process.
 
 \item[all-to-one reduction] each of the p participating processes starts with a buffer $M$ containing $m$ words.  The data from all processes are combined through an associative operator and accumulated at a single destination process into one buffer of size $m$.  Reduction can be used to find the sum, product, maximum, or minimum of sets of numbers
+
+\item[latency] At the logical level, a memory system (of multiple levels of caches) takes in a request for a memory word and returns a block of data of size $b$ containing the requested word after $l$ nanoseconds, referred to as the \textbf{latency} of the memory.  As an analogy, if water comes out of the end of a fire hose 2 seconds after a hydrant is turned on, then the latency of the system is 2 seconds.
+
+
+\item[bandwidth] The rate at which data can be pumped from the memory to the processor determines the bandwidth of the memory system.  How much data (per unit time) gets transferred from memory to processor.
+
+
+\item[hit ration] The fraction of data references satisfied by the cache is called the cache hit ratio of the computation on the system.   The effective computation rate of many applications is bounded \emph{not} by the processing rate of the CPU, but by the rate at which data can be pumped into the CPU.  Such computations are referred to as being \textbf{memory bound}.
+
+
+\item[temporal locality] If at one point a particular memory location is referenced, then it is likely that the same location will be referenced again in the near future.
+
+\item[spatial locality] Data that is accessed or referenced spatially close to each other (\texttt{a[i-1],a[i],a[i+1]}) is likely to be accessed again in the near future
 \end{description}

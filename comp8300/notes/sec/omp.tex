@@ -1,0 +1,126 @@
+\section*{OpenMP}
+\begin{minipage}{0.5\linewidth}
+  \flushleft
+  The program starts as a single thread of execution, the initial thread (sequential).  A team of threads is forked at the beginning of a parallel region and joined at the end.  All threads but the initial one are terminated.
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[xleftmargin=1pt,xrightmargin=1pt]
+       | initial thread
+       v
+  ----------- <-- fork
+  | | | | | | team of threads in
+  v v v v v v parallel region
+  ----------- <-- join
+       |
+       v initial thread
+\end{lstlisting}
+\end{minipage}
+% Identical
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xrightmargin=3pt]
+#pragma omp parallel default(none)
+{
+   #pragma omp for
+   for (i = 0 < i < n; i++) {
+     /* parallel loop body */
+   }
+} // identical to right snippet
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=3pt]
+#pragma omp parallel for \
+   default(none)
+{ // <- outmost {} can be removed
+   for (i = 0 < i < n; i++) {
+     /* parallel loop body */
+   }
+} // merged sections
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xrightmargin=3pt]
+int n = 5;
+#pragma omp parallel for \
+    private(i, a)
+{ // a,i undefined upon entry
+   for (i = 0 < i < n; i++)
+     a = i + 1;
+}
+// can't access a here
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=3pt]
+int n = 5;
+#pragma omp parallel for \
+   private(i) lastprivate(a)
+{ // when i == n-1, loop ends
+   for (i = 0 < i < n; i++)
+     a = i + 1;
+} // last i as if sequential
+// a == 4 + 1; last i decides a
+\end{lstlisting}
+\end{minipage}
+% firstprivate
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xrightmargin=3pt]
+int n = 5, b = 7;
+#pragma omp parallel for \
+   private(i,a) firstprivate(b)
+{ // b inits to 7 upon entry
+   for (i = 0 < i < n; i++)
+     a = i + b;
+}
+// can't access a,i here
+\end{lstlisting}
+\end{minipage}
+% default
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=3pt]
+int n = 5, b = 7;
+#pragma omp parallel for \
+   private(i,a) default(shared)
+{ // n and b shared by all threads
+   for (i = 0 < i < n; i++)
+     a = i + b;
+}
+// can't access a,i here
+\end{lstlisting}
+\end{minipage}
+ In C/C++, \emph{only} \texttt{default(none | shared)}; \emph{no} \texttt{default(private)}
+
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xrightmargin=3pt]
+#pragma omp parallel
+{// no dependency among two loops
+  #pragma omp for nowait
+    for (i = 0; i < nmax; i++)
+      if (equal(name, curr_lst[i]))
+         processCurrentName(name);
+ // nowait removes implied barrier
+  #pragma omp for
+    for (i = 0; i < mmax; i++)
+      if (equal(name, past_lst[i]))
+         processPastName(name);
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=3pt]
+// 2nd loop not depends on 1st but
+// implied barrier by default
+#pragma omp parallel
+{
+  #pragma omp for
+    for (i = 0; i < nmax; i++)
+      taskA();
+  // implicit barrier
+  #pragma omp for
+    for (i = 0; i < mmax; i++)
+      taskB();
+}
+\end{lstlisting}
+\end{minipage}
+With \texttt{nowait}, fast threads in 1st loop move onto 2nd loop w/t waiting

@@ -7,7 +7,8 @@
 
 % Notes begin
 \begin{multicols*}{3}
-% \input{sec/jargon}
+  % \input{sec/jargon}
+  %\pagebreak
 % \input{sec/laws}
 % \input{sec/flynn}
 % \input{sec/routing}
@@ -15,12 +16,48 @@
 
 % \input{sec/roofline}
 
-\input{sec/mpi}
-\pagebreak
-\input{sec/deadlock}
-\input{sec/simplempiprogs}
-\input{sec/timer}
-\pagebreak
+% \input{sec/mpi}
+% \pagebreak
+% \input{sec/deadlock}
+% \input{sec/simplempiprogs}
+% \input{sec/timer}
+% \pagebreak
+
+% \input{sec/pthreads}
+% \pagebreak
+\input{sec/omp}
+\subsection*{schedule \texttt{(static | dynamic | guided | runtime)}}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xrightmargin=3pt]
+int dim = 128;// shared by default
+#pragma omp parallel \
+   num_threads(4)
+   #pragma omp for schedule(static)
+   for (i = 0; i < dim; i++)
+     task();
+// each thread gets 128/4 == 32
+// round-robin division
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=3pt]
+int dim = 128;// shared by default
+#pragma omp parallel \
+   num_threads(4)
+  #pragma omp for schedule(dynamic)
+  for (i = 0; i < dim; i++)
+     task();
+// thread gets chunk_size at first
+// fast threads request more
+\end{lstlisting}
+\end{minipage}
+\begin{itemize}
+\item w/t \texttt{chunk\_size}, \texttt{static} div iters evenly; last chunk may be smaller
+\item \texttt{dynamic,chunk\_size} defaults to 1 if not specified;
+\item \texttt{guided,chunk\_size} defaults to 1 if not specified
+\item for \texttt{runtime}, \texttt{chunk\_size} can be set via env var \texttt{OMP\_SCHEDULE}
+\item In \texttt{guided}, chunk size is reduced exponentially as each chunk is dispatched to a thread. \texttt{chunk\_size} $\rightarrow$ smallest chunk to be dispatched
+\end{itemize}
 
 \end{multicols*}
 \end{document}

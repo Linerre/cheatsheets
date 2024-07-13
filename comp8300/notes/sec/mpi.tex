@@ -186,7 +186,7 @@ int MPI_Wait(
 \item Code becomes more compact and easier to read
 \item All collective comm fns in MPI take a communicator arg that defines the group of procs participating in the collective operation
 \item All the procs belonging to this communicator participate in the op
-\item All of them \textbf{must} call the collective comm fns (see below)
+\item \textbf{All} the procs \textbf{must} call the collective communication functions
 \item Collective comm ops \emph{do not} act like barriers (a proc could go past its call for the collective communication operation, even before other processes have reached it)
 \item Collective comm ops acts like a \emph{virtual} sync step (no need for tags)
 \item All procs in group (communicator) must specify same src-/target-proc
