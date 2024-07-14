@@ -124,3 +124,35 @@ int n = 5, b = 7;
 \end{lstlisting}
 \end{minipage}
 With \texttt{nowait}, fast threads in 1st loop move onto 2nd loop w/t waiting
+\subsection*{Schedule \texttt{(static | dynamic | guided | runtime)}}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xrightmargin=3pt]
+int dim = 128;// shared by default
+#pragma omp parallel \
+   num_threads(4)
+   #pragma omp for schedule(static)
+   for (i = 0; i < dim; i++)
+     task();
+// each thread gets 128/4 == 32
+// round-robin division
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=3pt]
+int dim = 128;// shared by default
+#pragma omp parallel \
+   num_threads(4)
+  #pragma omp for schedule(dynamic)
+  for (i = 0; i < dim; i++)
+     task();
+// thread gets chunk_size at first
+// fast threads request more
+\end{lstlisting}
+\end{minipage}
+\begin{itemize}
+\item w/t \texttt{chunk\_size}, \texttt{static} div iters evenly; last chunk may be smaller
+\item \texttt{dynamic,chunk\_size} defaults to 1 if not specified;
+\item \texttt{guided,chunk\_size} defaults to 1 if not specified
+\item for \texttt{runtime}, \texttt{chunk\_size} can be set via env var \texttt{OMP\_SCHEDULE}
+\item In \texttt{guided}, chunk size is reduced exponentially as each chunk is dispatched to a thread. \texttt{chunk\_size} $\rightarrow$ smallest chunk to be dispatched
+\end{itemize}
