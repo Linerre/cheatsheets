@@ -156,3 +156,255 @@ int dim = 128;// shared by default
 \item for \texttt{runtime}, \texttt{chunk\_size} can be set via env var \texttt{OMP\_SCHEDULE}
 \item In \texttt{guided}, chunk size is reduced exponentially as each chunk is dispatched to a thread. \texttt{chunk\_size} $\rightarrow$ smallest chunk to be dispatched
 \end{itemize}
+\subsection*{Synchronization: \texttt{barrier}, \texttt{ordered}, \texttt{atomic}, \texttt{critical} plus \texttt{single/master}}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C]
+/*** within a parallel region ***/
+// all threads in team must arrive
+// here before any can move on
+#pragma omp barrier
+/*** within a parallel region ***/
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+  \begin{itemize}
+  \item \texttt{barrier} binds to closet \texttt{parallel}
+  \item most commonly used to avoid data race: insert betwn write/read
+  \item cond exec it needs cond C/C++ statements
+\end{itemize}
+\end{minipage}
+% Ordered
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C]
+cum_sum [0] = list [0];
+#pragma omp parallel for \
+    shared(cum_sum,list,n) ordered
+for (i =1; i<n; i ++) {
+// other processing list[i]
+ #pragma omp ordered
+ {
+   cum_sum[i] =
+         cum_sum[i-1] + list[i];
+ }}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+  \begin{itemize}
+  \item \texttt{ordered} block exec sequentially
+  \item must be within scope of omp \texttt{for}
+  \item single \texttt{for} directive can have \emph{only} one \texttt{ordered} block within it
+  \item only a single thread can enter block
+  \item 1st arrived thread enters directly
+  \item all others enter one after another in order (loop indices)
+  \item large \texttt{ordered} block slows program
+\end{itemize}
+\end{minipage}
+% Critical
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C]
+#pragma omp parallel sections
+{
+  #pragma parallel section
+  {
+   /* producer thread */
+   task = produce_task();
+   #pragma omp critical (task_queue)
+   {// must check queue_empty
+     insert_into_queue(task);
+   }
+  }
+  #pragma parallel section
+  {
+   /* consumer thread */
+   #pragma omp critical (task_queue)
+   {// must check queue_full
+    task = extract_from_queue(task);
+   }
+   consume_task(task);
+  }
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=4pt,framextopmargin=2pt]
+#pragma omp critical [(name)]
+  /* structured block */
+// no jumps allowed in above block
+\end{lstlisting}
+  \begin{itemize}
+  \item optional \texttt{name} identifies a critical
+  \item if no \texttt{name}, all unnamed sections map to the same default name
+  \item diff thread can exec diff criticals
+  \item at any time, \emph{only} 1 thread in a critical section specified by \texttt{name}
+  \item if sec already has a thread, all others must wait until current done
+  \item names of critical secs are global across the program
+  \item \texttt{critical} is omp version of \texttt{mutex}
+  \item better to minimize \texttt{critical} sections for good performance
+  \item for a single expr in \texttt{critical}, consider use \texttt{atomic}
+\end{itemize}
+\end{minipage}
+% Atomic
+\begin{lstlisting}[language=C]
+#pragma omp atomic [seq_cst [ ,]] atomic-clause [[ ,] seq_cst]
+  /* single expression statement */
+#pragma omp atomic [seq_cst [ ,]] // <- memory-order clause
+  /* single expression statement */
+#pragma omp atomic [seq_cst [ ,]] capture [[ ,] seq_cst]
+  /* structured block */
+// see atomic-clause in right table; `capture' retains original x/v val
+\end{lstlisting}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xrightmargin=2pt]
+#pragma omp parallel shared(n,ic)
+  for (i=0; i<n; i++) {
+    #pragma omp atomic
+    ic = ic + 1; // ic++;
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=4pt]
+#pragma omp parallel shared(n,ic)
+  for (i=0; i<n; i++) {
+    #pragma omp atomic
+    ic = ic + fn(i);
+} // fn(i) is not atomic
+\end{lstlisting}
+\end{minipage}
+% Single
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xrightmargin=2pt]
+int e[100], sum, meam;
+#pragma omp parallel shared(e,sum)
+{
+   sum = ...; /* compute sum */
+}// implied barrier inserted here
+#pragma omp parallel single
+{
+   meam = ...; /* compute mean */
+}// implied barrier inserted here
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item \texttt{\#pragma omp parallel single [clause list]}
+  \item thread to exec \texttt{single} is \emph{arbitrary}
+  \item 1st come 1st exec.  unless \texttt{nowait}, all others proceed to end of \texttt{single} region and wait
+  \item clause: \texttt{(first)private}, \texttt{nowait}
+  \item to comp. global data or perf. I/O
+\end{itemize}
+\end{minipage}
+% Master
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xrightmargin=2pt]
+#pragma omp parallel master
+  /* structured block */
+// no implied barrier
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item a specialization of \texttt{single}
+  \item only master thread exec the block
+  \item no implied barrier associated
+\end{itemize}
+\end{minipage}
+\begin{tabular}{l|l}
+  \hline
+  atomic clause & expression statement (binop: \verb|+,-,*,^,&,<<,>>|) \\
+  \hline
+  read    & \texttt{val = x;}  \\
+  write   & \texttt{x = expr;} \\
+  update  & \parbox[t]{6.8cm}{\texttt{x++; x--; ++x; --x; x binop = expr;}\\ \texttt{x = x binop expr; x = expr binop x;}}\\
+  \hline
+  \multicolumn{2}{l}{For \texttt{capture} and \texttt{structured-block} see omp reference page 2}\\
+  \hline
+\end{tabular}
+\subsection*{Reduction (see omp guide for all \texttt{ops} and init vals)}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=1pt,xrightmargin=3pt]
+int sum = 0;// assume n,a init-ed
+#pragma omp parallel \
+  shared(n,a,sum) private(sumloc)
+{ // each thread comp its sum
+  sumloc = 0; // init private sum
+  #pragma omp for
+  for(i=0; i<n; i++)
+    sumloc += a[i]
+  #pragma omp critical(reduc)
+  {
+    sum += sumloc;
+  }// one thread comp final sum
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=C,xleftmargin=3pt]
+int sum = 0;// assume n,a init-ed
+#pragma omp parallel for \
+  shared(n,a,sum) private(sumloc) \
+  reduction(+: sum)
+  for(i=0; i<n; i++)
+    sum += a[i]
+/* with reduction(sum) directive,
+each thread comp. its local sum
+and accumulate to the final sum.
+But the order in which each thread
+updates `sum' is unspecified. When
+comp. float/double values, results
+vary slightly: limited precision*/
+\end{lstlisting}
+\end{minipage}
+\begin{itemize}
+\item aggregate types (like arrays), pointers, references are not supported
+\item a reduction variable must \emph{not} be \texttt{const}-qualified
+\item clause operators can\emph{not} be overloaded in terms of its \texttt{var}s
+\end{itemize}
+% Flush
+\begin{lstlisting}[language=C]
+#pragma omp flush [(list)] // `list' specify vars to be flushed
+\end{lstlisting}
+\begin{itemize}
+\item for making mem consistent across threads because register allocated vars may be inconsistent
+\item provides a mem fence by forcing a var to be written to/read from mem
+\item all write ops to shared vars must be committed to memory at a flush
+\item and all refs to shared vars after a fence must be satisfied from the mem
+\item Since private vars relevant only to a single thread, \texttt{flush} directive applies \emph{only} to shared vars.
+\item a \texttt{flush} is implied at the following places:
+  \begin{enumerate}
+  \item at a \texttt{barrier}
+  \item at entry and exit of \texttt{critical}, \texttt{ordered}, \texttt{parallel}, \texttt{parallel for} and \texttt{parallel sections} blocks
+  \item at \textbf{exit} of \texttt{for}, \texttt{sections} and \texttt{single} blocks
+  \end{enumerate}
+\item a \texttt{flush} is \emph{not} implied if \texttt{nowait} is present
+\item a \texttt{flush} is \emph{not} implied at the following places:
+  \begin{enumerate}
+  \item \textbf{entry} of \texttt{for}, \texttt{sections} and \texttt{single} blocks
+  \item entry or exit of \texttt{master} block
+  \end{enumerate}
+\end{itemize}
+\subsection*{Useful functions and environment variables (see guide for more)}
+\begin{lstlisting}[language=C]
+/* following fn relate to concurrency and number of processors */
+#include <omp.h>
+// # of threads for next `parallel'
+void omp_set_num_threads (int num);// must used outside parallel region
+int omp_get_num_threads ();// # of threads in a team; 1 for master
+int omp_get_max_threads ();// max # of threads could be created
+int omp_get_thread_num (); // unique id for each thread (0-index)
+int omp_get_num_procs ();  // # of processors available
+int omp_in_parallel();     // 0 (outside) | non-zero (inside)
+\end{lstlisting}
+\begin{lstlisting}[language=bash,framesep=1pt,xleftmargin=-2pt,xrightmargin=-2pt]
+# can use `opm_set_num_threads' fn or `num_threads' directive to change
+# but require `setenv OMP_SET_DYNAMIC TRUE'
+setenv OMP_NUM_THREADS 8 # set default # of threads in parallel region
+setenv OMP_DYNAMIC TRUE  # allow runtime ctrl of threads (can > logical)
+setenv OMP_NESTED TRUE | FALSE # enable nested parallelism
+# if set, print all relevant env vars at the beginning of the program
+setenv OMP_DISPLAY_ENV true | verbose
+setenv OMP_STACKSIZE 8K # B(ytes); K:1024B; M:1024Kbytes; G:1024Mbytes
+setenv OMP_SCHEDULE "static,4" # "dynamic" | "guided"
+\end{lstlisting}

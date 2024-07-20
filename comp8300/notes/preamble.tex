@@ -57,13 +57,19 @@
 \usepackage{tikz}
 \usetikzlibrary{ arrows, automata, bbox, calc, positioning, tikzmark, decorations.pathmorphing, decorations.pathreplacing, decorations.shapes, }
 \tikzset{
-% ->, % makes the edges directed
->=stealth', % makes the arrow heads bold
-node distance=1cm, % specifies minimum distance between two nodes
-% small/.style={},
-every state/.style={thick}, % sets the properties for each ’state’ node
-every node/.style={inner sep=1pt},
-initial text=start, % sets the text that appears on the start arrow
+  >=stealth',
+  node distance=1cm,
+  recstate/.style={
+    circle,draw=blue!50,fill=blue!20,thick,font=\small\sffamily,rounded corners=3pt,
+    minimum size=1cm,inner sep=1pt
+  },
+  ivp/.style={draw,->,auto,font=\small\sffamily,bend angle=60},
+  msi/.style={draw=Brown,->,auto,font=\small\sffamily,bend angle=80},
+  msibs/.style={draw=RoyalBlue,->,auto,font=\small\sffamily,bend angle=80},
+  msinl/.style={font=\footnotesize\sffamily}, %msi node label
+  every edge/.style={draw,->,auto,font=\small\sffamily},
+  every loop/.style={looseness=4},
+  initial text=start,initial where=right
 }
 
 % Place a figure env right here via [H] option
@@ -84,6 +90,9 @@ initial text=start, % sets the text that appears on the start arrow
 \setlength\belowdisplayskip{-5pt}
 \setlength\abovedisplayshortskip{-4pt}
 \setlength\belowdisplayshortskip{-4pt}
+\setlength\tabcolsep{5pt}
 \newcommand{\gor}{\;|\;}
 \newcommand{\num}{\texttt{\#}~}
+\newcommand{\pro}[1]{\textcolor{Brown}{#1}}
+\newcommand{\bus}[1]{\textcolor{RoyalBlue}{#1}}
 \renewcommand{\arraystretch}{1.2}
