@@ -38,8 +38,9 @@ module softcore_proc #(
    //------------------------------------------------------
    //--                Module Parameters                 --
    //------------------------------------------------------
-   parameter int  SIMULATION     = 0,           // The SIMULATION variable is used to reduce the wait times. A second delay may be reasonable in real life, but trying to simulate that will take hours!
-   parameter int  CLK_FREQUENCY  = 100_000_000  // This is the frequency 'clk_in' is running at in Hz.
+   parameter int SIMULATION = 0,             // The SIMULATION variable is used to reduce the wait times.
+                                             // One second delay may be reasonable in real life, but trying to simulate that will take hours!
+   parameter int CLK_FREQUENCY = 100_000_000 // This is the frequency 'clk_in' is running at in Hz.
 )(
    //------------------------------------------------------
    //--                   Module Ports                   --
@@ -61,9 +62,9 @@ module softcore_proc #(
    //------------------------------------------------------
    // There are multiple different ways to declare a state machine in verilog.
    // This method is probably the best for a couple of reasons.
-   //    1) By using an enum, most simulators will display the textual name of the state
+   //    1. By using an enum, most simulators will display the textual name of the state
    //       rather than the number
-   //    2) It gives the sythesiser freedom to optimise the FSM.
+   //    2. It gives the sythesiser freedom to optimise the FSM.
    // You do not need to write a FSM as 'one-hot', or grey coded when targetting
    // an FPGA device, as the synthesiser will detect and optimse the state
    // machine. What's important is that you write the FSM in a manner that the
@@ -87,7 +88,7 @@ module softcore_proc #(
    //------------------------------------------------------
    // Assertions are useful to detect user errors with parameters. While
    // there is an assert keyword in verilog, it is not supported by all
-   // compilers. 'Initial if' is the safest way to do this. (This is a 
+   // compilers. 'Initial if' is the safest way to do this. (This is a
    // regular if statement inside a regular initial block).
    // $error causes the compiler to halt & thrown an error.
    initial if(MAX_NUM_COMMANDS_W != 8) $error("The width of the command address and program counter need to be identical for the jump statements to work");
@@ -96,10 +97,10 @@ module softcore_proc #(
    //------------------------------------------------------
    // Although verilog lets you declare variables anywhere. It makes your life
    // much easier to declare them all at the top.
-   genvar                           g;                // A genvar is used in a generate loop. A generate loop can only use a genvar!
+   genvar                           g;                // A genvar is used in a generate loop. One generate loop can only use one genvar!
    ProcFSMType                      processor_fsm;    // It's not really necessary to declare a FSM type & then the variable, I just think it's neater.
    reg   [MAX_NUM_COMMANDS_W-1:0]   program_counter;
-   reg   [4:0][7:0]                 register;
+   reg   [4:0][7:0]                 register; // 2D array
    CommandType                      current_command;  // CommandType is defined in command_package.sv
    wire                             timer_done;
    reg   [MAX_TIMER_W-1:0]          timer;
@@ -108,6 +109,7 @@ module softcore_proc #(
    wire  [7:0]                      and_result;
    wire  [7:0]                      or_result;
    wire  [7:0]                      xor_result;
+   wire  [7:0]                      not_result;
    ////////////////////////////////////////////////////////////////////////////
    //                        Processor State Machine                         //
    ////////////////////////////////////////////////////////////////////////////
@@ -116,8 +118,8 @@ module softcore_proc #(
    // always block only controls the processor_fsm registers. This block only
    // specifies how the states change. What happens at each state is specified
    // in different always blocks for those variables.
-   always @(posedge clk_in)begin
-      if(!nrst_in)begin
+   always @(posedge clk_in) begin
+      if (!nrst_in) begin
          processor_fsm <= STATE_INIT;
       end else begin
          case(processor_fsm)
@@ -156,6 +158,9 @@ module softcore_proc #(
                      processor_fsm <= STATE_EXECUTE;
                   end
                   INSTR_XOR : begin
+                     processor_fsm <= STATE_EXECUTE;
+                  end
+                  INSTR_NOT : begin
                      processor_fsm <= STATE_EXECUTE;
                   end
                   INSTR_JUMP : begin
@@ -228,30 +233,50 @@ module softcore_proc #(
    //--                 Program Counter                  --
    //------------------------------------------------------
    // The program counter is the register in a CPU that keeps track of which
-   // instruction the processor is up to. Here is always increments in order
+   // instruction the processor is up to. Here it always increments in order
    // unless a jump command is issued.
    always @(posedge clk_in)begin
       if(!nrst_in)begin
          program_counter <= {MAX_NUM_COMMANDS_W{1'b0}};
       end else begin
          // The Program Counter only increments in STATE_INCREMENT
-         if(processor_fsm == STATE_INCREMENT)begin
+         if(processor_fsm == STATE_INCREMENT)
+           begin
+              //!! DONE: Task 1.2
+              //!! You will need to modify this block to implement the jump
+              //!! command. A jump instruction moves the program counter to
+              //!! a location of your choosing.
+              //!! Test08 will pass when you have done this correctly
+              if (current_command.instruction == INSTR_JUMP)
+                begin
+                   program_counter <= current_command.address;
+                end
+              //!! DONE: Task 2.1
+              //!! Implement the remaining jump commands here as well.
+              //!! These are tested in tests 10 through 15.
+              else if (current_command.instruction == INSTR_JUMP_GT) begin
+                 if (current_command.data > register[0])
+                   program_counter <= current_command.address;
+                 else
+                   program_counter <= program_counter + 1'b1;
+              end
+              else if (current_command.instruction == INSTR_JUMP_EQ) begin
+                 if (current_command.data == register[0])
+                   program_counter <= current_command.address;
+                 else
+                   program_counter <= program_counter + 1'b1;
+              end
+              else if (current_command.instruction == INSTR_JUMP_LT) begin
+                 if (current_command.data < register[0])
+                      program_counter <= current_command.address;
+                 else
+                   program_counter <= program_counter + 1'b1;
+              end
 
-            // If it is not a jump command, increment the program counter
-            program_counter <= program_counter + 1'b1;
-
-            //!! TODO: Task 1.2
-            //!! You will need to modify this block to implement the jump
-            //!! command. A jump instruction moves the program counter to
-            //!! a location of your choosing.
-            //!! Test08 will pass when you have done this correctly
-
-            //!! TODO: Task 2.1
-            //!! Implement the remaining jump commands here as well.
-            //!! These are tested in tests 10 through 15.
-
-         end
-      end
+              // If it is not a jump command, increment the program counter
+              else program_counter <= program_counter + 1'b1;
+           end // if (processor_fsm == STATE_INCREMENT)
+      end // else: !if(!nrst_in)
    end
    //------------------------------------------------------
    //--                 term_out signal                  --
@@ -289,6 +314,8 @@ module softcore_proc #(
          end else if(current_command.instruction == INSTR_XOR)begin
             register[0] <= xor_result;
 
+         end else if (current_command.instruction == INSTR_NOT)begin
+            register[0] <= not_result;
          end
       end
    end
@@ -357,9 +384,10 @@ module softcore_proc #(
    //!! XOR has been done for you as an example.
    //!! Recall that the ternary operator '?' can be used to reduce conditional statements ( condition ? exprIfTrue : exprIfFalse )
    //!! Gotchas: Beware of the difference between bitwise and logical operators in verilog.
-   //!! assign adder_result  = ...
-   //!! assign and_result    = ...
-   //!! assign or_result     = ...
+   assign adder_result  = register[0] + ((current_command.address==8'h00) ? current_command.data : register[current_command.address]);
+   assign and_result    = register[0] & ((current_command.address==8'h00) ? current_command.data : register[current_command.address]);
+   assign or_result     = register[0] | ((current_command.address==8'h00) ? current_command.data : register[current_command.address]);
    assign xor_result    = register[0] ^ ((current_command.address==8'h00) ? current_command.data : register[current_command.address]);
+   assign not_result    = ~register[0];
 
 endmodule

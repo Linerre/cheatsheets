@@ -97,6 +97,7 @@ proc deploy { top } {
     write_bitstream -force $top.bit
 
     puts "All done!"
+    close_project -quiet
 }
 
 # Check syntax for verilog code
@@ -105,7 +106,7 @@ proc flycheck {} {
 }
 
 # Program the device
-proc load { top } {
+proc impl { top } {
     open_hw_manager
 
     # connect to default hardware server on the default port 3121
@@ -191,4 +192,6 @@ proc compile { top } {
         read_xdc $condir/top.xdc
     }
 
+    # report timing summary
+    report_timing_summary -file $logdir/post_sync_timing_smuuary.rpt
 }

@@ -18,7 +18,7 @@ module program_module #(
    //------------------------------------------------------
    //--                Module Parameters                 --
    //------------------------------------------------------
-   parameter int  CLK_FREQUENCY = 100_000_000      // This is the frequency clk_in is running at in Hz.
+   parameter int  CLK_FREQUENCY = 100_000_000      // This is the frequency clk_in is running at in Hz (100MHz).
 
 )(
    //------------------------------------------------------
@@ -57,13 +57,21 @@ module program_module #(
    //------------------------------------------------------
    initial begin
       // Bounce
-                         // Instruction    Address     Data
-      program_array[0]  <= {INSTR_STORE_DIRECT, 8'h01,      8'h01};     // Write 0x01 to the LEDs
-      program_array[1]  <= {INSTR_WAIT,         8'h00,      8'd10};     // 10*100ms = 1 second pause.
-      program_array[2]  <= {INSTR_STORE_DIRECT, 8'h01,      8'h02};     // Write 0x02 to the LEDs
-      program_array[3]  <= {INSTR_WAIT,         8'h00,      8'd10};     // 10*100ms = 1 second pause.
-      program_array[4]  <= {INSTR_STORE_DIRECT, 8'h01,      8'h04};
-      program_array[5]  <= {INSTR_WAIT,         8'h00,      8'd10};
+                             // Instruction    Address     Data
+      // program_array[0]  <= {INSTR_STORE_DIRECT, 8'h01,      8'h01};     // Write 0x01 to the LEDs
+      // program_array[1]  <= {INSTR_WAIT,         8'h00,      8'd10};     // 10*100ms = 1 second pause.
+      // program_array[2]  <= {INSTR_STORE_DIRECT, 8'h01,      8'h02};     // Write 0x02 to the LEDs
+      // program_array[3]  <= {INSTR_WAIT,         8'h00,      8'd10};     // 10*100ms = 1 second pause.
+      // program_array[4]  <= {INSTR_STORE_DIRECT, 8'h01,      8'h04};
+      // program_array[5]  <= {INSTR_WAIT,         8'h00,      8'd10};
+      program_array[0] <=  {INSTR_LOAD,            8'h00,      8'h00}; //  acc = 0;
+                                                                       //  do {
+      program_array[1] <=  {INSTR_WAIT_ON_BUTTON,  8'h03,      8'h03}; //     wait_on_button();
+      program_array[2] <=  {INSTR_ADD,             8'h03,      8'hFF}; //     add(acc, dip[7:0]);
+      program_array[3] <=  {INSTR_STORE,           8'h01,      8'h33}; //     store(acc,leds[7:0]);
+      program_array[4] <=  {INSTR_JUMP,            8'h01,      8'h00}; //  } while(1);
+      program_array[5] <=  {INSTR_TERM,            8'h00,      8'h00};
+
       program_array[6]  <= {INSTR_STORE_DIRECT, 8'h01,      8'h08};
       program_array[7]  <= {INSTR_WAIT,         8'h00,      8'd10};
       program_array[8]  <= {INSTR_STORE_DIRECT, 8'h01,      8'h10};

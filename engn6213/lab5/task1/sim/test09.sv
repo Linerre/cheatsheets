@@ -15,12 +15,12 @@ task automatic test09(
    //--                    Test Setup                    --
    //------------------------------------------------------
 
-   program_array[0] <=  {INSTR_LOAD,            8'h00,      8'h00}; //  acc = 0;
-                                                                    //  do {
-   program_array[1] <=  {INSTR_WAIT_ON_BUTTON,  8'h03,      8'h03}; //     wait_on_button();
-   program_array[2] <=  {INSTR_ADD,             8'h03,      8'hFF}; //     add(acc, dip[7:0]);
-   program_array[3] <=  {INSTR_STORE,           8'h01,      8'h33}; //     store(acc,leds[7:0]);
-   program_array[4] <=  {INSTR_JUMP,            8'h01,      8'h00}; //  } while(1);
+   program_array[0] <=  {INSTR_LOAD,            8'h00,      8'h00}; // acc = 0;
+                                                                    // do {
+   program_array[1] <=  {INSTR_WAIT_ON_BUTTON,  8'h03,      8'h03}; //   wait_on_button();
+   program_array[2] <=  {INSTR_ADD,             8'h03,      8'hFF}; //   add(acc, dip[7:0]);
+   program_array[3] <=  {INSTR_STORE,           8'h01,      8'h33}; //   store(acc,leds[7:0]);
+   program_array[4] <=  {INSTR_JUMP,            8'h01,      8'h00}; // } while(1);
    program_array[5] <=  {INSTR_TERM,            8'h00,      8'h00};
    $display("Running %s",test_num);
    $display("Testing the addition only calculator program");

@@ -14,27 +14,27 @@ task automatic test17(
    //------------------------------------------------------
    //--                    Test Setup                    --
    //------------------------------------------------------
-   
+
    //!! TODO Task Section 7.3
    //!! You need to write a program here that implements the following pseudo code.
-   //!! You have all the instructions needed to do this now. 
+   //!! You have all the instructions needed to do this now.
    //!! Some lines are filled for you. Follow the comments to write the rest of the program
    //!! Note: Make sure you remember to set the index of the program array properly.
-   
+
    //!! acc = 0;
    //!! do {
    //!!    wait_on_button();
-   //!!    if(dip[15:8] == 0){
+   //!!    if(dip[15:8] == 0)
    //!!       add(acc, dip[7:0]);
-   //!!    else if(dip[15:8] == 8'd1){
-   //!!       and(acc, dip[7:0]);
-   //!!    else if(dip[15:8] == 8'd2){
+   //!!    else if(dip[15:8] == 8'd1)
+   //!!       and(acc, dip[7:0]);}
+   //!!    else if(dip[15:8] == 8'd2)
    //!!       or(acc, dip[7:0]);
-   //!!    else if(dip[15:8] == 8'd3){
+   //!!    else if(dip[15:8] == 8'd3)
    //!!       xor(acc, dip[7:0]);
-   //!!    else if(dip[15:8] == 8'd4){
+   //!!    else if(dip[15:8] == 8'd4)
    //!!       not(acc);
-   //!!    else if(dip[15:8] == 8'd5){
+   //!!    else if(dip[15:8] == 8'd5)
    //!!       subtract(acc, dip[7:0]);
    //!!    else
    //!!       term;
@@ -55,12 +55,12 @@ task automatic test17(
    program_array[5] <=  {INSTR_JUMP_EQ,         8'd15,      8'h01};
    program_array[6] <=  {INSTR_JUMP_EQ,         8'd19,      8'h02};
    // Write the conditional jump to the Xor section
-   // program_array[7] 
+   program_array[7] <=  {INSTR_JUMP_EQ,         8'd23,      8'h03};
    // Write the conditional jump to the Not section
-   // program_array[8] 
+   program_array[8] <=  {INSTR_JUMP_EQ,         8'd27,      8'h04};
    // Write the conditional jump to the Subtract section
-   // program_array[9] 
-   
+   program_array[9] <=  {INSTR_JUMP_EQ,         8'd31,      8'h05};
+
    // Jump to the end of the program
    program_array[10]<=  {INSTR_JUMP,            8'd37,      8'h05};
 
@@ -85,19 +85,36 @@ task automatic test17(
    program_array[18]<=  {INSTR_JUMP,            8'h01,      8'h00};
 
    // Or section
-      // You need to fill in this section 
-
+      // You need to fill in this section
+   program_array[19]<=  {INSTR_LOAD,            8'd01,      8'h03};
+   program_array[20]<=  {INSTR_OR,              8'd03,      8'h03};
+   program_array[21]<=  {INSTR_STORE,           8'h01,      8'h33};
+   program_array[22]<=  {INSTR_JUMP,            8'h01,      8'h00};
    // Xor section
       // You need to fill in this section
+   program_array[23]<=  {INSTR_LOAD,            8'd01,      8'h03};
+   program_array[24]<=  {INSTR_XOR,             8'd03,      8'h03};
+   program_array[25]<=  {INSTR_STORE,           8'h01,      8'h33};
+   program_array[26]<=  {INSTR_JUMP,            8'h01,      8'h00};
 
    // Not section
       // You need to fill in this section
+   program_array[27]<=  {INSTR_LOAD,            8'd01,      8'h03};
+   program_array[28]<=  {INSTR_NOT,             8'd00,      8'h03};
+   program_array[29]<=  {INSTR_STORE,           8'h01,      8'h33};
+   program_array[30]<=  {INSTR_JUMP,            8'h01,      8'h00};
 
    // subtract section
       // You need to fill in this section
 	  // Consider 2's complement for subtraction
+   program_array[31]<=  {INSTR_LOAD,            8'd03,      8'h03};
+   program_array[32]<=  {INSTR_NOT,            8'd03,      8'h03};
+   program_array[33]<=  {INSTR_ADD,             8'd00,      8'h01};
+   program_array[34]<=  {INSTR_ADD,             8'd01,      8'h01};
+   program_array[35]<=  {INSTR_STORE,           8'h01,      8'h33};
+   program_array[36]<=  {INSTR_JUMP,            8'h01,      8'h00};
 
-   // Terminate Section, the end of the program. The index may be extended to fit extra instructions if needed. 
+   // Terminate Section, the end of the program. The index may be extended to fit extra instructions if needed.
    program_array[37]<=  {INSTR_TERM,            8'h00,      8'h00};
    $display("Running %s",test_num);
    $display("Testing the full calculator program");

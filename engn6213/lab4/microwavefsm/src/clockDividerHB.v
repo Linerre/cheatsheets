@@ -19,13 +19,14 @@ module clockDividerHB
     always @ (posedge clk)
         begin
             if (reset == 1'b1 || counter >= THRESHOLD-1)
-                counter <= 1'b0;
+                counter <= 32'd0;
             else if (enable == 1'b1)
                 counter <= counter + 1'b1;
         end
 
-    // dividedClk is the desired clock we want to use
-    // counter reaches THRESHOLD-1 every 0.5s, so dividedClk becomes 1 every 0.5s
+   // dividedClk is the desired clock we want to use
+   // counter reaches THRESHOLD-1 every 0.5s
+   // so dividedClk becomes 1 every 0.5s and becomes 0 every other 0.5s
     always @ (posedge clk)
         begin
             if (reset == 1'b1)
@@ -35,8 +36,9 @@ module clockDividerHB
             // sequential logic, no else statement is fine here
         end
 
-    // Though an output, this beat rarely connects to any board port
-    // Instead, it remains internal to a logic design
-    assign beat = (counter == THRESHOLD-1) & (dividedClk);
+   // Though an output, this beat rarely connects to any board port
+   // Instead, it remains internal to a logic design, often used as
+   // as a signal (every 1s) for other ooutputs
+   assign beat = (counter == THRESHOLD-1) & (dividedClk);
 
 endmodule
