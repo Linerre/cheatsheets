@@ -1,18 +1,21 @@
-\section*{MPI}
-Message-passing programming paradigm has 2 key attributes:
+\section*{MPI (SPMD)}
+Message-passing programming paradigm key attributes:
 \begin{enumerate}
-\item partitioned address space (not shared), which implies
+\item partitioned address space (no shared vars), which implies
   \begin{itemize}
   \item each data element must belong to 1 partitioned space
   \item interactions (read-only/read-write) require coop of 2 procs
   \end{itemize}
 \item supports only \emph{explicit} parallelization
+\item HW need not implement system-wide loads and stores to execute message-passing programs (need only be able to comm message)
+\item often harder to get first correct program than shared address space
+\item structure often helpful in getting first correct, scalable program
 \end{enumerate}
 Two common causes of \textbf{deadlock} in MPI:
-\begin{enumerate}
+\begin{enumerate*}
 \item false order or \texttt{send} and \texttt{recv}
 \item system send-buffer fill-up
-\end{enumerate}
+\end{enumerate*}
 
 \subsection*{Starting and terminating MPI}
 \begin{minipage}{0.5\linewidth}

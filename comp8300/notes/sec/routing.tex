@@ -1,6 +1,6 @@
 \section*{Store-and-Forward (SF) routing (\textbf{L7P5})}
 \begin{equation*}
-  t_{\text{comm}} = t_{s} + l(t_h + mt_w) \text{where} m \text{is message size}; l \text{is link \#}
+  t_{\text{comm}} = t_{s} + l(t_h + mt_w) \quad m \text{ is message size}; l \text{ is link num}
 \end{equation*}
 \begin{equation*}
   t_{\text{comm}} \approx t_{s} + lmt_w (\because t_h \ll mt_w \text{even for small} m)
@@ -9,7 +9,7 @@
 \begin{equation*}
   t_{\text{comm}} = t_{s} + lt_h + mt_w
 \end{equation*}
-
+If the communication is between nearest neighbors (that is, $l = 1$), or if the message size is small, then $T_{\text{comm}}$ is similar for store-and-forward and cut-through routing
 \section*{One-to-all SF on different networks (\textbf{L7P9-10})}
 \begin{tabular}{c|lc}
   \hline
@@ -20,6 +20,8 @@
   3D Mesh & $T_{\text{one-all}} = 3(t_s + t_{w}m) \frac{\sqrt[3]{p}}{2}$ &  \\
   Hypercude & $T_{\text{one-all}} = (t_s + t_{w}m) \log_2 p$ & \textbf{L7P10} \\
   \hline
+  \multicolumn{3}{l}{one-to-all broadcast with SF routing is \textbf{fastest} on hypercube}\\
+  \hline
 \end{tabular}
 \section*{One-to-all CT on different networks (\textbf{L7P11-13})}
 \begin{tabular}{c|l|c}
@@ -29,6 +31,9 @@
   Ring & $T_{\text{one-all}} = \log_2 p(t_s + mt_{w}) + t_h(p-1)$ & \textbf{L7P11} \\
   2D Mesh & $T_{\text{one-all}} = 2\log_2 (\sqrt{p})(t_s + mt_{w}) + 2t_h(\sqrt{p}-1) $ & \textbf{L7P12}\\
   Binary Tree & $T_{\text{one-all}} = \log_2(p)(t_s + mt_{w})+(\sum^{\log_2(p)}_{i=1}2i)t_h$ & \textbf{L7P13} \\
+  \hline
+  \multicolumn{3}{l}{one-to-all broadcast with CF does \emph{not} improve (not faster than SF)}\\
+  \multicolumn{3}{l}{because of exclusively nearest-neighbor communication}\\
   \hline
 \end{tabular}
 
@@ -42,3 +47,25 @@
   Hypercube & $T_{\text{all-all}} = 2\log_2(p)(t_s + t_h)+2(p-1)mt_w$ & \textbf{L7P16} \\
   \hline
 \end{tabular}
+
+\section*{Methods for containing interaction overheads}
+\begin{enumerate}
+\item Maximizing Data Locality
+  \begin{itemize}
+  \item Minimize Volume of Data-Exchange (minimize the overall volume of shared data, akin to maximizing the temporal data locality)
+  \item Minimize Frequency of Interaction (there is a relatively high startup cost associated with each interaction on many architectures)
+  \end{itemize}
+\item Minimizing Contention and Hot Spots
+\item Overlapping Computations with Interactions (init interaction early enough so that it's completed before it's needed for computation)
+\item Replicating Data or Computations
+\item Using Optimized Collective Interaction Operations
+\item Overlapping Interactions with Other Interactions
+\end{enumerate}
+\section*{Parallel Algorithm Models}
+\begin{itemize}
+\item Data-Parallel (data parallelism, GPU) tasks are statically or semi-statically mapped onto processes and each task performs similar operations on different data
+\item Task Graph: interrelationships among the tasks are utilized to promote locality or to reduce interaction costs; typically employed to solve problems in which the amount of data associated with the tasks is large relative to the amount of computation associated with them.
+\item Work Pool: a dynamic mapping of tasks onto processes for load balancing in which any task may potentially be performed by any process; no desired premapping of tasks onto processes
+\item Master-Slave (manager-worker): one or more master processes generate work and allocate it to worker processes
+\item Pipeline or Producer-Consumer: a stream of data is passed on through a succession of processes, each of which perform some task on it
+\end{itemize}

@@ -22,9 +22,9 @@
   \item communications among processes
   \end{enumerate*}
 
-\item[speedup (fixed problem size)] $S_p = \frac{T_{seq}}{T_{par}} (\geq 1)$
+\item[speedup (fixed problem size) and efficiency] $S_p = \frac{T_{seq}}{T_{par}} (\geq 1)\qquad E_p = \frac{S_{p}}{p} (0 < E_p \leq 1)$
 
-\item[efficiency] $E_p = \frac{S_{p}}{p} (0 < E_p \leq 1)$
+% \item[efficiency] $E_p = \frac{S_{p}}{p} (0 < E_p \leq 1)$
 
 \item[embarrassingly (easy) parallel] aka. perfectly parallel, delightfully parallel or pleasingly parallel, where problem can be easily divided into independent parts and solved without communication
 
@@ -71,7 +71,38 @@
 \item[hit ration] The fraction of data references satisfied by the cache is called the cache hit ratio of the computation on the system.   The effective computation rate of many applications is bounded \emph{not} by the processing rate of the CPU, but by the rate at which data can be pumped into the CPU.  Such computations are referred to as being \textbf{memory bound}.
 
 
-\item[temporal locality] If at one point a particular memory location is referenced, then it is likely that the same location will be referenced again in the near future.
+\item[temporal locality] If at one point a particular mem location is ref-ed, then it's likely that the same location will be ref-ed again soon
 
 \item[spatial locality] Data that is accessed or referenced spatially close to each other (\texttt{a[i-1],a[i],a[i+1]}) is likely to be accessed again in the near future
+
+\item[recursive decomposition] a method for inducing concurrency in problems that can be solved using the divide-and-conquer strategy.  A problem is solved by first dividing it into a set of independent subproblems. Each subproblem is solved by recursively applying a similar division into smaller subproblems followed by a combination of their results. (quicksort)
+
+
+\item[data decomposition] a powerful/commonly used method for deriving concurrency in algorithms that operate on large data structures.  The decomposition of computations is done in two steps.  First, the data on which the computations are performed is partitioned; second, this data partitioning is used to induce a partitioning of the computations into tasks. The operations these tasks perform on different data partitions are usually similar or are chosen from a small set of operations (LU factorization).
+
+
+\item[partitioning output data] In many computations, each element of the output can be computed naturally independently of others as a function of the input. In such computations, a partitioning of the output data automatically induces a decomposition of the problems into tasks, where each task is assigned the work of computing a portion of the output. (matrix-multiplication)
+
+
+\item[partioning input data] When impossible to split output data, it is possible to partition the input data, and then use this partitioning to induce concurrency. A task is created for each partition of the input data and this task performs as much computation as possible using these local data. Note that the solutions to tasks induced by input partitions may not directly solve the original problem. In such cases, a follow-up computation is needed to combine the results. (sum of n elements)
+
+\item[exploratory decomposition] is used to decompose problems whose underlying computations correspond to a search of a space for solutions. In exploratory decomposition, we partition the search space into smaller parts, and search each one of these parts concurrently, until the desired solutions are found. For an example of exploratory decomposition, consider the 15-puzzle problem.
+
+
+\item[speculative decomposition] used when a program may take one of many possible computationally significant branches depending on the output of other computations that precede it. In this situation, while one task is performing the computation whose output is used in deciding the next computation, other tasks can concurrently start the computations of the next stage. The speedup due to speculative decomposition can add up if there are multiple speculative stages. (discrete event simulation)
+
+
+\item[stream parallelism] simultaneous execution of different programs on a data stream
+
+
+\item[startup time $t_s$] The startup time is the time required to handle a message at the sending and receiving nodes: the time to prepare the message (adding header, trailer, and error correction information), the time to execute the routing algorithm, and the time to establish an interface between the local node and the router. This delay is incurred only once for a single message transfer
+
+\item[per-hop time $t_h$ (aka. node latency)] After a message leaves a node, it takes a finite amount of time to reach the next node in its path. The time taken by the header of a message to travel between two directly-connected nodes in the network is called the per-hop time.
+
+
+\item[per-word transfer time $t_w$] If the channel bandwidth is $r$ words/s, then each word takes time $tw = 1/r$ to traverse the link. This time is called the per-word transfer time. This time includes network as well as buffering overheads.
+
+
+
+
 \end{description}
