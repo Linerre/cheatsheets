@@ -35,9 +35,10 @@ simulation/
 .Xil/
 comp6710/
 comp4300*/
-comp6330/labs/labs
+comp6330/labs/
 comp6330/assigns/
 comp6330/xv6ref/
+comp6330/xv6-public/
 comp6310/labs/
 comp6310/assigns/
 comp6300/lab_pack_1/
