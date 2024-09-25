@@ -1,0 +1,77 @@
+\section*{Memory (compiled and runnable \texttt{!=} correct)}
+\begin{tabular}[th!]{l|ccc}
+  \hline
+  type & allocation & deallocation & life cycle \\
+  \hline
+  stack* & implicit (compiler) & implicit (compiler) & short \\
+  heap & explicit (user) & explicit (user) & long \\
+  \hline
+  \multicolumn{3}{l}{*: also called \textbf{automatic} memory}\\
+  \hline
+\end{tabular}
+\begin{tabular}[th!]{l|lp{6.5cm}}
+  \hline
+  name & type & usage \\
+  \hline
+  \texttt{malloc} & lib call & dynamic memory alloc without zeroing \\
+  \texttt{calloc} & lib call & dynamic memory alloc with zeroing\\
+  \texttt{realloc} & lib call & dynamic memory allocation \\
+  \texttt{free} & lib call & only accepts memory alloced by \texttt{re/malloc} \\
+  \texttt{brk} & sys call & sets program break to specific value; user programs should avoid using it directly \\
+  \texttt{sbrk} & sys call & increment program break by n bytes; user programs should avoid using it directly \\
+  \texttt{mmap} & sys call & commonly used by allocator, not by user programs \\
+  \hline
+\end{tabular}
+\begin{itemize}
+\item idiom for string: \texttt{malloc(strlen(s) + 1)}
+\item the size of allocated region \emph{must} be tracked by memory-allocator itself
+\end{itemize}
+\section*{Common memory errors}
+\begin{enumerate}
+\item Forget to Allocate Memory
+  \begin{lstlisting}[language=c,xrightmargin=2pt]
+char *src = "hello";
+char *dst; // oops! unallocated; (char *) malloc(5 * sizeof char)
+strcpy(dst, src); // segfault
+\end{lstlisting}
+
+\item Not Allocate Enough Memory (buffer overflow)
+\begin{lstlisting}[language=c,xrightmargin=2pt]
+char *src = "hello";
+char *dst = (char *) malloc(strlen(src)); // too small!
+strcpy(dst, src); // may work properly
+\end{lstlisting}
+
+\item Forget to Initialize Allocated Memory
+  \begin{itemize}
+  \item Will eventually encounter an uninitialized read (undefined behavior)
+  \item Out-of-bound read/write
+  \end{itemize}
+
+\item Forget to Free Memory (memory leak)
+  \begin{itemize}
+  \item In long-running apps or systems (such as OS itself), slowly leaking memory eventually results in running out of memory
+  \item For short-lived, soon-exiting programs, OS will clean up, thus \emph{no} memory leak (bad habit anyway)
+  \end{itemize}
+
+\item Use-after-free (dangling pointer)
+\item Free Memory Repeatedly (double free)
+\item Call \texttt{free()} Incorrectly (invalid free)
+  \begin{itemize}
+  \item Freeing an uninitialized/arbitrary pointer
+  \item Freeing the wrong pointer or freeing NULL pointer
+  \end{itemize}
+\end{enumerate}
+\subsection*{Two levels of memory management in system}
+
+\begin{enumerate}
+\item performed by the OS, which hands out memory to processes when they run, and takes it back when processes exit (or otherwise die)
+\item \emph{within} each process, e.g. when calling \texttt{malloc()} or \texttt{free()}.  OS will reclaim \emph{all} the memory of the process (including those pages for code, stack and heap) when program is finished running. No matter what the state of your heap in your address space, the OS takes back all of those pages when the process dies, thus ensuring that no memory is lost despite the fact that you didn’t free it.
+\end{enumerate}
+\subsection*{Reasons for dynamic memory}
+\begin{itemize}
+\item the amount of required memory may be task dependent
+\item input size may be unknown at compile time
+\item conservative pre-allocation would be wasteful
+\item recursive functions
+\end{itemize}

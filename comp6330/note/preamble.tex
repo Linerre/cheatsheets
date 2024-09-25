@@ -1,0 +1,99 @@
+% -- Layout ----
+\usepackage[top=0.6cm, bottom=0.6cm, left=0.5cm, right=0.5cm, landscape]{geometry}
+
+% -- Titles ----
+\usepackage[
+  tiny,                     % text size title
+  compact                   % reduce vertical space before/after title
+]{titlesec}
+% \titlespacing*
+\titleformat{\section}{\normalfont\small\bfseries}{\thesection}{0em}{} % Remove space before and after section titles
+\titleformat{\subsection}{\normalfont\small\bfseries}{\thesubsection}{0em}{} % Remove space before and after subsection titles
+\titlespacing*{\section}{0pt}{0pt}{0pt} % Remove space before/after section titles
+\titlespacing*{\subsection}{0pt}{0pt}{0pt} % Remove space before/after subsec titles
+
+% -- Colors ----
+\usepackage[dvipsnames]{xcolor}
+\definecolor{dmm}{RGB}{192,192,192} % Define a custom dimmed text color
+\definecolor{cmt}{RGB}{61,123,123}
+\definecolor{err}{RGB}{128,0,0}
+
+% -- Math ------
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{turnstile}%better vdash
+
+% -- Lists -----
+\usepackage[inline]{enumitem}
+\setlist{noitemsep}% Remove vspace between items
+% Set vspace before and after  list environments as well as the left margin
+\setlist[itemize,1]{leftmargin=.6em,labelindent=0pt,labelsep=2pt,
+  topsep=1pt,partopsep=1pt}
+\setlist[enumerate,1]{leftmargin=1em,labelindent=0pt,labelsep=2pt,
+  topsep=1pt,partopsep=1pt}
+\setlist[itemize,2]{leftmargin=.3em,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[enumerate,2]{leftmargin=0.2em,labelindent=1pt,topsep=1pt,partopsep=1pt}
+\setlist[description]{labelwidth=\linewidth,font=\small\bfseries,leftmargin=1em,topsep=1pt,partopsep=1pt}
+% -- Code listing ---
+\usepackage{listings}
+\lstset{
+  aboveskip=3pt,
+  belowskip=3pt,
+  basicstyle=\small\ttfamily,
+  breaklines=true,
+  % commentstyle=\upshape\ttfamily,
+  captionpos=b,
+  commentstyle=\color{cmt},
+  columns=flexible,
+  frame=single,
+  keepspaces=false,
+  keywordstyle=\bfseries,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+}
+
+% Parse Trees
+\usepackage{tikz}
+\usetikzlibrary{ arrows, automata, bbox, calc, positioning, tikzmark, decorations.pathmorphing, decorations.pathreplacing, decorations.shapes, }
+\tikzset{
+  >=stealth',
+  node distance=1cm,
+  recstate/.style={
+    circle,draw=blue!50,fill=blue!20,thick,font=\small\sffamily,rounded corners=3pt,
+    minimum size=1cm,inner sep=1pt
+  },
+  ivp/.style={draw,->,auto,font=\small\sffamily,bend angle=60},
+  msi/.style={draw=Brown,->,auto,font=\small\sffamily,bend angle=80},
+  msibs/.style={draw=RoyalBlue,->,auto,font=\small\sffamily,bend angle=80},
+  msinl/.style={font=\footnotesize\sffamily}, %msi node label
+  every edge/.style={draw,auto,font=\small\sffamily},
+  every loop/.style={looseness=4},
+  initial text=start,initial where=right
+}
+
+% Place a figure env right here via [H] option
+\usepackage{float}
+
+% Side by side figure
+\usepackage{subcaption}
+% \usepackage{caption}
+% \captionsetup{belowskip=0pt, aboveskip=0pt}
+\usepackage{pifont}
+
+% -- Multi-Col layout --
+\usepackage{multicol}
+
+% No indentation
+\setlength\parindent{0pt}
+\setlength\abovedisplayskip{-5pt}
+\setlength\belowdisplayskip{-5pt}
+\setlength\abovedisplayshortskip{-4pt}
+\setlength\belowdisplayshortskip{-4pt}
+\setlength\tabcolsep{5pt}
+\newcommand{\gor}{\;|\;}
+\newcommand{\num}{\texttt{\#}~}
+\newcommand{\pro}[1]{\textcolor{Brown}{#1}}
+\newcommand{\bus}[1]{\textcolor{RoyalBlue}{#1}}
+\renewcommand{\arraystretch}{1.2}
