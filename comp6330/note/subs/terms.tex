@@ -7,9 +7,11 @@ running program: the \textbf{code} of the program (the instructions); The runnin
 \item[LRU] least recently used: take advantage of locality in the memory-reference stream, assuming it is likely that an entry that has not recently been used is a good
 candidate for eviction.
 
-\item[memory virtualization] OS maps user program address space to physical memory address
+\item[most-recently-used (MRU)] MostFrequently-Used (MFU) and Most-Recently-Used (MRU). In most cases (not all!), these policies do not work well, as they ignore the locality most programs exhibit instead of embracing it.
 
-\item[memory management unit] the part of the processor that helps with address translation (base and bounds registers kept on the chip)
+\item[memory virtualization] OS maps user program address space to physical memory address.
+
+\item[memory management unit] the part of the processor that helps with address translation (base and bounds registers kept on the chip).
 
 \item[paging] Chop memory into \emph{fixed-sized} pieces, each called a \textbf{page}
 

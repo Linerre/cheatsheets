@@ -19,28 +19,9 @@
 % \input{subs/ch20_hybrid}
 % \input{subs/ch20_2levelpt}
 \input{subs/ch20_multi_level_pt}
-\section*{Swapping}
-\begin{itemize}
-\item When procs require more than available physical memory $\to$ use secondary storage, e.g. hard drive, SSD
-\item Space on disk reserved to move pages back/forth to memory
-\item OS reads/writes to swap space in \textbf{page-sized} units
-\item OS needs to remember disk address of a given page
-\item TLB uses this bit to track if a page is present in physical memory
-\end{itemize}
-\section*{Why hardware doesn't handle page faults}
-\begin{enumerate}
-\item page faults to disk are \emph{slow}; extra overheads of software are minimal
-\item the hardware would have to understand swap space, how to issue I/Os to disk, and lots other details it currently doesn't know much about
-\end{enumerate}
-\section*{OS handles page faults via swapping}
-while the I/O is in flight, the process will be in blocked state. Thus, OS will be free to run other ready processes while the page fault is being serviced
-\begin{enumerate}
-\item page tables stores bits information about where to find the desired page
-\item OS uses the bits in PTE for a disk address
-\item On page fault, OS looks in PTE to find the address and issues request to disk to fetch page into memory
-\item When disk I/O done, OS marks the page in page table as present, update PFN field of PTE to record in-memory location of newly-fetched page, and retry ix
-\item This next attempt may cause TLB miss which would then be serviced and update TLB with addr translation (or update TLB directly)
-\item a last restart would find the translation in TLB and proceed to fetch desired data/instruction from memory at translated physical address
-\end{enumerate}
+\input{subs/ch21_swap}
+\columnbreak
+\input{subs/ch22_swap_policy}
+
 \end{multicols*}
 \end{document}
