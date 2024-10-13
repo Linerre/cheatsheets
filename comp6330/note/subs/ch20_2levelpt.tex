@@ -10,13 +10,13 @@
   \flushleft
   \begin{itemize}
   \item Space usage in proportion to in-use addr space
-  \item carefully constructed, each portion of PT fits neatly within a page, \textbf{easier} memory management: OS grabs next free page for alloc or grow
+  \item each portion of PT can fit neatly within a page $\to$ \textbf{easier} memory management: OS grabs next free page for alloc or grow
   \end{itemize}
 \end{minipage}
 \begin{minipage}{.5\linewidth}
   \flushleft
   \begin{itemize}
   \item on TLB miss $\to$ two loads from memory (slower)
-  \item increased \textbf{complexity} (hardware or OS) of handling page-table lookup (on TLB miss).
+  \item \textbf{complexity}$\uparrow$ (hardware or OS) of handling page-table lookup (on TLB miss).
   \end{itemize}
 \end{minipage}
