@@ -22,208 +22,290 @@
 % \input{subs/ch21_swap}
 % \columnbreak
 % \input{subs/ch22_swap_policy}
-
-\section*{Lock}
+% \input{subs/ch28_locks}
+\section*{Concurrent Counters (initial vs scalable/approximate)}
 \begin{minipage}{.5\linewidth}
-\begin{lstlisting}[language=c,xrightmargin=2pt]
-// globally-allocated lock 'mutex'
-lock_t mutex; // declare lock var
-// ... other work ...
-lock(&mutex);
-balance = balance + 1;
-unlock(&mutex);
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}{.5\linewidth}
-  \begin{itemize}
-  \item must declare a lock before using it
-  \item lock available = unlocked, free $\to$ no thread holds it
-  \item lock acquired = locked, held $\to$ exactly one thread holds it (likely in a critical section)
-  \end{itemize}
-\end{minipage}
-\begin{itemize}
-\item other info like which thread holds lock or a queue for ordering lock acquisition can be stored in lock but often hidden from user
-\item calling \texttt{lock()} will try to acquire lock (1. free; 2. not free)
-  \begin{enumerate}
-  \item thread acquires lock and enters critical section; \textbf{owner} of lock
-  \item thread waits (not return) and cannot enter critical section
-  \end{enumerate}
-\item calling \texttt{unlock()} will free the lock (1. no waiting thread; 2. opposite)
-  \begin{enumerate}
-  \item lock becomes free and any thread can try to acquire it
-  \item one of waiting threads will acquire lock and enters critical section
-  \end{enumerate}
-
-\item \textbf{coarse-grained}: one big lock for access to critical section at any time
-\item \textbf{fine-grained}: different locks to protect different data and data structs (allowing more threads in different locked code at once)
-\end{itemize}
-\section*{Evaluating Locks}
-\begin{enumerate}
-\item \textbf{correctness} lock provides \textbf{mutual exclusion}
-\item \textbf{fairness} each thread gets a fair shot at acquiring the lock (once it's free); no thread contending for the lock starve while doing so
-\item \textbf{performance} time overhead added by using the lock:
-  \begin{enumerate}
-  \item single thread (no contention) $\to$ what is the overhead?
-  \item multiple threads contending for lock on single CPU
-  \item lock perf. on multiple CPUs and threads contending for the lock
-  \end{enumerate}
-\end{enumerate}
-\begin{minipage}{.5\linewidth}
-\begin{lstlisting}[language=c,xrightmargin=2pt]
-void lock() { // before entering
-  DisableInterrupts();
+\begin{lstlisting}[language=c,xrightmargin=4pt]
+typedef struct __counter_t {
+  int value;
+  pthread_mutex_t lock;
+} counter_t;
+void init(counter_t *c) {
+  c->value = 0;
+  Pthread_mutex_init(
+          &c->lock, NULL);
 }
-void unlock() { // after leaving
-  EnableInterrupts();
+int get(counter_t *c) {
+  Pthread_mutex_lock(&c->lock);
+  int rc = c->value;
+  Pthread_mutex_unlock(&c->lock);
+  return rc;
 }
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}{.5\linewidth}
-  \begin{itemize}
-  \item one of earliest solution offers mutex by disabling interrupts
-  \item code inside critical section (not interrupted) runs as if it were atomic
-  \item invented for single-processor systems;  main advantage: simplicity
-  \end{itemize}
-\end{minipage}
-\begin{enumerate}
-\item \textbf{insecure} arbitrary thread will need to perform \emph{privileged} ops so greedy/malicious progs can monopolize CPU and exploit system
-\item \textbf{importable} not working on multiprocessors: threads enter same critical section via other CPUs $\to$ null effect of disabling interrupts
-\item \textbf{buggy} turning off interrupts for too long $\to$ lost useful/critical interrupts that make OS work as expected (e.g. disturb I/O awakening)
-\end{enumerate}
-Thus, limited use case: OS occasionally uses interrupt masking to guarantee atomicity when accessing its own data structures
-\section*{Failed Attempt: Just Using Loads/Stores}
-\begin{minipage}{.5\linewidth}
-\begin{lstlisting}[language=c,xrightmargin=2pt]
-typedef struct __lock_t
-{ int flag; } lock_t;
-
-void init(lock_t *mutex) {
-  // 0: lock is avail | 1: held
-  mutex->flag = 0; }
-
-void lock(lock_t *mutex) {
-  while (mutex->flag == 1) // TEST
-     ; // spin-wait (do nothing)
-  mutex->flag = 1; // now SET it }
-
-void unlock(lock_t *mutex) {
-   mutex->flag = 0; }
+\begin{lstlisting}[language=c,xleftmargin=4pt,framextopmargin=2pt]
+void increment(counter_t *c) {
+  Pthread_mutex_lock(&c->lock);
+  c->value++;
+  Pthread_mutex_unlock(&c->lock);
+}
+void decrement(counter_t *c) {
+  Pthread_mutex_lock(&c->lock);
+  c->value--;
+  Pthread_mutex_unlock(&c->lock);
+}
 \end{lstlisting}
-\end{minipage}
-\begin{minipage}{.5\linewidth}
   \begin{itemize}
-  \item use 1 var \texttt{flag} to indicate thread's ownership of lock
-  \item when lock not free, other threads \textbf{spin-wait} in while loop
-  \item once lock free, waiting thread gets lock $\to$ set flat to 1
-  \item correctness problem: both of two threads can set flag to 1 (with interrupts) and enter same critical section $\to$ mutex \textbf{not} guaranteed
-  \item performance issue: thread endless checks flag (spin-waiting) and wastes CPU cycles
+  \item add locks to every read/write access to shared value
+  \item thread-safe but too slow: scales poorly as \#threads grows
   \end{itemize}
 \end{minipage}
-\section*{Working Spin Locks with Test-And-Set (atomic exchange)}
-\begin{itemize}
-\item test old value and simultaneously setting the mem location to new value
-\item return the old value pointed by \texttt{old\_ptr} and set \texttt{new} at same time
-\item this sequence of operations is performed \textbf{atomically}
-\end{itemize}
-\begin{minipage}{.7\linewidth}
 \begin{lstlisting}[language=c]
-int TestAndSet(int *old_ptr, int new) {
-  int old = *old_ptr;// fetch old value at old_ptr
-  *old_ptr = new;      // store 'new' into old_ptr
-  return old;          // return the old value
+typedef struct __counter_t {
+    int global;                         // global count
+    pthread_mutex_t glock;              // global lock
+    int local[NUMCPUS];                 // per-CPU count
+    pthread_mutex_t llock[NUMCPUS]; // ... and locks
+    int threshold;                      // update freq
+} counter_t;
+// record threshold, init locks and vals of all local cnt/gloabl cnt
+void init(counter_t *c, int threshold) {
+    c->threshold = threshold;
+    c->global = 0;
+    pthread_mutex_init(&c->glock, NULL);
+    int i;
+    for (i = 0; i < NUMCPUS; i++) {
+       c->local[i] = 0;
+       pthread_mutex_init(&c->llock[i], NULL);
+  }
 }
 
-typedef struct __lock_t { int flag; } lock_t;
-
-// 0: lock is avail, 1: lock is held
-void init(lock_t *lock) { lock->flag = 0; }
-
-void lock(lock_t *lock) {
-   while (TestAndSet(&lock->flag, 1) == 1)
-     ; // spin-wait (do nothing)
-}
-
-void unlock(lock_t *lock) { lock->flag = 0; }
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}{.3\linewidth}
-  \flushleft
-  \begin{itemize}
-  \item make both \textbf{test} (old lock value) and \textbf{set} (new value) a single atomic op $\to$ only one thread acquires the lock $\to$ working mutual exclusion primitive
-  \item On single CPU, needs a preemptive scheduler (interrupt via timer); otherwise a thread spins on a CPU and never gives it up
-  \end{itemize}
-\end{minipage}
-\begin{enumerate}
-\item \textbf{correctness} yes, only a single thread enters critical section at a time
-\item \textbf{fairness} not generally, thread may spin forever $\to$ starve/zero fairness
-\item \textbf{performance} \textbf{a} on single CPU, pretty bad: if N threads contending for the lock, each thread spins for duration of time slice before being timer-preempted. \textbf{b} on multiple CPU, reasonably well if \# of threads $\approx$ \# of CPUs and critical section is short (wasting fewer CPU cycles)
-\end{enumerate}
-
-\section*{Compare-and-Swap (SPARC) or Compare-and-Exchange (x86)}
-\begin{minipage}{.65\linewidth}
-\begin{lstlisting}[language=c]
-// only diff with set-and-test shown below
-int CompareAndSwap(int *ptr,
-                     int expected, int new)
-{
-    int original = *ptr;
-    if (original == expected)
-       *ptr = new;
-    return original;
-}
-void lock(lock_t *lock) {
-   while(CompareAndSwap(&lock->flag,0,1) == 1)
-      ; // spin
-} // more powerful than test-and-set
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}{.35\linewidth}
-  \flushleft
-  \begin{itemize}
-  \item test if value at addr \texttt{ptr} == expected;
-  \item if so, update mem location \texttt{ptr} to new.
-  \item If not, do nothing.
-  \item In either case, return orig val at that mem location, thus allowing the code calling compare-and-swap to know if it succeeded
-  \item for lock-free struct
-  \end{itemize}
-\end{minipage}
-a simple spin lock built with it \texttt{==} test-and-set spin lock analyzed above
-\section*{Load-Linked + Store-Conditional (MIPS, Alpha, PowerPC, ARM)}
-\begin{minipage}{.65\linewidth}
-\begin{lstlisting}[language=c]
-int LoadLinked(int *ptr) { return *ptr; }
-// atomic operation
-int StoreConditional(int *ptr, int new) {
-  if (no update to *ptr
-      since LoadLinked to this address) {
-     *ptr = new;
-     return 1; // success!
-  } else { return 0; }  // failed to update
-}
-// Using LL/SC To Build A Lock
-void lock(lock_t *lock) {
-  while (1) {
-    while (LoadLinked(&lock->flag) == 1)
-       ; // spin until it's zero
-    if (StoreConditional(&lock->flag, 1) == 1)
-       return;
-      // if set-it-to-1 is a success: all done
-      // otherwise: try it all over again
+// usually, just grab local lock and update local amount;
+// once above `threshold', grab global lock, transfer local vals to it
+void update(counter_t *c, int threadID, int amt) {
+    int cpu = threadID % NUMCPUS;
+    pthread_mutex_lock(&c->llock[cpu]);
+    c->local[cpu] += amt;
+    if (c->local[cpu] >= c->threshold) {
+        // transfer to global (assumes amt > 0)
+        pthread_mutex_lock(&c->glock);
+        c->global += c->local[cpu];
+        pthread_mutex_unlock(&c->glock);
+        c->local[cpu] = 0;
     }
+    pthread_mutex_unlock(&c->llock[cpu]);
 }
-void unlock(lock_t *lock) { lock->flag = 0; }
+\end{lstlisting}
+\begin{minipage}{.48\linewidth}
+\begin{lstlisting}[language=c]
+int get(counter_t *c) {
+  pthread_mutex_lock(&c->glock);
+  int val = c->global;
+  pthread_mutex_unlock(&c->glock);
+  return val; // only approximate!
+}
 \end{lstlisting}
 \end{minipage}
-\begin{minipage}{.35\linewidth}
+\begin{minipage}{.52\linewidth}
+  \centering
+  \includegraphics[width=.85\linewidth]{imgs/tracing_approx_cnter}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+  \includegraphics[width=.8\linewidth]{imgs/precise_approx_cnter}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{imgs/scaling_approx_cnter}
+\end{minipage}
+\section*{Concurrent Linked List (insertion and lookup)}
+\begin{minipage}{.52\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=-4pt]
+// basic node structure
+typedef struct __node_t {
+   int               key;
+   struct __node_t   *next;
+} node_t;
+// basic list struct, used per list
+typedef struct __list_t {
+    node_t           *head;
+    pthread_mutex_t  lock;
+} list_t;
+void List_Init(list_t *L) {
+  L->head = NULL;
+  pthread_mutex_init(&L->lock, NULL);
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.48\linewidth}
   \flushleft
   \begin{itemize}
-  \item load-linked operation likes load ix $\to$ fetch a value from addr \texttt{ptr} and place in a register
-  \item store-cond succeeds (and updates the val) \emph{only} if no intervening store to the addr has taken place
-  \item if succeeded, returns 1; val at \texttt{ptr} $\to$ \texttt{new}
-  \item if failed, returns 0; val at \texttt{ptr} \emph{not} updated
-  \item suppose 2 threads both exec \texttt{LoadLinked} and proceed to store-cond
-  \item at this point only 1 thread will succeed in updating flag to 1
+  \item acquire lock upon entry to insert fn and release it upon exit
+  \item if \texttt{malloc()} fails, the code must also release lock
+  \item nearly 40\% bugs found on such rarely-taken code path
+  \item \textbf{rearrange} code so that lock and release only surround actual critical section in insert code, $\because$ part of insert need no locking
+  \item assume \texttt{malloc} itself thread-safe $\to$ no race conds and only updating shared list needs lock
   \end{itemize}
 \end{minipage}
+\begin{minipage}{.53\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=-4pt]
+int List_Insert(list_t *L,int key)
+{
+  pthread_mutex_lock(&L->lock);
+  node_t *new = malloc(sizeof node_t);
+  if (new == NULL) {
+    perror("malloc");
+    pthread_mutex_unlock(&L->lock);
+    return -1; // fail
+  }
+  new->key = key;
+  new->next = L->head;
+  L->head = new;
+  pthread_mutex_unlock(&L->lock);
+  return 0; // success
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.53\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt]
+int List_Insert(list_t *L, int key)
+{
+ node_t *new = malloc(sizeof node_t);
+ if (new == NULL) {
+    perror("malloc");
+    return -1;
+ }
+ new->key = key;
+ // just lock critical section
+ pthread_mutex_lock(&L->lock);
+ new->next = L->head;
+ L->head = new;
+ pthread_mutex_unlock(&L->lock);
+ return 0; // success
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.53\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=-4pt]
+int List_Lookup(list_t *L, int key)
+{
+  pthread_mutex_lock(&L->lock);
+  node_t *curr = L->head;
+  while (curr) {
+    if (curr->key == key) {
+      pthread_mutex_unlock(&L->lock);
+      return 0; // success
+    }
+    curr = curr->next;
+ }
+ pthread_mutex_unlock(&L->lock);
+ return -1; // failure
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.53\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt]
+int List_Lookup(list_t *L, int key) {
+  int rv = -1;
+  pthread_mutex_lock(&L->lock);
+  node_t *curr = L->head;
+  while (curr) {
+    if (curr->key == key) {
+      rv = 0;
+      break;
+    }
+    curr = curr->next;
+  }
+  pthread_mutex_unlock(&L->lock);
+  return rv; // common exit path
+}
+\end{lstlisting}
+\end{minipage}
+\begin{itemize}
+\item improved impl does \emph{not} scale well; single lock for entire list: bottleneck
+\item \textbf{hand-over-hand locking} (lock coupling) enables more concurrency:
+\item One lock per node – instead of a single lock for the entire list
+\item While traversing, grab next nd's lock, then release current nd's lock
+\item in practice, hard to get faster than simple single lock approach, as overheads of acquiring/releasing locks for each node of list is prohibitive
+\item Even with very large lists and a large \# threads, concurrency of multiple ongoing traversals is unlikely faster than simply grabbing a single lock, performing an operation, and releasing it
+\item general theme: using one global lock for the entire data structures always ensure thread safety, but at cost of concurrency (performance)
+\item to improve performance: increase granularity of critical regions and assign different locks to these regions
+\end{itemize}
+\section*{Concurrent Queue (by Michael and Scott)}
+\begin{itemize}
+\item use two locks: one for head of queue and one for its tail
+\item in common case, enqueue routine will only access tail lock, and dequeue only head lock (goal: allow concurrent enqueue and dequeue ops)
+\item add a dummy node in init $\to$ enable separation of head and tail ops
+\end{itemize}
+\begin{lstlisting}[language=c,xleftmargin=16pt,xrightmargin=6pt,framextopmargin=3pt]
+typedef struct __node_t {
+    int             value;
+    struct __node_t *next;
+} node_t;
+
+typedef struct __queue_t {
+    node_t          *head;
+    node_t          *tail;
+    pthread_mutex_t head_lock, tail_lock;
+} queue_t;
+
+void Queue_Init(queue_t *q) {
+    // allocate a dummy node
+    node_t *tmp = malloc(sizeof(node_t));
+    tmp->next = NULL;
+    q->head = q->tail = tmp;
+    pthread_mutex_init(&q->head_lock, NULL);
+    pthread_mutex_init(&q->tail_lock, NULL);
+}
+
+void Queue_Enqueue(queue_t *q, int value) {
+    node_t *tmp = malloc(sizeof(node_t));
+    assert(tmp != NULL);
+    tmp->value = value;
+    tmp->next = NULL;
+
+    pthread_mutex_lock(&q->tail_lock);
+    q->tail->next = tmp;
+    q->tail = tmp;
+    pthread_mutex_unlock(&q->tail_lock);
+}
+
+int Queue_Dequeue(queue_t *q, int *value) {
+    pthread_mutex_lock(&q->head_lock);
+    node_t *tmp = q->head;
+    node_t *new_head = tmp->next;
+    if (new_head == NULL) {
+       pthread_mutex_unlock(&q->head_lock);
+       return -1; // queue was empty
+    }
+    *value = new_head->value;
+    q->head = new_head;
+    pthread_mutex_unlock(&q->head_lock);
+    free(tmp);
+    return 0;
+}
+\end{lstlisting}
+\begin{lstlisting}[language=c,xleftmargin=16pt,xrightmargin=6pt]
+#define BUCKETS (101) // built with left concurrent linked list
+typedef struct __hash_t {
+    list_t lists[BUCKETS];
+} hash_t;
+void Hash_Init(hash_t *H) {
+    int i;
+    for (i = 0; i < BUCKETS; i++) // use a lock per hash bucket
+       List_Init(&H->lists[i]);
+}
+int Hash_Insert(hash_t *H, int key) {
+    return List_Insert(&H->lists[key % BUCKETS], key);
+}
+int Hash_Lookup(hash_t *H, int key) {
+    return List_Lookup(&H->lists[key % BUCKETS], key);
+}
+\end{lstlisting}
+\begin{itemize}
+\item correctness first: for concur data structs, one big lock generally works
+\item general guide for performance: break critical regions into separate smaller ones and apply separate locks to them
+\item need to consider overhead of lock (and context switching) $\to$ more threads may not mean faster execution
+\end{itemize}
 \end{multicols*}
 \end{document}
