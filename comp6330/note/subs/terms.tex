@@ -2,20 +2,24 @@
 \item[address space] (of a process) contains all of the memory state of the
 running program: the \textbf{code} of the program (the instructions); The running program uses a \textbf{stack} to keep track of where it is in function call chain as well as to allocate local variables and pass parameters and return values to and from routines; the \textbf{heap} is used for dynamically-allocated, user-managed memory, etc.  It is the running program’s view of memory in the system
 
+\item[condition variable] an explicit queue that threads can put themselves on when some state of execution (i.e., some \textbf{condition}) is \emph{not} as desired (by \textbf{waiting} on the condition); some other thread, when it changes said state, can then wake one (or more) of those waiting threads and thus allow them to continue (by signaling on the condition). The idea goes back to Dijkstra's use of ``private semaphores''; a similar idea was later named a ``condition variable'' by Hoare in his work on monitors.
+
 \item[Lauer's law] As Hugh Lauer said, when discussing the construction of the Pilot operating system: ``If the same people had twice as much time, they could produce as good of a system in half the code.''
 
-\item[limited direct execution] let the program run directly on the hardware; however, at certain key points in time (such as when a process issues a system call, or a timer interrupt occurs), arrange so that the OS gets involved and makes sure the “right” thing happens.   Thus, the OS, with a little hardware support, tries best to get out of the way of the running program, to deliver an \emph{efficient} virtualization.
+\item[limited direct execution] let the program run directly on the hardware; however, at certain key points in time (such as when a process issues a system call, or a timer interrupt occurs), arrange so that the OS gets involved and makes sure the ``right'' thing happens.   Thus, the OS, with a little hardware support, tries best to get out of the way of the running program, to deliver an \emph{efficient} virtualization.
 
 \item[lock] Generally, Programmers annotate source code with locks, putting them around critical sections, and thus ensure that any such critical section executes as if it were a single \textbf{atomic} instruction.
 
 \item[LRU] least recently used: take advantage of locality in the memory-reference stream, assuming it is likely that an entry that has not recently been used is a good
 candidate for eviction.
 
-\item[most-recently-used (MRU)] MostFrequently-Used (MFU) and Most-Recently-Used (MRU). In most cases (not all!), these policies do not work well, as they ignore the locality most programs exhibit instead of embracing it.
+\item[mesa semantics] Signaling a thread only wakes them up; it is thus a hint that the state of the world has changed (in this case, that a value has been placed in the buffer), but there is no guarantee that when the woken thread runs, the state will still be as desired. This interpretation of what a signal means is often referred to as Mesa semantics (1st implemented in Mesa programming language). In contrast, \textbf{Hoare semantics} requires the woken thread be run immediately.  Most (if not all) systems use the Mesa semantics.
 
 \item[memory virtualization] OS maps user program address space to physical memory address.
 
 \item[memory management unit] the part of the processor that helps with address translation (base and bounds registers kept on the chip).
+
+\item[most-recently-used (MRU)] MostFrequently-Used (MFU) and Most-Recently-Used (MRU). In most cases (not all!), these policies do not work well, as they ignore the locality most programs exhibit instead of embracing it.
 
 \item[mutex] The name that the POSIX library uses for a lock, as it is used to provide mutual exclusion between threads, i.e., if one thread is in the critical section, it excludes the others from entering until it has completed the section.
 

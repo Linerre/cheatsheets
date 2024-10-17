@@ -1,0 +1,339 @@
+\section*{Condition Variable (check a cond before continuing exec)}
+\begin{minipage}{.58\linewidth}
+\begin{lstlisting}[language=c]
+volatile int done = 0;
+void *child(void *arg) {
+  printf("child\n");
+  done = 1;
+  return NULL;
+}
+int main(int argc, char *argv[]) {
+  printf("parent: begin\n");
+  pthread_t c;
+  // create a child
+  Pthread_create(&c, NULL, child, NULL);
+  while (done == 0)
+     ; // spin
+  printf("parent: end\n");
+  return 0;
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.42\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item expected output:
+    \begin{itemize}
+    \item[] \texttt{parent}: \texttt{begin}
+    \item[] \texttt{child}
+    \item[] \texttt{parent}: \texttt{end}
+    \end{itemize}
+  \item easy solution: spin on a cond var until it changes
+  \item it works but \mo{very} \mo{inefficient}
+  \item spinning wastes CPU cycles
+  \item desired: put parent to sleep while waiting for child doing its work and then wake parent up to proceed
+  \item need a condition variable as a more efficient checkpoint
+  \end{itemize}
+\end{minipage}
+\begin{lstlisting}[language=c]
+// referred to as wait() and signal() for simplicity hereafter
+pthread_cond_wait(pthread_cond_t *c, pthread_mutex_t *m);
+pthread_cond_signal(pthread_cond_t *c); // ^ take mutex as arg
+\end{lstlisting}
+\begin{lstlisting}[language=c]
+int done = 0;
+pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t c = PTHREAD_COND_INITIALIZER;
+\end{lstlisting}
+\begin{minipage}{.56\linewidth}
+\begin{lstlisting}[language=c]
+void thr_exit() {
+  Pthread_mutex_lock(&m);
+  done = 1;
+  Pthread_cond_signal(&c);
+  Pthread_mutex_unlock(&m);
+}
+void *child(void *arg) {
+  printf("child\n");
+  thr_exit();
+  return NULL;
+}
+void thr_join() {
+  Pthread_mutex_lock(&m);
+  while (done == 0) // better than if
+     Pthread_cond_wait(&c, &m);
+  Pthread_mutex_unlock(&m);
+}
+int main(int argc, char *argv[]) {
+  printf("parent: begin\n");
+  pthread_t p;
+  Pthread_create(&p, NULL, child, NULL);
+  thr_join();
+  printf("parent: end\n");
+  return 0;
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.44\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item \texttt{wait()} puts calling thread to sleep and release the lock (done \mr{atomically})
+  \item when sleeping thread wakes up (after some other thread signal), it must \mb{reacquire} lock before returning to caller
+  \item thus preventing certain race conds when a thread is trying to put itself to sleep (while others contending for lock)
+  \item suppose 1 CPU and 2 threads
+  \end{itemize}
+  \begin{enumerate}
+  \item parent creates child and immediately calls \texttt{join()} to wait for child
+  \item parent acquires lock, sees child not done $\to$ \texttt{wait()} (also release the lock)
+  \item child grabs lock, runs, prints, then \texttt{exit()} to signal parent
+  \item parent returns from \texttt{wait()}, reholds lock, unlocks, done
+  \end{enumerate}
+\end{minipage}
+\begin{enumerate}
+\item child runs immediately upon creation, sets \texttt{done} to 1, \texttt{signal()} to wake sleeping thread, but there is none, so child done and returns
+\item parent runs \texttt{join()}, sees \texttt{done} is 1, so does \mr{not} wait and just returns
+\end{enumerate}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xrightmargin=2pt]
+void thr_exit() {
+  Pthread_mutex_lock(&m);
+  Pthread_cond_signal(&c);
+  Pthread_mutex_unlock(&m); }
+void thr_join() {
+  Pthread_mutex_lock(&m);
+  Pthread_cond_wait(&c, &m);
+  Pthread_mutex_unlock(&m); }
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item if no condition variable \texttt{done}
+  \item child may run immediately and \texttt{exit()}, then \texttt{signal()} main
+  \item but main has \mr{not} fallen asleep
+  \item since child already \texttt{signal()} before and won't do that again, when main thread try to \texttt{wait()}, it waits forever $|$ [if no mutex $\downarrow$]
+  \end{itemize}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xrightmargin=2pt]
+void thr_exit() { // signal first
+ done = 1; // no one to wake up
+ Pthread_cond_signal(&c); }
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt]
+void thr_join() { // wait later ->
+ if (done == 0)    // sleep forever
+   Pthread_cond_wait(&c); }
+\end{lstlisting}
+\end{minipage}
+\section*{The Producer/Consumer (Bounded Buffer) Problem}
+\begin{itemize}
+\item buffer is shared by a single producer and a single consumer
+\item consumer \mo{wait}s for item avail. in buffer before reading; producer \mo{wait}s buffer to be empty before writing: need mutex + cond var
+\end{itemize}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=0pt,xrightmargin=2pt,frame=lines]
+int buffer; // single-item buffer
+int count = 0; // init empty
+// assume buffer empty
+void put(int value) {
+  assert(count == 0);
+  count = 1;
+  buffer = value;
+} // broken `put', see below
+int get() { // assume buffer full
+  assert(count == 1);
+  count = 0;
+  return buffer;
+} // broken `get', see below
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt,frame=lines]
+int buffer[MAX]; int count = 0;
+int fill_ptr = 0; int use_ptr = 0;
+void put(int value) {
+  buffer[fill_ptr] = value;
+  fill_ptr = (fill_ptr + 1) % MAX;
+  count++;
+} // correct `put', see right ->
+int get() {
+  int tmp = buffer[use_ptr];
+  use_ptr = (use_ptr + 1) % MAX;
+  count--;
+  return tmp;
+} // correct `get', see right ->
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{.63\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=0pt]
+int loops;      // must init somewhere
+cond_t cond;    // broken when two consumers
+mutex_t mutex; // see text on the right
+void *producer(void *arg) {
+  int i;
+  for (i = 0; i < loops; i++) {
+    thread_mutex_lock(&mutex);              // p1
+    if (count == 1)                         // p2
+      Pthread_cond_wait(&cond, &mutex); // p3
+    put(i);                                 // p4
+    Pthread_cond_signal(&cond);             // p5
+    Pthread_mutex_unlock(&mutex);           // p6
+  }
+}
+void *consumer(void *arg) {
+  int i;
+  for (i = 0; i < loops; i++) {
+    Pthread_mutex_lock(&mutex);             // c1
+    if (count == 0)                         // c2
+      Pthread_cond_wait(&cond, &mutex); // c3
+    int tmp = get();                        // c4
+    Pthread_cond_signal(&cond);             // c5
+    Pthread_mutex_unlock(&mutex);           // c6
+    printf("%d\n", tmp);
+  }
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.4\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item works well \mo{only} for single producer/consumer
+  \item if with $p_1$ and $c_1$, $c_2$:
+  \item $c_1$ runs first, acquires lock \mb{c1}, checks buf \mb{c2}, which is empty, so it releases lock and waits \mb{c3} (go to sleep)
+  \item $p_1$ runs, acquires lock \mb{p1}, checks \mb{p2} and fills buf \mb{p4}, wakes up $c_1$ \mb{p5} (buf full). $p_1$ goes to sleep \mb{p6}, \mb{p1}-\mb{p3}
+  \item $c_2$ runs (before $c_1$ has a chance) and consumes existing item \mb{c1}-\mb{c2}, \mb{c4}-\mb{c6}, skipping \mb{c3} due to buf full
+  \item $c_1$ resumes, acquires lock, attempts to \texttt{get()} [\mb{c4}], \mr{without re-checking} \texttt{count}, as check was done before it went to sleep \mb{c2}
+  \item Signaling only wakes up thread; it is a \mr{hint} that state
+of world has changed
+  \end{itemize}
+\end{minipage}
+\begin{minipage}{.64\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=0pt]
+void *producer(void *arg) {
+  int i;
+  for (i = 0; i < loops; i++) {
+    thread_mutex_lock(&mutex);              // p1
+-   if (count == 1)                         // p2
++   while (count == 1)                      // p2
+      Pthread_cond_wait(&cond, &mutex); // p3
+    put(i);                                 // p4
+void *consumer(void *arg) {
+  int i;
+  for (i = 0; i < loops; i++) {
+    Pthread_mutex_lock(&mutex);             // c1
+-   if (count == 1)                         // c2
++   while (count == 0)                      // c2
+      Pthread_cond_wait(&cond, &mutex); // c3
+    int tmp = get();                        // c4
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.4\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item fix: change \texttt{if} to \texttt{while}
+  \item when $c_1$ wakes up, it \mo{recheck}s \texttt{cond} \mb{c2}; if buf empty, $c_1$ sleeps (\mb{c3})
+  \item there is \mr{still one bug}:
+  \item $c_1$, $c_2$ runs first and both go to sleep (\mb{c3})
+  \item $p_1$ runs, fills buf, wakes $c_1$, loops back (\mb{p1}-\mb{p6}), waits on same cond (buf full $\to$ go to sleep, \mb{p2}-\mb{p3})
+  \item $c_1$ wakes, returns from \texttt{wait()} \mb{c3}, re-checks \mb{c2}, takes val \mb{c4} (continued ...)
+  \end{itemize}
+\end{minipage}
+\vspace{-.8em}
+\begin{itemize}
+\item if $c_1$ wakes $c_2$ (\mb{c5}), $c_2$ finds buf empty (\mb{c2}) and goes back to sleep (\mb{c3})
+\item since no \mb{c5} from $c_2$, $p_1$ keeps sleeping, $c_1$ falls asleep \mb{c1}-\mb{c3}; all sleeping...
+\item Signaling must be more directed: consumer should wake only producers
+\item producers wait on cond \texttt{empty} and signal \texttt{fill}; consumers wait on \texttt{fill} and signal \texttt{emtpy}
+\item a consumer never accidentally wakes a consumer and vice versa
+\end{itemize}
+\begin{minipage}{.55\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=-1em,xrightmargin=-4pt,frame=lines]
+cond_t empty, fill; mutex_t mutex;
+void *producer(void *arg) {
+  int i;
+  for (i = 0; i < loops; i++) {
+    thread_mutex_lock(&mutex);
+    while (count == 1)
+     Pthread_cond_wait(&empty,&mutex);
+    put(i);
+    Pthread_cond_signal(&fill);
+    Pthread_mutex_unlock(&mutex);
+  }
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.55\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=-2.8em,frame=lines]
+void *consumer(void *arg) {
+  int i;
+  for (i = 0; i < loops; i++) {
+    Pthread_mutex_lock(&mutex);
+    if (count == 0)
+      Pthread_cond_wait(&fill,&mutex);
+    int tmp = get();
+    Pthread_cond_signal(&empty);
+    Pthread_mutex_unlock(&mutex);
+    printf("%d\n", tmp);
+  }
+}
+\end{lstlisting}
+\end{minipage}
+\section*{Covering Conds (covers all cases where a thread needs to wake up)}
+\begin{itemize}
+\item \texttt{wait()} and \texttt{signal()} approach to thread synchronization assumes the waiting condition is the \textbf{same} for all threads
+\item When multiple waiting threads have different conditions: a multi-thread memory allocator $\to$ When a thread frees memory, it should signal which thread to indicate more memory is available?
+\end{itemize}
+\begin{minipage}{.6\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=4pt]
+// how many bytes of the heap are free
+int bytesLeft = MAX_HEAP_SIZE;
+// need lock and condition
+cond_t c;  mutex_t m;
+void *allocate(int size) {
+  Pthread_mutex_lock(&m);
+  while (bytesLeft < size)
+    Pthread_cond_wait(&c, &m);
+  void *ptr = ...; // get mem from heap
+  bytesLeft -= size;
+  Pthread_mutex_unlock(&m);
+  return ptr;
+}
+void free(void *ptr, int size) {
+  Pthread_mutex_lock(&m);
+  bytesLeft += size;
+- Pthread_cond_signal(&c);// signal whom?
++ Pthread_cond_broadcast(&c);
+  Pthread_mutex_unlock(&m);
+ }
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.4\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item assume 0 bytes free now
+  \item $T_a$ calls \texttt{allocate(100)}
+  \item $T_b$ calls \texttt{allocate(10)}
+  \item Both $T_a$ and $T_b$ wait on cond and go to sleep due to no enough free bytes to satisfy either of requests
+  \item $T_c$ calls \texttt{free(50)} and try to signal a thread
+  \item it might wake $T_a$ instead of $T_b$ (suitable in this case)
+  \item $T_a$ remains waiting and code not working
+  \item Lampson and Redell suggest to wake up \mb{all} waiting threads by \texttt{phthread\_cond\_broadcast()}
+  \end{itemize}
+\end{minipage}
+The downside is a negative performance impact: needlessly wake up many waiting threads that shouldn't (yet) be awake. Those threads will simply wake up, re-check cond, and then go immediately back to sleep
+\begin{tcolorbox}[left=0mm, top=1mm, right=0mm, rightlower=0mm, bottom=1mm,
+  title=Always hold the lock while signaling,halign title=center]
+There are some cases where it is likely OK not to, but probably is something you should avoid. Thus, for simplicity, \textbf{hold the lock when calling signal}. The converse of this tip -- hold lock when calling wait -- is \textbf{mandated} by the semantics of wait: wait always
+(a) assumes lock is held when calling it, (b) releases said lock when
+putting caller to sleep, and (c) re-acquires lock just before returning. Thus, the generalization is correct:\textbf{ hold the lock when calling signal or wait}, and you will always be in good shape.
+\end{tcolorbox}
+\begin{tcolorbox}[left=0mm, top=1mm, right=0mm, rightlower=0mm, bottom=1mm,
+  title=Use \texttt{while} (not \texttt{if}) for conditions,
+  halign title=center]
+When checking for a condition in a multi-threaded program, using a
+\texttt{while} loop is always correct; using an if statement only might be, depending on what signaling does. Using while loops around conditional checks also handles the case where \textbf{spurious wakeups} occur. In some thread packages, due to implementation details, it's possible that 2 threads get woken up though a single signal. Spurious wakeups are further reason to re-check the condition a thread is waiting on.
+\end{tcolorbox}

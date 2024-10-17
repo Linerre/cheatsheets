@@ -17,7 +17,6 @@
 \definecolor{dmm}{RGB}{192,192,192} % Define a custom dimmed text color
 \definecolor{cmt}{RGB}{61,123,123}
 \definecolor{err}{RGB}{128,0,0}
-
 % -- Math ------
 \usepackage{mathtools}
 \usepackage{amssymb}
@@ -37,8 +36,8 @@
 % -- Code listing ---
 \usepackage{listings}
 \lstset{
-  aboveskip=3pt,
-  belowskip=3pt,
+  aboveskip=2pt,
+  belowskip=2pt,
   basicstyle=\small\ttfamily,
   breaklines=true,
   % commentstyle=\upshape\ttfamily,
@@ -75,13 +74,12 @@
 
 % Place a figure env right here via [H] option
 \usepackage{float}
-
+\usepackage{tcolorbox}
 % Side by side figure
 \usepackage{subcaption}
 % \usepackage{caption}
 % \captionsetup{belowskip=0pt, aboveskip=0pt}
 \usepackage{pifont}
-
 % -- Multi-Col layout --
 \usepackage{multicol}
 
@@ -94,6 +92,7 @@
 \setlength\tabcolsep{5pt}
 \newcommand{\gor}{\;|\;}
 \newcommand{\num}{\texttt{\#}~}
-\newcommand{\pro}[1]{\textcolor{Brown}{#1}}
-\newcommand{\bus}[1]{\textcolor{RoyalBlue}{#1}}
+\newcommand{\mr}[1]{\textcolor{Magenta}{#1}}
+\newcommand{\mb}[1]{\textcolor{Cerulean}{#1}}
+\newcommand{\mo}[1]{\textcolor{Maroon}{#1}}
 \renewcommand{\arraystretch}{1.2}

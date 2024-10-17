@@ -23,289 +23,207 @@
 % \columnbreak
 % \input{subs/ch22_swap_policy}
 % \input{subs/ch28_locks}
-\section*{Concurrent Counters (initial vs scalable/approximate)}
-\begin{minipage}{.5\linewidth}
-\begin{lstlisting}[language=c,xrightmargin=4pt]
-typedef struct __counter_t {
-  int value;
-  pthread_mutex_t lock;
-} counter_t;
-void init(counter_t *c) {
-  c->value = 0;
-  Pthread_mutex_init(
-          &c->lock, NULL);
-}
-int get(counter_t *c) {
-  Pthread_mutex_lock(&c->lock);
-  int rc = c->value;
-  Pthread_mutex_unlock(&c->lock);
-  return rc;
-}
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}{.5\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=4pt,framextopmargin=2pt]
-void increment(counter_t *c) {
-  Pthread_mutex_lock(&c->lock);
-  c->value++;
-  Pthread_mutex_unlock(&c->lock);
-}
-void decrement(counter_t *c) {
-  Pthread_mutex_lock(&c->lock);
-  c->value--;
-  Pthread_mutex_unlock(&c->lock);
-}
-\end{lstlisting}
-  \begin{itemize}
-  \item add locks to every read/write access to shared value
-  \item thread-safe but too slow: scales poorly as \#threads grows
-  \end{itemize}
-\end{minipage}
-\begin{lstlisting}[language=c]
-typedef struct __counter_t {
-    int global;                         // global count
-    pthread_mutex_t glock;              // global lock
-    int local[NUMCPUS];                 // per-CPU count
-    pthread_mutex_t llock[NUMCPUS]; // ... and locks
-    int threshold;                      // update freq
-} counter_t;
-// record threshold, init locks and vals of all local cnt/gloabl cnt
-void init(counter_t *c, int threshold) {
-    c->threshold = threshold;
-    c->global = 0;
-    pthread_mutex_init(&c->glock, NULL);
-    int i;
-    for (i = 0; i < NUMCPUS; i++) {
-       c->local[i] = 0;
-       pthread_mutex_init(&c->llock[i], NULL);
-  }
-}
+% \input{subs/ch29_locked_dt}
+% \input{subs/ch30_cv}
 
-// usually, just grab local lock and update local amount;
-// once above `threshold', grab global lock, transfer local vals to it
-void update(counter_t *c, int threadID, int amt) {
-    int cpu = threadID % NUMCPUS;
-    pthread_mutex_lock(&c->llock[cpu]);
-    c->local[cpu] += amt;
-    if (c->local[cpu] >= c->threshold) {
-        // transfer to global (assumes amt > 0)
-        pthread_mutex_lock(&c->glock);
-        c->global += c->local[cpu];
-        pthread_mutex_unlock(&c->glock);
-        c->local[cpu] = 0;
-    }
-    pthread_mutex_unlock(&c->llock[cpu]);
-}
-\end{lstlisting}
-\begin{minipage}{.48\linewidth}
+\section*{Semaphores (yet another synchronization primitive)}
+\begin{itemize}
+\item semaphore is just an integer value, accompanied by a queue of threads (waiting for signals) and manipulated with 2 routines: \texttt{P()} and \texttt{V()}
+\item in POSIX, \texttt{P()} $\to$ \texttt{sem\_wait()}; \texttt{V()} $\to$ \texttt{sem\_post()}; \mo{must first} \texttt{sem\_init()}
+\item tweaking init sem vals to impl. locks, cond vars, other conc primitives
+\end{itemize}
 \begin{lstlisting}[language=c]
-int get(counter_t *c) {
-  pthread_mutex_lock(&c->glock);
-  int val = c->global;
-  pthread_mutex_unlock(&c->glock);
-  return val; // only approximate!
+#include <semaphore.h> // if pshared == 0: sem shared btw thds in same
+int sem_init(sem_t *sem, int pshared, unsigned int value); // process
+int sem_wait(sem_t *sem); // wait on a semaphore
+int sem_post(sem_t *sem); // signal the waiting threads
+\end{lstlisting}
+\begin{minipage}{0.6\linewidth}
+\begin{lstlisting}[language=c]
+int sem_wait(sem_t *s) {
+  /* decrement semaphore `s' by one
+  wait if semaphore `s' is negative */
+} // assume both wait/post exec atomically
+int sem_post(sem_t *s) {
+  /* increment semaphore `s' by one
+  if waiting threads >= 1, wake one */
 }
 \end{lstlisting}
 \end{minipage}
-\begin{minipage}{.52\linewidth}
-  \centering
-  \includegraphics[width=.85\linewidth]{imgs/tracing_approx_cnter}
-\end{minipage}
-\begin{minipage}{.5\linewidth}
-  \includegraphics[width=.8\linewidth]{imgs/precise_approx_cnter}
-\end{minipage}
-\begin{minipage}{.5\linewidth}
-  \centering
-  \includegraphics[width=.8\linewidth]{imgs/scaling_approx_cnter}
-\end{minipage}
-\section*{Concurrent Linked List (insertion and lookup)}
-\begin{minipage}{.52\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=-4pt]
-// basic node structure
-typedef struct __node_t {
-   int               key;
-   struct __node_t   *next;
-} node_t;
-// basic list struct, used per list
-typedef struct __list_t {
-    node_t           *head;
-    pthread_mutex_t  lock;
-} list_t;
-void List_Init(list_t *L) {
-  L->head = NULL;
-  pthread_mutex_init(&L->lock, NULL);
-}
+\begin{minipage}{0.4\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
+sem_t m;
+// init to X;
+// X should be 1 at first
+sem_init(&m, 0, X);
+/* used as a lock */
+sem_wait(&m);
+// critical section here
+sem_post(&m);
 \end{lstlisting}
 \end{minipage}
+\section*{Binary Semaphores (Locks, code at above right)}
+For $N > 1$ threads, the 1st thread to execute \texttt{sem\_wait()}
+immediately brings \texttt{s} to 0; other threads will be forced to wait\\
 \begin{minipage}{.48\linewidth}
+\begin{tabular}[th]{lll}
+  \hline
+  \multicolumn{3}{l}{trace single T using a sem}\\
+  \textbf{sem} & $T_0$ & $T_1$\\
+  \hline
+  1 & & \\
+  1 & call \texttt{sem\_wait()} & \\
+  0 & \texttt{sem\_wait()} returns & \\
+  0 & (\texttt{crit sect}) & \\
+  0 & call \texttt{sem\_post()} & \\
+  1 & \texttt{sem\_post()} returns\\
+  \hline
+\end{tabular}
+\end{minipage}
+\begin{minipage}{.52\linewidth}
   \flushleft
   \begin{itemize}
-  \item acquire lock upon entry to insert fn and release it upon exit
-  \item if \texttt{malloc()} fails, the code must also release lock
-  \item nearly 40\% bugs found on such rarely-taken code path
-  \item \textbf{rearrange} code so that lock and release only surround actual critical section in insert code, $\because$ part of insert need no locking
-  \item assume \texttt{malloc} itself thread-safe $\to$ no race conds and only updating shared list needs lock
+  \item $T_0$ calls \texttt{sem\_wait()}, dec \texttt{sem}: $1 \to 0$
+  \item then $T_0$ will wait only if sem $\leq$ 0
+  \item $\because$ \texttt{sem == 0} now, \texttt{sem\_wait()} will simply return and $T_0$ will continue
+  \item $T_0$ now free to enter critical sect.
+  \item If no other thd tries to acquire lock while $T_0$ in critical sect, when $T_0$ calls \texttt{sem\_post()}, it will restore \texttt{sem} ($0 \to 1$) and wake no waiting thread, $\because$ there are none
   \end{itemize}
 \end{minipage}
-\begin{minipage}{.53\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=-4pt]
-int List_Insert(list_t *L,int key)
-{
-  pthread_mutex_lock(&L->lock);
-  node_t *new = malloc(sizeof node_t);
-  if (new == NULL) {
-    perror("malloc");
-    pthread_mutex_unlock(&L->lock);
-    return -1; // fail
+Run (running); Ready (runnable not running); Sleep (thread is blocked)
+\includegraphics[width=\linewidth,height=6cm]{imgs/twots_usesem2}
+\section*{Semaphores for ordering events in concurrent programs}
+\begin{minipage}{.4\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
+sem_t s; // expected:
+/* parent: begin
+   child
+   parent: end */
+void *child(void *arg) {
+  printf("child\n");
+  sem_post(&s); // signal
+  return NULL;
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.6\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
+int main(int argc, char *argv[]) {
+  sem_init(&s, 0, X); // X should be 0
+  printf("parent: begin\n");
+  pthread_t c;
+  pthread_create(&c, NULL, child, NULL);
+  sem_wait(&s); // wait here for child
+  printf("parent: end\n");
+  return 0;
+} // simulate pthread_join()
+\end{lstlisting}
+\end{minipage}
+% needed this empty line
+
+\includegraphics[width=\linewidth,height=4cm]{imgs/pwaitschd}
+\includegraphics[width=\linewidth,height=4cm]{imgs/chdwaitsp}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
+int buffer[MAX]; // assume MAX = 1
+int fill = 0;
+int use = 0;
+int main(int argc, char *argv[]) {
+  // ... init empty = MAX
+  sem_init(&empty, 0, MAX);
+  sem_init(&full, 0, 0);
+  // ... init full = 0
+} // assume running on 1 CPU
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
+void put(int value) {
+  buffer[fill] = value;       // L F1
+  fill = (fill + 1) % MAX; // L F2
+} // put/get works only if MAX = 1
+int get() {
+  int tmp = buffer[use]; // L G1
+  use = (use + 1) % MAX; // L G2
+  return tmp;
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
+sem_t empty; sem_t full;
+void *producer(void *arg) {
+  int i;
+  for (i = 0; i < loops; i++) {
+    sem_wait(&empty); // Line P1
+    put(i);             // Line P2
+    sem_post(&full);    // Line P3
   }
-  new->key = key;
-  new->next = L->head;
-  L->head = new;
-  pthread_mutex_unlock(&L->lock);
-  return 0; // success
 }
 \end{lstlisting}
 \end{minipage}
-\begin{minipage}{.53\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=2pt]
-int List_Insert(list_t *L, int key)
-{
- node_t *new = malloc(sizeof node_t);
- if (new == NULL) {
-    perror("malloc");
-    return -1;
- }
- new->key = key;
- // just lock critical section
- pthread_mutex_lock(&L->lock);
- new->next = L->head;
- L->head = new;
- pthread_mutex_unlock(&L->lock);
- return 0; // success
-}
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}{.53\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=-4pt]
-int List_Lookup(list_t *L, int key)
-{
-  pthread_mutex_lock(&L->lock);
-  node_t *curr = L->head;
-  while (curr) {
-    if (curr->key == key) {
-      pthread_mutex_unlock(&L->lock);
-      return 0; // success
-    }
-    curr = curr->next;
- }
- pthread_mutex_unlock(&L->lock);
- return -1; // failure
-}
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}{.53\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=2pt]
-int List_Lookup(list_t *L, int key) {
-  int rv = -1;
-  pthread_mutex_lock(&L->lock);
-  node_t *curr = L->head;
-  while (curr) {
-    if (curr->key == key) {
-      rv = 0;
-      break;
-    }
-    curr = curr->next;
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
+void *consumer(void *arg) {
+  int tmp = 0;
+  while (tmp != -1) {
+    sem_wait(&full);    // Line C1
+    tmp = get();        // Line C2
+    sem_post(&empty);  // Line C3
+    printf("%d\n", tmp);
   }
-  pthread_mutex_unlock(&L->lock);
-  return rv; // common exit path
 }
 \end{lstlisting}
 \end{minipage}
-\begin{itemize}
-\item improved impl does \emph{not} scale well; single lock for entire list: bottleneck
-\item \textbf{hand-over-hand locking} (lock coupling) enables more concurrency:
-\item One lock per node – instead of a single lock for the entire list
-\item While traversing, grab next nd's lock, then release current nd's lock
-\item in practice, hard to get faster than simple single lock approach, as overheads of acquiring/releasing locks for each node of list is prohibitive
-\item Even with very large lists and a large \# threads, concurrency of multiple ongoing traversals is unlikely faster than simply grabbing a single lock, performing an operation, and releasing it
-\item general theme: using one global lock for the entire data structures always ensure thread safety, but at cost of concurrency (performance)
-\item to improve performance: increase granularity of critical regions and assign different locks to these regions
-\end{itemize}
-\section*{Concurrent Queue (by Michael and Scott)}
-\begin{itemize}
-\item use two locks: one for head of queue and one for its tail
-\item in common case, enqueue routine will only access tail lock, and dequeue only head lock (goal: allow concurrent enqueue and dequeue ops)
-\item add a dummy node in init $\to$ enable separation of head and tail ops
-\end{itemize}
-\begin{lstlisting}[language=c,xleftmargin=16pt,xrightmargin=6pt,framextopmargin=3pt]
-typedef struct __node_t {
-    int             value;
-    struct __node_t *next;
-} node_t;
-
-typedef struct __queue_t {
-    node_t          *head;
-    node_t          *tail;
-    pthread_mutex_t head_lock, tail_lock;
-} queue_t;
-
-void Queue_Init(queue_t *q) {
-    // allocate a dummy node
-    node_t *tmp = malloc(sizeof(node_t));
-    tmp->next = NULL;
-    q->head = q->tail = tmp;
-    pthread_mutex_init(&q->head_lock, NULL);
-    pthread_mutex_init(&q->tail_lock, NULL);
-}
-
-void Queue_Enqueue(queue_t *q, int value) {
-    node_t *tmp = malloc(sizeof(node_t));
-    assert(tmp != NULL);
-    tmp->value = value;
-    tmp->next = NULL;
-
-    pthread_mutex_lock(&q->tail_lock);
-    q->tail->next = tmp;
-    q->tail = tmp;
-    pthread_mutex_unlock(&q->tail_lock);
-}
-
-int Queue_Dequeue(queue_t *q, int *value) {
-    pthread_mutex_lock(&q->head_lock);
-    node_t *tmp = q->head;
-    node_t *new_head = tmp->next;
-    if (new_head == NULL) {
-       pthread_mutex_unlock(&q->head_lock);
-       return -1; // queue was empty
-    }
-    *value = new_head->value;
-    q->head = new_head;
-    pthread_mutex_unlock(&q->head_lock);
-    free(tmp);
-    return 0;
-}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt,framexbottommargin=2pt]
+void *producer(void *arg) {
+  int i;
+  for (i = 0; i < loops; i++) {
++   sem_wait(&mutex); // Line P0
+    sem_wait(&empty); // Line P1
+    put(i);             // Line P2
+    sem_post(&full);  // Line P3
++   sem_post(&mutex); // Line P4
+  }// 3. producer now runs P0
+}  // 4. lock held -> deadlock
+void *consumer(void *arg) {
+  int i;
+  for (i = 0; i < loops; i++) {
++   sem_wait(&mutex); // Line C0
+    sem_wait(&full);   // Line C1
+    int tmp = get();   // Line C2
+    sem_post(&empty); // Line C3
++   sem_post(&mutex); // Line C4
+    printf("%d\n", tmp);
+  }// 1. consumer runs first C0-C1
+}  // 2. holds lock and sleeps
 \end{lstlisting}
-\begin{lstlisting}[language=c,xleftmargin=16pt,xrightmargin=6pt]
-#define BUCKETS (101) // built with left concurrent linked list
-typedef struct __hash_t {
-    list_t lists[BUCKETS];
-} hash_t;
-void Hash_Init(hash_t *H) {
-    int i;
-    for (i = 0; i < BUCKETS; i++) // use a lock per hash bucket
-       List_Init(&H->lists[i]);
-}
-int Hash_Insert(hash_t *H, int key) {
-    return List_Insert(&H->lists[key % BUCKETS], key);
-}
-int Hash_Lookup(hash_t *H, int key) {
-    return List_Lookup(&H->lists[key % BUCKETS], key);
-}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=4pt,xrightmargin=0pt,framexbottommargin=2pt]
+void *producer(void *arg) {
+  int i;
+  for (i = 0; i < loops; i++) {
++   sem_wait(&empty); // Line P1
++   sem_wait(&mutex); // Line P1.5
+    put(i);             // Line P2
++   sem_post(&mutex); // Line P2.5
++   sem_post(&full);   // Line P3
+  }// 2. prod runs & locks P1-P2
+}  // 3. puts & unlocks P2-P2.5
+void *consumer(void *arg) {
+  int i;
+  for (i = 0; i < loops; i++) {
++   sem_wait(&full);   // Line C1
++   sem_wait(&mutex); // Line C1.5
+    int tmp = get();   // Line C2
++   sem_post(&mutex); // Line C2.5
++   sem_post(&empty); // Line C3
+    printf("%d\n", tmp);
+  }// 1. consumer runs & sleeps C1
+}  // 4. wakes & takes P3,C1.5-C3
 \end{lstlisting}
-\begin{itemize}
-\item correctness first: for concur data structs, one big lock generally works
-\item general guide for performance: break critical regions into separate smaller ones and apply separate locks to them
-\item need to consider overhead of lock (and context switching) $\to$ more threads may not mean faster execution
-\end{itemize}
+\end{minipage}
 \end{multicols*}
 \end{document}
