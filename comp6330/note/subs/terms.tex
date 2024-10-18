@@ -2,7 +2,16 @@
 \item[address space] (of a process) contains all of the memory state of the
 running program: the \textbf{code} of the program (the instructions); The running program uses a \textbf{stack} to keep track of where it is in function call chain as well as to allocate local variables and pass parameters and return values to and from routines; the \textbf{heap} is used for dynamically-allocated, user-managed memory, etc.  It is the running program’s view of memory in the system
 
+\item[atomicity violation] The desired serializability among multiple memory accesses is violated (i.e. a code region is intended to be atomic, but the atomicity is not enforced during execution)
+
+\item[order violation] The desired order between two (groups of) memory accesses is flipped (i.e., A should always be executed before B, but the order is not enforced during execution)
+
 \item[condition variable] an explicit queue that threads can put themselves on when some state of execution (i.e., some \textbf{condition}) is \emph{not} as desired (by \textbf{waiting} on the condition); some other thread, when it changes said state, can then wake one (or more) of those waiting threads and thus allow them to continue (by signaling on the condition). The idea goes back to Dijkstra's use of ``private semaphores''; a similar idea was later named a ``condition variable'' by Hoare in his work on monitors.
+
+\item[deadlock avoidance] Avoidance requires some global knowledge of which locks various threads might grab during their execution, and subsequently \textbf{schedules} said threads in a way as to guarantee no deadlock can occur.
+
+\item[Hill's law] One early source is Mark Hill's dissertation, which studied how to design caches for CPUs. Hill found that simple direct-mapped caches worked better than fancy set-associative designs (one reason is that in caching, simpler designs enable faster lookups). As Hill succinctly summarized
+  his work: ``Big and dumb is better.'' And thus we call this similar advice Hill's Law.
 
 \item[Lauer's law] As Hugh Lauer said, when discussing the construction of the Pilot operating system: ``If the same people had twice as much time, they could produce as good of a system in half the code.''
 
@@ -37,9 +46,11 @@ candidate for eviction.
 
 \item[sparse address space] large address spaces with large amounts of unused address space
 
-\item[translation-lookaside buffer (TLB)] part of the chip’s memory-management unit (MMU), and is simply a hardware cache of popular virtual-to-physical address translations; thus, a better name would be an address-translation cache.
-
 \item[time-space-trade-offs] Usually, if you wish to make access to a particular data structure faster, you will have to pay a space-usage penalty for the structure.
+
+\item[throttling] an approach where programmer decides upon a threshold for ``too many'', and then use a semaphore to limit the number of threads concurrently executing the piece of code in question.  This is also a form of \textbf{admission control}. Imagine that you create hundreds of threads to work on some problem in parallel. However, in a certain part of the code, each thread acquires a large amount of memory to perform part of the computation; let’s call this part of the code the \emph{memory-intensive region}. If \emph{all} of the threads enter the memory-intensive region at the same time, the sum of all the memory allocation requests will exceed the amount of physical memory on the machine. As a result, the machine will start thrashing (i.e., swapping pages to and from the disk), and the entire computation will slow to a crawl.  A simple semaphore can solve this problem. By initializing the value of the semaphore to the maximum number of threads you wish to enter the memory-intensive region at once, and then putting a \texttt{sem\_wait()} and \texttt{sem\_post()} around the region, a semaphore can naturally throttle the number of threads that are ever concurrently in the dangerous region of the code.
+
+\item[translation-lookaside buffer (TLB)] part of the chip’s memory-management unit (MMU), and is simply a hardware cache of popular virtual-to-physical address translations; thus, a better name would be an address-translation cache.
 
 \item[virtual address] All that in user program address space
 

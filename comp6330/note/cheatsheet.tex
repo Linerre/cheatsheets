@@ -25,205 +25,336 @@
 % \input{subs/ch28_locks}
 % \input{subs/ch29_locked_dt}
 % \input{subs/ch30_cv}
-
-\section*{Semaphores (yet another synchronization primitive)}
-\begin{itemize}
-\item semaphore is just an integer value, accompanied by a queue of threads (waiting for signals) and manipulated with 2 routines: \texttt{P()} and \texttt{V()}
-\item in POSIX, \texttt{P()} $\to$ \texttt{sem\_wait()}; \texttt{V()} $\to$ \texttt{sem\_post()}; \mo{must first} \texttt{sem\_init()}
-\item tweaking init sem vals to impl. locks, cond vars, other conc primitives
-\end{itemize}
+% \input{subs/ch31_sem}
+\section*{Atomicity-Violation Bugs (Non-Deadlock)}
+\begin{minipage}{0.5\linewidth}
 \begin{lstlisting}[language=c]
-#include <semaphore.h> // if pshared == 0: sem shared btw thds in same
-int sem_init(sem_t *sem, int pshared, unsigned int value); // process
-int sem_wait(sem_t *sem); // wait on a semaphore
-int sem_post(sem_t *sem); // signal the waiting threads
-\end{lstlisting}
-\begin{minipage}{0.6\linewidth}
-\begin{lstlisting}[language=c]
-int sem_wait(sem_t *s) {
-  /* decrement semaphore `s' by one
-  wait if semaphore `s' is negative */
-} // assume both wait/post exec atomically
-int sem_post(sem_t *s) {
-  /* increment semaphore `s' by one
-  if waiting threads >= 1, wake one */
-}
+Thread 1::
+if (thd->proc_info) {
+  fputs(thd->proc_info, ...);
+}       // ^ may deref NULL
+Thread 2::
+thd->proc_info = NULL;
 \end{lstlisting}
 \end{minipage}
-\begin{minipage}{0.4\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
-sem_t m;
-// init to X;
-// X should be 1 at first
-sem_init(&m, 0, X);
-/* used as a lock */
-sem_wait(&m);
-// critical section here
-sem_post(&m);
-\end{lstlisting}
-\end{minipage}
-\section*{Binary Semaphores (Locks, code at above right)}
-For $N > 1$ threads, the 1st thread to execute \texttt{sem\_wait()}
-immediately brings \texttt{s} to 0; other threads will be forced to wait\\
-\begin{minipage}{.48\linewidth}
-\begin{tabular}[th]{lll}
-  \hline
-  \multicolumn{3}{l}{trace single T using a sem}\\
-  \textbf{sem} & $T_0$ & $T_1$\\
-  \hline
-  1 & & \\
-  1 & call \texttt{sem\_wait()} & \\
-  0 & \texttt{sem\_wait()} returns & \\
-  0 & (\texttt{crit sect}) & \\
-  0 & call \texttt{sem\_post()} & \\
-  1 & \texttt{sem\_post()} returns\\
-  \hline
-\end{tabular}
-\end{minipage}
-\begin{minipage}{.52\linewidth}
+\begin{minipage}{0.5\linewidth}
   \flushleft
   \begin{itemize}
-  \item $T_0$ calls \texttt{sem\_wait()}, dec \texttt{sem}: $1 \to 0$
-  \item then $T_0$ will wait only if sem $\leq$ 0
-  \item $\because$ \texttt{sem == 0} now, \texttt{sem\_wait()} will simply return and $T_0$ will continue
-  \item $T_0$ now free to enter critical sect.
-  \item If no other thd tries to acquire lock while $T_0$ in critical sect, when $T_0$ calls \texttt{sem\_post()}, it will restore \texttt{sem} ($0 \to 1$) and wake no waiting thread, $\because$ there are none
+  \item two $T$s access \texttt{proc\_info} in \texttt{thd}
+  \item if $T_1$ checked but interrupted by $T_2$ before calling \texttt{fputs}
+  \item $T_2$ sets pointer to \texttt{NULL}
+  \item $T_1$ resumes and deref \texttt{NULL} ptr, BOM!
   \end{itemize}
 \end{minipage}
-Run (running); Ready (runnable not running); Sleep (thread is blocked)
-\includegraphics[width=\linewidth,height=6cm]{imgs/twots_usesem2}
-\section*{Semaphores for ordering events in concurrent programs}
-\begin{minipage}{.4\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
-sem_t s; // expected:
-/* parent: begin
-   child
-   parent: end */
-void *child(void *arg) {
-  printf("child\n");
-  sem_post(&s); // signal
-  return NULL;
+\begin{itemize}
+\item the code has an atomicity assumption about the check for non-NULL of \texttt{proc\_info} and the usage of \texttt{proc\_info} in the \texttt{fputs()} call
+\item when the assumption is incorrect, the code will not work as desired
+\end{itemize}
+\begin{lstlisting}[language=c]
+pthread_mutex_t pinfo_lock = PTHREAD_MUTEX_INITIALIZER;
+\end{lstlisting}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c]
+Thread 1::
+pthread_mutex_lock(&pinfo_lock);
+if (thd->proc_info) {
+   fputs(thd->proc_info, ...);
+}
+pthread_mutex_unlock(&pinfo_lock);
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=4pt]
+// lock the critical section
+Thread 2::
+pthread_mutex_lock(&pinfo_lock);
+thd->proc_info = NULL;
+pthread_mutex_unlock(&pinfo_lock);
+thd->proc_info = NULL;
+\end{lstlisting}
+\end{minipage}
+\section*{Order-Violation Bugs (Non-Deadlock)}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c]
+Thread 1::
+void init() {
+ mThread = PR_CreateThd(mMain,...);
 }
 \end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=4pt]
+Thread 2::
+void mMain(...) {
+  mState = mThread->State;
+}// may deref NULL ^
+\end{lstlisting}
+\end{minipage}
+\begin{itemize}
+\item $T_2$ assumes \texttt{mThread} already init (non-NULL) while accessing it
+\item yet if $T_2$ runs before $T_1$ $\to$ \texttt{mThread == NULL}, BOM! deref NULL ptr
+\item to fix this type of bug $\to$ use \mo{cond var}/\mo{semaphore} to enforce ordering
+\end{itemize}
+\begin{lstlisting}[language=c]
+pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER; // lock
+pthread_cond_t  mtCond = PTHREAD_COND_INITIALIZER;  // cond var
+int mtInit = 0; // state variable
+Thread 1::
+void init() {
+  // other work ...
+  mThread = PR_CreateThread(mMain, ...);
+  // signal that the thread has been created...
+  pthread_mutex_lock(&mtLock);
+  mtInit = 1; // set state
+  pthread_cond_signal(&mtCond);
+  pthread_mutex_unlock(&mtLock);
+  // other work ...
+}
+Thread 2::
+void mMain(...) {
+  // other work ...
+  // wait for the thread to be initialized...
+  pthread_mutex_lock(&mtLock);
+  while (mtInit == 0)
+    pthread_cond_wait(&mtCond, &mtLock); // wait for state to be set
+  pthread_mutex_unlock(&mtLock);
+  mState = mThread->State;
+  // other work ...
+}
+\end{lstlisting}
+\begin{minipage}{0.5\linewidth}
+  \section*{Deadlock}
+\begin{lstlisting}[language=c,frame=lines]
+Thread 1::
+pthread_mutex_lock(L1);
+pthread_mutex_lock(L2);
+Thread 2::
+pthread_mutex_lock(L1);
+pthread_mutex_lock(L2);
+\end{lstlisting}
+  \flushleft
+  \begin{itemize}
+  \item deadlock \emph{may} occur when
+  \item $T_1$ holds \texttt{L1}, waiting for \texttt{L2}
+  \item $T_2$ holds \texttt{L2}, waiting for \texttt{L1}
+  \end{itemize}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+  \includegraphics[width=\linewidth,height=3.6cm]{imgs/deadlocks1}
+\end{minipage}
+\section*{Reasons for Deadlock}
+\begin{enumerate}
+\item circular dependencies between threads and resources, such that none of the threads can acquire the required resources to make progress
+\item encapsulation: modularity does not mesh well with locking
+\end{enumerate}
+\section*{4 must-hold conds for a deadlock to occur (any unmet, no deadlock)}
+\begin{itemize}
+\item \textbf{Mutual exclusion} Threads claim exclusive control of resources that they require (e.g. a thread grabs a lock)
+\item \textbf{Hold-and-wait} Threads hold resources they already acquired (e.g. locks) while waiting for extra resources (locks they wish to acquire)
+\item \textbf{No preemption} can't forcibly rm resources from $T$s holding them
+\item \textbf{Circular wait} a circular chain of $T$s such that each $T$ holds one or more resources (e.g. locks) being requested by the next $T$ in the chain
+\end{itemize}
+\section*{Prevent circular wait $\to$ total/partial ordering on lock acquisition}
+\begin{itemize}
+\item if \emph{only} 2 locks (\texttt{L1},\texttt{L2}), strict ordering: always acquire \texttt{L1} before \texttt{L2}
+\item lock acquisition must respect the partial ordering (reflexive, transitive, anti-symmetric) $\to$ guarantee no circularity
+\end{itemize}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt]
+// fn need to grabs two locks
+do sth(mutex t *m1, mutex t *m2)
+\end{lstlisting}
+  \begin{itemize}
+  \item if always grabs \texttt{m1} before \texttt{m2} (or \texttt{m2} before \texttt{m1}) $\to$ may deadlock
+  \item $\because T_1$ calls \texttt{do\_sth(m1, m2)} while $T_2$ calls \texttt{do\_sth(m2, m1)} $\to$ deadlock
+  \item $T_1$ waits for \texttt{m2}; $T_2$ waits for \texttt{m1}
+  \item fix: enforce ordering by lock addr
+  \end{itemize}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=4pt,framextopmargin=1pt]
+// grab in high-to-low addr order
+if (m1 > m2) {
+  pthread_mutex_lock(m1);
+  pthread_mutex_lock(m2);
+} else {
+  pthread_mutex_lock(m2);
+  pthread_mutex_lock(m1);
+}
+// assume m1 != m2 (not same lock)
+\end{lstlisting}
+\end{minipage}
+\section*{Prevent hold-and-wait $\to$ acquire all locks at once, atomically}
+\begin{minipage}{0.75\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt]
+pthread_mutex_lock(prevention); // begin acquisition
+pthread_mutex_lock(L1);
+pthread_mutex_lock(L2);
+...
+pthread_mutex_unlock(prevention); // end
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.3\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item \mb{must} first grab \texttt{prevention} lock
+  \item ensure no untimely $T$ switch can occurs $\to$ avoid deadlock
+  \end{itemize}
+\end{minipage}
+\begin{itemize}
+\item Ok for $T$ to acquire \texttt{L1}$\cdots$\texttt{L2} in any order $\because$ it already holding \texttt{L}$_\text{prevention}$
+\item must know exactly which locks must be held and acquire ahead of time
+\item concurrency $\downarrow$ $\because$ must acquire all locks at once even when not need to
+\end{itemize}
+\begin{minipage}{0.56\linewidth}
+\section*{Add Preemption: imperfect, working}
+\begin{lstlisting}[language=c,xleftmargin=2pt]
+top:
+  pthread_mutex_lock(L1);
+  if (pthread_mutex_trylock(L2) != 0) {
+    pthread_mutex_unlock(L1);
+    goto top;
+  }
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.44\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item deadlock-free, ordering-robust lock acquisition protocol:
+  \item try to grab lock if available $\to$ success
+  \item if lock held by other $\to$ error; try again later
+  \end{itemize}
+\end{minipage}
+\begin{itemize}
+\item $T_{\text{other}}$ could follow same protocol but grab lock in order of \texttt{L2} then \texttt{L1}
+\item this leads to \mo{livelock}: both systems running through this code sequence repeatedly (thus not a deadlock), but progress not being made
+\item add a random delay before looping back and trying over again $\to$ decreasing the odds of repeated interference among competing threads
+\item[1.] if \texttt{L1} gets dropped in some routine, go-back $\to$ more complex
+\item[2.] if along \texttt{L1}, extra mem also acquired, must ensure to release mem too
+\item[3.] \emph{not} really \emph{add} preemption, but just preempt its own lock ownership
+\end{itemize}
+\section*{Prevent Mutual Exclusion (lock-free data struct + hardware help)}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c]
+int CompAndSwap(
+  int *addr, int expected, int new
+) {
+  if (*addr == expected) {
+    *addr = new;
+    return 1; // success
+  }
+  return 0; // failure
+} // atomic ix provided by hardware
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt]
+void AtomicIncrement(
+  int *val, int amt
+) {
+  do {
+    int old = *val;
+  } while (
+  CompAndSwap(val, old, old + amt)
+  == 0); // if val == old, inc old
+} // else keep trying
+\end{lstlisting}
+\end{minipage}
+livelock still possible; robust solution will be more complex than above\newline
+\begin{minipage}{0.55\linewidth}
+\section*{list insertion example}
+\begin{lstlisting}[language=c,frame=none,xleftmargin=-6pt]
+// thread-unsafe: race condition
+void insert(int value) {
+  node_t *n = malloc(sizeof(node_t));
+  assert(n != NULL);
+  n->value = value;
+  n->next = head;
+  head = n;
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+\begin{lstlisting}[language=c,frame=none,xleftmargin=-18pt]
+void insert(int value) {
+  node_t *n = malloc(sizeof(node_t));
+  assert(n != NULL);
+  n->value = value;
+  pthread_mutex_lock(listlock);
+  n->next = head;
+  head = n;
+  pthread_mutex_unlock(listlock);
+} // lock critical section
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.68\linewidth}
+\begin{lstlisting}[language=c]
+void insert(int value) {
+  node_t *n = malloc(sizeof(node_t));
+  assert(n != NULL);
+  n->value = value;
+  do {
+    n->next = head;
+  } while (CompAndSwap(&head, n->next, n) == 0);
+} // retry again with new head by other thread
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.32\linewidth}
+  \flushleft
+  \begin{itemize}
+  \item point \texttt{next} to curr head and try to make the node new head
+  \item this will fail if some other $T$ successfully swapped in a new head in meanwhile
+  \item then try again
+  \end{itemize}
+\end{minipage}
+\section*{Deadlock Avoidance via Scheduling}
+\begin{minipage}{.4\linewidth}
+  \begin{tabular}[ht]{lllll}
+    Lock        & \texttt{T1} & \texttt{T2} & \texttt{T3} & \texttt{T4} \\
+    \texttt{L1} & yes & yes & \mr{no} & no \\
+    \texttt{L2} & yes & yes & yes & no \\
+  \end{tabular}
 \end{minipage}
 \begin{minipage}{.6\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
-int main(int argc, char *argv[]) {
-  sem_init(&s, 0, X); // X should be 0
-  printf("parent: begin\n");
-  pthread_t c;
-  pthread_create(&c, NULL, child, NULL);
-  sem_wait(&s); // wait here for child
-  printf("parent: end\n");
-  return 0;
-} // simulate pthread_join()
-\end{lstlisting}
+  \includegraphics[width=.9\linewidth,height=1.8cm]{imgs/threadsdeadlock2}
 \end{minipage}
-% needed this empty line
+\begin{itemize}
+\item A smart scheduler could ensure T1 and T2 are not run at the same time $\to$ no deadlock could ever arise
+\item  it is OK for (T3 and T1) or (T3 and T2) to overlap. Even
+though T3 grabs lock \texttt{L2}, it can never cause a deadlock by running concurrently with other threads because it only grabs one lock
+\end{itemize}
+\begin{minipage}{.4\linewidth}
+  \begin{tabular}[ht]{lllll}
+    Lock        & \texttt{T1} & \texttt{T2} & \texttt{T3} & \texttt{T4} \\
+    \texttt{L1} & yes & yes & \mr{yes} & no \\
+    \texttt{L2} & yes & yes & yes & no \\
+  \end{tabular}
+\end{minipage}
+\begin{minipage}{.6\linewidth}
+  \includegraphics[width=\linewidth,height=1.8cm]{imgs/threadsdeadlock3}
+\end{minipage}
+\begin{itemize}
+\item T1, T2, and T3 all need to grab both locks \texttt{L1} and \texttt{L2} at some point
+\item static scheduling leads to conservative approach: T1, T2, T3 all run on same processor: $\to T_{\text{total-completion-time}} \uparrow$ considerably
+\item deadlock avoidance: not a widely-used general-purpose solution
+\end{itemize}
+\section*{Detect and Recover}
+\begin{itemize}
+\item allow deadlocks to occasionally occur $\to$ reboot once detected it
+\item this non-solution is indeed pragmatic if deadlocks are rare
+\item Many DBMS employ deadlock detection and recovery techniques
+\item deadlock detector runs periodically, building a resource graph and checking for cycles; when there's a cycle (deadlock), sys needs reboot
+\end{itemize}
+\begin{tcolorbox}[left=0mm, top=1mm, right=0mm, rightlower=0mm, bottom=1mm,
+  title=USE ATOMIC OPERATIONS,
+  halign title=center]
+  The idea behind making a series of actions \textbf{atomic}: ``all or nothing''. It should either appear as if all of the actions you wish to group together occurred, or that none of them occurred, with no in-between state visible. Sometimes, the grouping of many actions into a single atomic action is called a \textbf{transaction}
+\end{tcolorbox}
+\begin{tcolorbox}[left=0mm, top=1mm, right=0mm, rightlower=0mm, bottom=1mm,
+  title= DON'T ALWAYS DO IT PERFECTLY (TOM WEST'S LAW),
+  halign title=center]
+  ``Not everything worth doing is worth doing well'': If a bad thing happens rarely, certainly one should not spend much effort to prevent it, \emph{particularly if} the cost of the bad things is small. With pressing deadlines and other real-world concerns, one will always have to decide which aspects of a system to build well and which to put aside
+\end{tcolorbox}
 
-\includegraphics[width=\linewidth,height=4cm]{imgs/pwaitschd}
-\includegraphics[width=\linewidth,height=4cm]{imgs/chdwaitsp}
-\begin{minipage}{.5\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
-int buffer[MAX]; // assume MAX = 1
-int fill = 0;
-int use = 0;
-int main(int argc, char *argv[]) {
-  // ... init empty = MAX
-  sem_init(&empty, 0, MAX);
-  sem_init(&full, 0, 0);
-  // ... init full = 0
-} // assume running on 1 CPU
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}{.5\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
-void put(int value) {
-  buffer[fill] = value;       // L F1
-  fill = (fill + 1) % MAX; // L F2
-} // put/get works only if MAX = 1
-int get() {
-  int tmp = buffer[use]; // L G1
-  use = (use + 1) % MAX; // L G2
-  return tmp;
-}
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}{.5\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
-sem_t empty; sem_t full;
-void *producer(void *arg) {
-  int i;
-  for (i = 0; i < loops; i++) {
-    sem_wait(&empty); // Line P1
-    put(i);             // Line P2
-    sem_post(&full);    // Line P3
-  }
-}
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}{.5\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt]
-void *consumer(void *arg) {
-  int tmp = 0;
-  while (tmp != -1) {
-    sem_wait(&full);    // Line C1
-    tmp = get();        // Line C2
-    sem_post(&empty);  // Line C3
-    printf("%d\n", tmp);
-  }
-}
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}{.5\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=2pt,xrightmargin=2pt,framexbottommargin=2pt]
-void *producer(void *arg) {
-  int i;
-  for (i = 0; i < loops; i++) {
-+   sem_wait(&mutex); // Line P0
-    sem_wait(&empty); // Line P1
-    put(i);             // Line P2
-    sem_post(&full);  // Line P3
-+   sem_post(&mutex); // Line P4
-  }// 3. producer now runs P0
-}  // 4. lock held -> deadlock
-void *consumer(void *arg) {
-  int i;
-  for (i = 0; i < loops; i++) {
-+   sem_wait(&mutex); // Line C0
-    sem_wait(&full);   // Line C1
-    int tmp = get();   // Line C2
-    sem_post(&empty); // Line C3
-+   sem_post(&mutex); // Line C4
-    printf("%d\n", tmp);
-  }// 1. consumer runs first C0-C1
-}  // 2. holds lock and sleeps
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}{.5\linewidth}
-\begin{lstlisting}[language=c,xleftmargin=4pt,xrightmargin=0pt,framexbottommargin=2pt]
-void *producer(void *arg) {
-  int i;
-  for (i = 0; i < loops; i++) {
-+   sem_wait(&empty); // Line P1
-+   sem_wait(&mutex); // Line P1.5
-    put(i);             // Line P2
-+   sem_post(&mutex); // Line P2.5
-+   sem_post(&full);   // Line P3
-  }// 2. prod runs & locks P1-P2
-}  // 3. puts & unlocks P2-P2.5
-void *consumer(void *arg) {
-  int i;
-  for (i = 0; i < loops; i++) {
-+   sem_wait(&full);   // Line C1
-+   sem_wait(&mutex); // Line C1.5
-    int tmp = get();   // Line C2
-+   sem_post(&mutex); // Line C2.5
-+   sem_post(&empty); // Line C3
-    printf("%d\n", tmp);
-  }// 1. consumer runs & sleeps C1
-}  // 4. wakes & takes P3,C1.5-C3
-\end{lstlisting}
-\end{minipage}
 \end{multicols*}
 \end{document}
