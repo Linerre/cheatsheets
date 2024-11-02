@@ -2,6 +2,8 @@
 \item[address space] (of a process) contains all of the memory state of the
 running program: the \textbf{code} of the program (the instructions); The running program uses a \textbf{stack} to keep track of where it is in function call chain as well as to allocate local variables and pass parameters and return values to and from routines; the \textbf{heap} is used for dynamically-allocated, user-managed memory, etc.  It is the running program’s view of memory in the system
 
+\item[Access Control List (ACL)]  Access control lists are a more general and powerful way to represent exactly who can access a given resource. In a file system, this enables a user to create a very specific list of who can and cannot read a set of files, in contrast to the somewhat limited owner/group/everyone model of permissions bits.
+
 \item[atomicity violation] The desired serializability among multiple memory accesses is violated (i.e. a code region is intended to be atomic, but the atomicity is not enforced during execution)
 
 \item[order violation] The desired order between two (groups of) memory accesses is flipped (i.e., A should always be executed before B, but the order is not enforced during execution)
@@ -13,6 +15,27 @@ running program: the \textbf{code} of the program (the instructions); The runnin
 \item[DMI]  Intel’s proprietary DMI (Direct Media Interface), for connecting I/O Chip
 
 \item[eSATA] external SATA represent an evolution of storage interfaces over the past decades, with each step forward increasing performance to keep pace with modern storage devices
+
+\item[File] A file is an array of bytes which can be created, read, written, and deleted. It has a low-level name (i.e., a number) that refers to it uniquely. The low-level name is often called an \textbf{inode number} (\textbf{i-number}).  A file, as presented to the user via a file name, is essentially a “pointer” to the underlying inode that structure in the disk that contains the actual data. Different ways to refer to a file:
+\begin{enumerate*}[label={\alph*.},font={\color{red!50!black}\bfseries}]
+\item file name (human readable)
+\item inode number (persistent ID)
+\item file descriptor (process view)
+\end{enumerate*}
+
+\item[File Descriptor] To access a file, a process must use a system call (usually, \texttt{open()}) to request permission from the operating system. If permission is granted, the OS returns a \textbf{file descriptor} (an \texttt{int}, private per process and is used in UNIX systems), which can then be used for read or write access, as permissions and intent allow.  Thus, a file descriptor is a capability, i.e., an opaque handle that gives you the power to perform certain operations.  When you first open another file, it will almost certainly be file descriptor \textbf{3}, because In Linux, by default a process already has \textbf{3} file descriptors:
+\begin{enumerate*}[label={\alph*.},font={\color{red!50!black}\bfseries}]
+\item standard input (0)
+\item standard output (1)
+\item standard error (2)
+\end{enumerate*}
+
+
+\item[File Type]  In some systems (Windows), a file's name carry a structure: a two-part name, separated by a \texttt{.}: \texttt{filename.ext}. This is mostly a \textbf{convention}, so no enforcement on the data contained in the file. Other systems adopt an untyped view: no convention to relate to specific content of the file.
+
+\item[Directory] a collection of tuples, each of which contains a human-readable name and low-level name to which it maps. Each entry refers either to another directory or to a file. Each directory also has a low-level name (i-number) itself. A directory always has two special entries: the \textbf{\texttt{.}} entry, which refers to itself, and the \textbf{\texttt{..}} entry, which refers to its parent.
+
+\item[Directory Tree/Hierarchy] organizes all files and directories into a large tree, starting at the \textbf{root} (often represented as \texttt{/}).
 
 \item[SATA] Serial ATA (AT Attachment)
 
@@ -38,6 +61,8 @@ candidate for eviction.
 
 \item[mutex] The name that the POSIX library uses for a lock, as it is used to provide mutual exclusion between threads, i.e., if one thread is in the critical section, it excludes the others from entering until it has completed the section.
 
+\item[Open File Table] Each file descriptor is a private, per-process entity. Each process maintains an array of file descriptors, each of which refers to an entry in the system-wide \textbf{open file table}. The entry therein tracks which file this access refers to, the \textbf{current offset} of the file (i.e., which part of the file the next read or write will access), and other relevant details such as whether the file is readable or writable
+
 \item[paging] Chop memory into \emph{fixed-sized} pieces, each called a \textbf{page}
 
 \item[page frame] physical memory viewed as an array of fixed-sized slots called page frames; each of these frames can contain a single virtual-memory page.
@@ -55,6 +80,8 @@ candidate for eviction.
 \item[time-space-trade-offs] Usually, if you wish to make access to a particular data structure faster, you will have to pay a space-usage penalty for the structure.
 
 \item[throttling] an approach where programmer decides upon a threshold for ``too many'', and then use a semaphore to limit the number of threads concurrently executing the piece of code in question.  This is also a form of \textbf{admission control}. Imagine that you create hundreds of threads to work on some problem in parallel. However, in a certain part of the code, each thread acquires a large amount of memory to perform part of the computation; let’s call this part of the code the \emph{memory-intensive region}. If \emph{all} of the threads enter the memory-intensive region at the same time, the sum of all the memory allocation requests will exceed the amount of physical memory on the machine. As a result, the machine will start thrashing (i.e., swapping pages to and from the disk), and the entire computation will slow to a crawl.  A simple semaphore can solve this problem. By initializing the value of the semaphore to the maximum number of threads you wish to enter the memory-intensive region at once, and then putting a \texttt{sem\_wait()} and \texttt{sem\_post()} around the region, a semaphore can naturally throttle the number of threads that are ever concurrently in the dangerous region of the code.
+
+\item[Time of Check To Time of Use (TOCTTOU)] McPhee notes that ``... if there exists a time interval between a validity-check and the operation connected with that validity-check, [and,] through multitasking, the validity-check variables can deliberately be changed during this time interval, resulting in an invalid operation being performed by the control program'', thus this problem.  There are not any simple and great solutions to the TOCTTOU problem. One approach is to reduce the number of services that need root privileges to run, which helps. The \texttt{O\_NOFOLLOW} flag makes it so that \texttt{open()} will fail if the target is a symbolic link, thus avoiding attacks that require said links.
 
 \item[translation-lookaside buffer (TLB)] part of the chip’s memory-management unit (MMU), and is simply a hardware cache of popular virtual-to-physical address translations; thus, a better name would be an address-translation cache.
 
