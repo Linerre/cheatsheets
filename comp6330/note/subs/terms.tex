@@ -6,11 +6,16 @@ running program: the \textbf{code} of the program (the instructions); The runnin
 
 \item[atomicity violation] The desired serializability among multiple memory accesses is violated (i.e. a code region is intended to be atomic, but the atomicity is not enforced during execution)
 
-\item[order violation] The desired order between two (groups of) memory accesses is flipped (i.e., A should always be executed before B, but the order is not enforced during execution)
 
 \item[condition variable] an explicit queue that threads can put themselves on when some state of execution (i.e., some \textbf{condition}) is \emph{not} as desired (by \textbf{waiting} on the condition); some other thread, when it changes said state, can then wake one (or more) of those waiting threads and thus allow them to continue (by signaling on the condition). The idea goes back to Dijkstra's use of ``private semaphores''; a similar idea was later named a ``condition variable'' by Hoare in his work on monitors.
 
-\item[deadlock avoidance] Avoidance requires some global knowledge of which locks various threads might grab during their execution, and subsequently \textbf{schedules} said threads in a way as to guarantee no deadlock can occur.
+\item[Deadlock Avoidance] Avoidance requires some global knowledge of which locks various threads might grab during their execution, and subsequently \textbf{schedules} said threads in a way as to guarantee no deadlock can occur.
+
+\item[Directory] a collection of tuples, each of which contains a human-readable name and low-level name to which it maps. Each entry refers either to another directory or to a file. Each directory also has a low-level name (i-number) itself. A directory always has two special entries: the \textbf{\texttt{.}} entry, which refers to itself, and the \textbf{\texttt{..}} entry, which refers to its parent.
+
+\item[Directory Tree/Hierarchy] organizes all files and directories into a large tree, starting at the \textbf{root} (often represented as \texttt{/}).
+
+\item[dynamic partitioning] The dynamic approach is more flexible, giving out differing amounts of the resource over time; for example, one user may get a higher percentage of disk bandwidth for a period of time, but then later, the system may switch and decide to give a different user a larger fraction of available disk bandwidth.
 
 \item[DMI]  Intel’s proprietary DMI (Direct Media Interface), for connecting I/O Chip
 
@@ -33,14 +38,13 @@ running program: the \textbf{code} of the program (the instructions); The runnin
 
 \item[File Type]  In some systems (Windows), a file's name carry a structure: a two-part name, separated by a \texttt{.}: \texttt{filename.ext}. This is mostly a \textbf{convention}, so no enforcement on the data contained in the file. Other systems adopt an untyped view: no convention to relate to specific content of the file.
 
-\item[Directory] a collection of tuples, each of which contains a human-readable name and low-level name to which it maps. Each entry refers either to another directory or to a file. Each directory also has a low-level name (i-number) itself. A directory always has two special entries: the \textbf{\texttt{.}} entry, which refers to itself, and the \textbf{\texttt{..}} entry, which refers to its parent.
-
-\item[Directory Tree/Hierarchy] organizes all files and directories into a large tree, starting at the \textbf{root} (often represented as \texttt{/}).
-
-\item[SATA] Serial ATA (AT Attachment)
+\item[free list] In early file systems, a single pointer in the super block was kept to point to the first free block; inside that block the next free pointer was kept, thus forming a list through the free blocks of the system. When a block was needed, the head block was used and the list updated accordingly.
 
 \item[Hill's law] One early source is Mark Hill's dissertation, which studied how to design caches for CPUs. Hill found that simple direct-mapped caches worked better than fancy set-associative designs (one reason is that in caching, simpler designs enable faster lookups). As Hill succinctly summarized
   his work: ``Big and dumb is better.'' And thus we call this similar advice Hill's Law.
+
+\item[inode] Index node. The inode is the generic name that is used in many file systems to describe the structure that holds the metadata for a given file, such as its length, permissions, and the location of its constituent blocks. The name
+goes back at least as far as UNIX (and probably further back to Multics if not earlier systems); it is short for index node, as the inode number is used to index into an array of on-disk inodes in order to find the inode of that number. The design of the inode is one key part of file system design. Most modern systems have some kind of structure like this for every file they track, but perhaps call them different things (such as dnodes, fnodes, etc.).
 
 \item[Lauer's law] As Hugh Lauer said, when discussing the construction of the Pilot operating system: ``If the same people had twice as much time, they could produce as good of a system in half the code.''
 
@@ -63,6 +67,8 @@ candidate for eviction.
 
 \item[Open File Table] Each file descriptor is a private, per-process entity. Each process maintains an array of file descriptors, each of which refers to an entry in the system-wide \textbf{open file table}. The entry therein tracks which file this access refers to, the \textbf{current offset} of the file (i.e., which part of the file the next read or write will access), and other relevant details such as whether the file is readable or writable
 
+\item[order violation] The desired order between two (groups of) memory accesses is flipped (i.e., A should always be executed before B, but the order is not enforced during execution)
+
 \item[paging] Chop memory into \emph{fixed-sized} pieces, each called a \textbf{page}
 
 \item[page frame] physical memory viewed as an array of fixed-sized slots called page frames; each of these frames can contain a single virtual-memory page.
@@ -70,6 +76,13 @@ candidate for eviction.
 \item[page table] s a per-process data structure maintained by OS.  Its major role is to store address translations for each of the virtual pages of the address space, thus letting us know where in physical memory each page resides.
 
 \item[page fault] the act of accessing a page that is not in physical memory.  Upon a page fault, the OS is invoked to service the page fault.  Virtually all systems handle page faults in software.
+
+\item{pre-allocation policy} When allocating data blocks for a new file. For example, some Linux file systems, such as ext2 and ext3, will look for a sequence of blocks (say 8) that are free when a new file is created and needs data blocks; by finding such a sequence of free blocks, and then allocating them to the newly-created file, the file system guarantees that a portion of the file will be contiguous on the disk, thus improving performance. Such a \textbf{pre-allocation} policy is thus a commonly-used heuristic when allocating space for data blocks.
+
+\item[static partitioning] When dividing a resource among different clients/users, you can use either static partitioning or dynamic partitioning (see above). The static approach simply divides the resource into fixed proportions once; for example, if there are two possible users of memory, you can give some fixed fraction of memory to one user, and the rest to the other.
+
+\item[SATA] Serial ATA (AT Attachment)
+
 
 \item[segmentation] Chop memory into \textsw{variable-sized} chunks and allocate them based on needs (e.g in base/bound or segmentation approaches)
 
@@ -84,6 +97,8 @@ candidate for eviction.
 \item[Time of Check To Time of Use (TOCTTOU)] McPhee notes that ``... if there exists a time interval between a validity-check and the operation connected with that validity-check, [and,] through multitasking, the validity-check variables can deliberately be changed during this time interval, resulting in an invalid operation being performed by the control program'', thus this problem.  There are not any simple and great solutions to the TOCTTOU problem. One approach is to reduce the number of services that need root privileges to run, which helps. The \texttt{O\_NOFOLLOW} flag makes it so that \texttt{open()} will fail if the target is a symbolic link, thus avoiding attacks that require said links.
 
 \item[translation-lookaside buffer (TLB)] part of the chip’s memory-management unit (MMU), and is simply a hardware cache of popular virtual-to-physical address translations; thus, a better name would be an address-translation cache.
+
+\item[track buffer] modern disks are much smarter: they internally read the entire track in and buffer it in an internal disk cache (often called a track buffer for this very reason). Then, on subsequent reads to the track, the disk will just return the desired data from its cache. File systems thus no longer have to worry about these incredibly low-level details.
 
 
 \item[unwritten contract of disk drives] Specifically, one can usually assume that accessing two blocks near one-another within the drive’s address space will be faster than accessing two blocks that are far apart. One can also usually assume that accessing blocks in a contiguous chunk (i.e., a sequential read or write) is the fastest access mode, and usually much faster than any more random access pattern.
