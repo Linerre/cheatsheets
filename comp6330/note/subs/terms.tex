@@ -34,6 +34,8 @@ running program: the \textbf{code} of the program (the instructions); The runnin
 
 \item[eSATA] external SATA represent an evolution of storage interfaces over the past decades, with each step forward increasing performance to keep pace with modern storage devices
 
+\item[fail-stop fault model (disk)]  In this model, a disk can be in exactly one of two states: working or failed. With a working disk, all blocks can be read or written. In contrast, when a disk has failed, we assume it is permanently lost. One critical aspect of the fail-stop model is what it assumes about fault detection. Specifically, when a disk has failed, we assume that this is easily detected.
+
 \item[File] A file is an array of bytes which can be created, read, written, and deleted. It has a low-level name (i.e., a number) that refers to it uniquely. The low-level name is often called an \textbf{inode number} (\textbf{i-number}).  A file, as presented to the user via a file name, is essentially a “pointer” to the underlying inode that structure in the disk that contains the actual data. Different ways to refer to a file:
 \begin{enumerate*}[label={\alph*.},font={\color{red!50!black}\bfseries}]
 \item file name (human readable)
@@ -127,6 +129,8 @@ system tree. LFS cleverly avoids this problem with the inode map. Even though
 the location of an inode may change, the change is never reflected in the
 directory itself; rather, the imap structure is updated while the directory
 holds the same name-to-inode-number mapping. Thus, through indirection, LFS avoids the recursive update problem.
+
+\item[Redundant Array of Inexpensive Disks (RAIDs)] , a technique to use multiple disks in concert to build a faster, bigger, and more reliable disk system. The term was introduced in the late 1980s by a group of researchers at U.C. Berkeley (led by Professors David Patterson and Randy Katz and then student Garth Gibson); Externally, a RAID looks like a disk: a group of blocks one can read or write. A RAID system is often built as a separate hardware box, with a standard connection (e.g., SCSI, or SATA) to a host. Internally, the RAID is a complex beast, consisting of multiple disks, memory (both volatile and non-), and one or more processors to manage the system. A hardware RAID is very much like a computer system, specialized for the task of managing a group of disks.
 
 \item[Round-Robin (RR) scheduling] The basic idea is simple: instead of running jobs to completion, RR runs a job for a \textbf{time slice} (sometimes called a scheduling quantum) and then switches to the next job in the run queue. It repeatedly does so until the jobs are finished. \mr{good for response time, worst for turnaround time}
 
@@ -226,7 +230,7 @@ schedule(curr);              // run for quantum
 curr->pass += curr->stride;  // update pass using stride
 insert(queue, curr);         // return curr to queue
 \end{lstlisting}
-\includegraphics[width=\linewidt]{imgs/sche_stride}
+\includegraphics[width=\linewidth]{imgs/sched_stride}
 \begin{itemize}
 \item 3 processes: A, B, C; stride value: $A = 100\;B = 200\; C=40$
 \item $A$ runs 1st (choose arbitrarily) $\to$ \texttt{pass} updated to 100
@@ -241,3 +245,19 @@ insert(queue, curr);         // return curr to queue
 \item stride sched gets them exactly right at the end of each scheduling cycle
 \item lottery has no global state $\to$ much easier to incorporate new procs
 \end{itemize}
+\section*{RAID Advantages (transparently: looks like a big disk to host system)}
+\begin{enumerate}
+\item performance: multiple disks in parallel can greatly speed up I/O times
+\item capacity: large data sets demand large disks
+\item reliability: spreading data across multiple disks (without RAID techniques) makes the data vulnerable to the loss of a single disk; with some form of \textbf{redundancy}, RAIDs can tolerate the loss of a disk and keep operating as if nothing were wrong.
+\end{enumerate}
+\section*{Evaluating RAID: three axes}
+\begin{enumerate}
+\item capacity: given a set of $N$ disks each with $B$ blocks:
+  \begin{itemize}
+  \item without redundancy, useful capacity = $N\cdot B$
+  \item with mirroring (keep 2 copies of each block): $(N\cdot B)/2$
+  \end{itemize}
+\item reliability: In alignment with fault model: only an entire disk can fail
+\item performance: present a set of typical workloads to find out
+\end{enumerate}
