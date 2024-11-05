@@ -4,13 +4,19 @@ running program: the \textbf{code} of the program (the instructions); The runnin
 
 \item[Access Control List (ACL)]  Access control lists are a more general and powerful way to represent exactly who can access a given resource. In a file system, this enables a user to create a very specific list of who can and cannot read a set of files, in contrast to the somewhat limited owner/group/everyone model of permissions bits.
 
+\item[amortization] The general technique of amortization is commonly used in systems when there is a fixed cost to some operation. By incurring that cost less often (i.e., by performing the operation fewer times), the total cost to the system is reduced. For example, if the time slice is set to 10 ms, and the context-switch cost is 1 ms, roughly 10\% of time is spent context switching and is thus wasted. If we want to \emph{amortize} this cost, we can increase the time slice, e.g., to 100 ms. In this case, less than 1\% of time is spent context switching, and thus the cost of time-slicing has been amortized.
+
 \item[atomicity violation] The desired serializability among multiple memory accesses is violated (i.e. a code region is intended to be atomic, but the atomicity is not enforced during execution)
 
 \item[basepointer-based consistency (BBC, journaling)] (at Wisconsin) In this technique, no ordering is enforced between writes. To achieve consistency, an additional back pointer is added to every block in the system; for example, each data block has a reference to the inode to which it belongs. When accessing a file, the file system can determine if the file is consistent by checking if the forward pointer (e.g., the address in the inode or direct block) points to a block that refers back to it. If so, everything must have safely reached disk and thus the file is consistent; if not, the file is inconsistent, and an error is returned. By adding back pointers to the file system, a new form of lazy crash consistency can be attained
 
+\item[batch process] long-running background tasks: response time not important, cares for long run times (reduce the cost of context switches, cares for lots of CPU, not when)
+
 \item[checkpoint region (CR)] The checkpoint region contains pointers to (i.e., addresses of) the latest pieces of the inode map, and thus the inode map pieces can be found by reading the CR first. The overall structure of the on-disk layout contains a checkpoint region (which points to the latest pieces of the inode map); the inode map pieces each contain addresses of the inodes; the inodes point to files (and directories) just like typical UNIX file systems.
 
 \item[condition variable] an explicit queue that threads can put themselves on when some state of execution (i.e., some \textbf{condition}) is \emph{not} as desired (by \textbf{waiting} on the condition); some other thread, when it changes said state, can then wake one (or more) of those waiting threads and thus allow them to continue (by signaling on the condition). The idea goes back to Dijkstra's use of ``private semaphores''; a similar idea was later named a ``condition variable'' by Hoare in his work on monitors.
+
+\item[convey effect] a number of relatively-short potential consumers of a resource get queued behind a heavyweight resource consumer
 
 \item[Copy-on-write (COW)] This technique never overwrites files or directories in place; rather, it places new updates to previously unused locations on disk. After a number of updates are completed, COW file systems flip the root structure of the file system to include pointers to the newly updated structures. Doing so makes keeping the file system consistent straightforward.  LFS introduces a new approach to updating the disk. Instead of overwriting files in places, LFS always writes to an unused portion of the disk, and then later reclaims that old space through cleaning. This approach, which in database systems is called \textbf{shadow paging} and in file-system-speak is sometimes called copy-on-write, enables highly efficient writing, as LFS can gather all updates into an in-memory segment and then write them out together sequentially
 
@@ -57,6 +63,8 @@ goes back at least as far as UNIX (and probably further back to Multics if not e
 
 \item[immediate reporting (fs journaling)] With write buffering enabled (sometimes called immediate reporting), a disk will inform the OS the write is complete when it simply has been placed in the disk’s memory cache, and has not yet reached disk
 
+\item[interactive process] low latency foreground tasks: response time critical, short bursts (context switching cost not important, not much CPU needed but frequently)
+
 \item[Lauer's law] As Hugh Lauer said, when discussing the construction of the Pilot operating system: ``If the same people had twice as much time, they could produce as good of a system in half the code.''
 
 \item[limited direct execution] let the program run directly on the hardware; however, at certain key points in time (such as when a process issues a system call, or a timer interrupt occurs), arrange so that the OS gets involved and makes sure the ``right'' thing happens.   Thus, the OS, with a little hardware support, tries best to get out of the way of the running program, to deliver an \emph{efficient} virtualization.
@@ -92,7 +100,7 @@ All of these modes keep metadata consistent; they vary in their semantics for da
 
 \item[optimistic crash consistency] technique to reduce the number of times a journal protocol has to wait for disk writes to complete.  this new approach issues as many writes to disk as possible by using a generalized form of the transaction checksum, and includes a few other techniques to detect inconsistencies should they arise. For some workloads, these optimistic techniques can improve performance by an order of magnitude. However, to truly function well, a slightly different disk interface is required
 
-\item[paging] Chop memory into \emph{fixed-sized} pieces, each called a \textbf{page}
+\item[paging] Chop memory into \emph{fixed-sized} pieces, each called a \textbf{page} (usually 4KB)
 
 \item[page frame] physical memory viewed as an array of fixed-sized slots called page frames; each of these frames can contain a single virtual-memory page.
 
@@ -102,6 +110,16 @@ All of these modes keep metadata consistent; they vary in their semantics for da
 
 \item{pre-allocation policy} When allocating data blocks for a new file. For example, some Linux file systems, such as ext2 and ext3, will look for a sequence of blocks (say 8) that are free when a new file is created and needs data blocks; by finding such a sequence of free blocks, and then allocating them to the newly-created file, the file system guarantees that a portion of the file will be contiguous on the disk, thus improving performance. Such a \textbf{pre-allocation} policy is thus a commonly-used heuristic when allocating space for data blocks.
 
+\item[preemptive scheduling] Virtually all modern schedulers are preemptive, and quite willing to stop one process from running in order to run another. This implies that the scheduler employs the mechanisms we learned about previously; in particular, the scheduler can perform a \textbf{context switch}, stopping one running process temporarily and resuming (or starting) another. In the old days of batch computing, a number of \textbf{non-preemptive} schedulers were developed; such systems would run each job to completion before considering whether to run a new job.
+
+\item[process] At any point in time, the process can be described by its state: the contents of memory in its \textbf{address space}, the contents of CPU registers (including the \textbf{program counter} and \textbf{stack pointer}, among others), and information about I/O (such as open files which can be read or written). The \textbf{process API} consists of calls programs can make related to processes. Typically, this includes creation (\texttt{fork()}), destruction (\texttt{exit(), kill(), wait()}), and other useful calls.
+
+\item[process states] Processes exist in one of many different process states, including \mb{running} (\texttt{RUNNING}), \mb{ready to run} \texttt{RUNNABLE}, and blocked (\texttt{SLEEPING}). Different events (e.g., getting scheduled or descheduled, or waiting for an I/O to complete) transition a process from one of these states to the other.
+
+\item[process control block (PCB)] A \textbf{process list} (aka. \textbf{task list}) contains information about all processes in the system. Each entry is found in what is sometimes called a process control block (PCB, aka \textbf{process descriptor}) , which is really just a structure that contains information about a specific process.
+
+\item[proportional-share scheduler] (aka fair-share scheduler) Proportional-share is based around a simple concept: instead of optimizing for turnaround or response time, a scheduler might instead try to guarantee that each job obtain a certain percentage of CPU time. For example, lottery scheduling.
+
 \item[recursive update problem]  The problem arises in any file system that never updates in place (such as LFS), but rather moves updates to new locations on the disk. Specifically, whenever an inode is updated, its location on disk changes. If we hadn’t been careful, this would have also entailed an update to
 the directory that points to this file, which then would have mandated
 a change to the parent of that directory, and so on, all the way up the file
@@ -110,11 +128,20 @@ the location of an inode may change, the change is never reflected in the
 directory itself; rather, the imap structure is updated while the directory
 holds the same name-to-inode-number mapping. Thus, through indirection, LFS avoids the recursive update problem.
 
+\item[Round-Robin (RR) scheduling] The basic idea is simple: instead of running jobs to completion, RR runs a job for a \textbf{time slice} (sometimes called a scheduling quantum) and then switches to the next job in the run queue. It repeatedly does so until the jobs are finished. \mr{good for response time, worst for turnaround time}
+
 \item[SATA] Serial ATA (AT Attachment)
+
+\item[scheduling policy] A scheduling policy determines \textbf{which} process should run next. If there is only one “ready” process then the answer is easy. If there are more processes then the policy decides in which order processes
+execute. The context switch mechanism takes care of \textbf{how} the kernel switches from one process to another, namely by storing its context and restoring the context of the other process.
 
 \item[segmentation] Chop memory into \textsw{variable-sized} chunks and allocate them based on needs (e.g in base/bound or segmentation approaches)
 
 \item[segmentation fault] a violation or error arising from a memory access on a segmented machine to an illegal address.
+
+\item[Shorted Time First (SFJ)]  scheduling policy that runs the shortest job first, then the next shortest, and so on.
+
+\item[Shorted Time-to-Completion First (STCF)] aka. Preemptive Shortest Job First (PSJF) scheduler: Any time a new job enters the system, the STCF scheduler determines which of the remaining jobs (including the new job) has the least time left, and schedules that one. \mr{great for turnaround time, but not good for response time}: If three jobs arrive at the same time, for example, the third job has to wait for the previous two jobs to run in their entirety before being scheduled just once.
 
 \item[small-write problem] both RAID-4 and RAID-5 have the small-write problem where a logical write to a single block causes 4 physical I/Os to take place.
 
@@ -125,10 +152,27 @@ intricate knowledge of each file system data structure and thus adds a fair amou
 
 \item[static partitioning] When dividing a resource among different clients/users, you can use either static partitioning or dynamic partitioning (see above). The static approach simply divides the resource into fixed proportions once; for example, if there are two possible users of memory, you can give some fixed fraction of memory to one user, and the rest to the other.
 
+\item[starvation (scheduling)]  if there are ``too many'' interactive jobs in the system, they will combine to consume all CPU time, and thus long-running jobs will never receive any CPU time (they \textbf{starve}). We'd like to make some progress on these jobs even in this scenario
+
+
+\item[ticket currency (lottery scheduling)] Currency allows a user with a set of tickets to allocate tickets among their own jobs in whatever currency they
+would like; the system then automatically converts said currency into the
+correct global value. For example, assume users A and B have each been given 100 tickets. User A is running two jobs, A1 and A2, and gives them each 500 tickets (out of 1000 total) in A's currency. User B is running only 1 job and gives it 10 tickets (out of 10 total). The system converts A1's and A2's allocation from 500 each in A's currency to 50 each in the global currency; similarly, B1's 10 tickets is converted to 100 tickets. The lottery is then held over the global ticket currency (200 total) to determine which job runs.
+\begin{lstlisting}[language=bash]
+User A -> 500 (A's currency) to A1 -> 50 (global currency)
+       -> 500 (A's currency) to A2 -> 50 (global currency)
+User B -> 10  (B's currency) to B1  -> 100 (global currency)
+\end{lstlisting}
+
+\item[ticket inflation] With inflation, a process can temporarily raise or lower the number of tickets it owns. Of course, in a competitive scenario with processes that do not trust one another, this makes little sense; one greedy process could give itself a vast number of tickets and take over the machine. Rather, inflation can be applied in an environment where a group of processes trust one another; in such a case, if any one process knows it needs more CPU time, it can boost its ticket value as a way to reflect that need to the system, all without communicating with any other processes.
+
+\item[ticket transfer] With transfers, a process can temporarily hand off its tickets to another process. This ability is especially useful in a client/server setting, where a client process sends a message to a server asking it to do some work on the client’s behalf. To speed up the work, the client can pass the tickets to the server and thus try to maximize the performance of the server while the server is handling the client’s request. When finished, the server then transfers the tickets back to the client and all is as before.
 
 \item[time-space-trade-offs] Usually, if you wish to make access to a particular data structure faster, you will have to pay a space-usage penalty for the structure.
 
 \item[throttling] an approach where programmer decides upon a threshold for ``too many'', and then use a semaphore to limit the number of threads concurrently executing the piece of code in question.  This is also a form of \textbf{admission control}. Imagine that you create hundreds of threads to work on some problem in parallel. However, in a certain part of the code, each thread acquires a large amount of memory to perform part of the computation; let’s call this part of the code the \emph{memory-intensive region}. If \emph{all} of the threads enter the memory-intensive region at the same time, the sum of all the memory allocation requests will exceed the amount of physical memory on the machine. As a result, the machine will start thrashing (i.e., swapping pages to and from the disk), and the entire computation will slow to a crawl.  A simple semaphore can solve this problem. By initializing the value of the semaphore to the maximum number of threads you wish to enter the memory-intensive region at once, and then putting a \texttt{sem\_wait()} and \texttt{sem\_post()} around the region, a semaphore can naturally throttle the number of threads that are ever concurrently in the dangerous region of the code.
+
+\item[time sharing] Time sharing is a basic technique used by an OS to share a resource. By allowing the resource to be used for a little while by one entity, and then a little while by another, and so forth, the resource in question (e.g., the CPU, or a network link) can be shared by many. The counterpart of time sharing is \textbf{space sharing}, where a resource is divided (in space) among those who wish to use it. For example, disk space is naturally a space-shared resource; once a block is assigned to a file, it is normally not assigned to another file until the user deletes the original file.
 
 \item[Time of Check To Time of Use (TOCTTOU)] McPhee notes that ``... if there exists a time interval between a validity-check and the operation connected with that validity-check, [and,] through multitasking, the validity-check variables can deliberately be changed during this time interval, resulting in an invalid operation being performed by the control program'', thus this problem.  There are not any simple and great solutions to the TOCTTOU problem. One approach is to reduce the number of services that need root privileges to run, which helps. The \texttt{O\_NOFOLLOW} flag makes it so that \texttt{open()} will fail if the target is a symbolic link, thus avoiding attacks that require said links.
 
@@ -153,3 +197,47 @@ intricate knowledge of each file system data structure and thus adds a fair amou
 Although FFS places all of these blocks within the same block group, FFS incurs many short seeks and subsequent rotational delays and thus performance falls far short of peak sequential bandwidth
 \section*{Reading a file from disk using LFS}
 Assume we have nothing in memory to begin. The first on-disk data structure we must read is the checkpoint region. The checkpoint region contains pointers (i.e., disk addresses) to the entire inode map, and thus LFS then reads in the entire inode map and caches it in memory. After this point, when given an inode number of a file, LFS simply looks up the inode-number to inode-diskaddress mapping in the imap, and reads in the most recent version of the inode. To read a block from the file, at this point, LFS proceeds exactly as a typical UNIX file system, by using direct pointers or indirect pointers or doubly-indirect pointers as need be. In the common case, LFS should perform the same number of I/Os as a typical file system when reading a file from disk; the entire imap is cached and thus the extra work LFS does during a read is to look up the inode’s address in the imap.
+\section*{Process API}
+These APIs, in some form, are available on any modern operating system.
+\begin{itemize}
+\item Create: An operating system must include some method to create new processes. When you type a command into the shell, or double-click on an application icon, the OS is invoked to create a new process to run the program you have indicated.
+\item Destroy: As there is an interface for process creation, systems also provide an interface to destroy processes forcefully. Of course, many processes will run and just exit by themselves when complete; when they don’t, however, the user may wish to kill them, and thus an interface to halt a runaway process is quite useful.
+\item Wait: Sometimes it is useful to wait for a process to stop running; thus some kind of waiting interface is often provided.
+\item Miscellaneous Control: Other than killing or waiting for a process, there are sometimes other controls that are possible. For example, most operating systems provide some kind of method to suspend a process (stop it from running for a while) and then resume it (continue it running).
+\item Status: There are usually interfaces to get some status information about a process as well, such as how long it has run for, or what state it is in.
+\end{itemize}
+\section*{Process States}
+In a simplified view, a process can be in one of three states:
+\begin{itemize}
+\item Running: In the running state, a process is running on a processor. This means it is executing instructions
+\item Ready: In the ready state, a process is ready to run but for some reason the OS has chosen not to run it at this given moment.
+\item Blocked: In the blocked state, a process has performed some kind of operation that makes it not ready to run until some other event takes place. A common example: when a process initiates an I/O request to a disk, it becomes blocked and thus some other process can use the processor.
+\end{itemize}
+\section*{Stride Scheduling}
+a deterministic fair-share scheduler, Each job in the system has a stride, which is inverse in proportion to the number of tickets it has. In our example above, with jobs A, B, and C, with 100, 50, and 250 tickets,
+respectively, we can compute the stride of each by dividing some large number by the number of tickets each process has been assigned. For example, if we divide 10,000 by each of those ticket values, we obtain the following stride values for A, B, and C: 100, 200, and 40. We call this value the \textbf{stride} of each process; every time a process runs, we will increment a counter for it (called its \textbf{pass} value) by its stride to track its global progress.
+
+The scheduler then uses the stride and pass to determine which process should run next. The basic idea is simple: at any given time, pick
+the process to run that has the lowest pass value so far; when you run
+a process, increment its pass counter by its stride  A pseudocode implementation is provided by Waldspurger:
+\begin{lstlisting}[language=c]
+curr = remove_min(queue);    // pick client with min pass
+schedule(curr);              // run for quantum
+curr->pass += curr->stride;  // update pass using stride
+insert(queue, curr);         // return curr to queue
+\end{lstlisting}
+\includegraphics[width=\linewidt]{imgs/sche_stride}
+\begin{itemize}
+\item 3 processes: A, B, C; stride value: $A = 100\;B = 200\; C=40$
+\item $A$ runs 1st (choose arbitrarily) $\to$ \texttt{pass} updated to 100
+\item $A$ runs 2nd  $\to$  \texttt{pass} updated to 200
+\item $C$ runs 3rd  $\to$  \texttt{pass} updated to 40
+\item $C$ runs again (lowest pass)  $\to$  \texttt{pass} updated to 80
+\item $C$ runs again (still lowest pass) $\to$ \texttt{pass} updated to 120
+\item $A$ runs (next lowest) $\to$  \texttt{pass} updated to 200
+\item $C$ runs twice more $\to$ \texttt{pass} updated to 160, then 200
+\item all pass values equal 200, above pattern repeat until all jobs done
+\item lottery scheduling achieves the proportions probabilistically over time
+\item stride sched gets them exactly right at the end of each scheduling cycle
+\item lottery has no global state $\to$ much easier to incorporate new procs
+\end{itemize}
