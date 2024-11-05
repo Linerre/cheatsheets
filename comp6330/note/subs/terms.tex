@@ -6,8 +6,15 @@ running program: the \textbf{code} of the program (the instructions); The runnin
 
 \item[atomicity violation] The desired serializability among multiple memory accesses is violated (i.e. a code region is intended to be atomic, but the atomicity is not enforced during execution)
 
+\item[basepointer-based consistency (BBC, journaling)] (at Wisconsin) In this technique, no ordering is enforced between writes. To achieve consistency, an additional back pointer is added to every block in the system; for example, each data block has a reference to the inode to which it belongs. When accessing a file, the file system can determine if the file is consistent by checking if the forward pointer (e.g., the address in the inode or direct block) points to a block that refers back to it. If so, everything must have safely reached disk and thus the file is consistent; if not, the file is inconsistent, and an error is returned. By adding back pointers to the file system, a new form of lazy crash consistency can be attained
+
+\item[checkpoint region (CR)] The checkpoint region contains pointers to (i.e., addresses of) the latest pieces of the inode map, and thus the inode map pieces can be found by reading the CR first. The overall structure of the on-disk layout contains a checkpoint region (which points to the latest pieces of the inode map); the inode map pieces each contain addresses of the inodes; the inodes point to files (and directories) just like typical UNIX file systems.
 
 \item[condition variable] an explicit queue that threads can put themselves on when some state of execution (i.e., some \textbf{condition}) is \emph{not} as desired (by \textbf{waiting} on the condition); some other thread, when it changes said state, can then wake one (or more) of those waiting threads and thus allow them to continue (by signaling on the condition). The idea goes back to Dijkstra's use of ``private semaphores''; a similar idea was later named a ``condition variable'' by Hoare in his work on monitors.
+
+\item[Copy-on-write (COW)] This technique never overwrites files or directories in place; rather, it places new updates to previously unused locations on disk. After a number of updates are completed, COW file systems flip the root structure of the file system to include pointers to the newly updated structures. Doing so makes keeping the file system consistent straightforward.  LFS introduces a new approach to updating the disk. Instead of overwriting files in places, LFS always writes to an unused portion of the disk, and then later reclaims that old space through cleaning. This approach, which in database systems is called \textbf{shadow paging} and in file-system-speak is sometimes called copy-on-write, enables highly efficient writing, as LFS can gather all updates into an in-memory segment and then write them out together sequentially
+
+\item[crash-consistency problem] One major challenge faced by a file system is how to update persistent data structures despite the presence of a \textbf{power loss} or \textbf{system crash}. Specifically, what happens if, right in the middle of updating on-disk structures, someone trips over the power cord and the machine loses power? Or the operating system encounters a bug and crashes? What we’d like to do ideally is move the file system from one consistent state (e.g., before the file got appended to) to another atomically (e.g., after the inode, bitmap, and new data block have been written to disk). Because of power losses and crashes, updating a persistent data structure can be quite tricky, and leads to a new and interesting problem in file system implementation, known as the crash-consistency (consistent-update) problem.
 
 \item[Deadlock Avoidance] Avoidance requires some global knowledge of which locks various threads might grab during their execution, and subsequently \textbf{schedules} said threads in a way as to guarantee no deadlock can occur.
 
@@ -40,17 +47,23 @@ running program: the \textbf{code} of the program (the instructions); The runnin
 
 \item[free list] In early file systems, a single pointer in the super block was kept to point to the first free block; inside that block the next free pointer was kept, thus forming a list through the free blocks of the system. When a block was needed, the head block was used and the list updated accordingly.
 
+\item[garbage collection (file system)] In LFS, it repeatedly writes the latest version of a file (including its inode and data) to new locations on disk. This process, while keeping writes efficient, implies that LFS leaves old versions of file structures scattered throughout the disk. We (rather unceremoniously) call these old versions garbage.
+
 \item[Hill's law] One early source is Mark Hill's dissertation, which studied how to design caches for CPUs. Hill found that simple direct-mapped caches worked better than fancy set-associative designs (one reason is that in caching, simpler designs enable faster lookups). As Hill succinctly summarized
   his work: ``Big and dumb is better.'' And thus we call this similar advice Hill's Law.
 
 \item[inode] Index node. The inode is the generic name that is used in many file systems to describe the structure that holds the metadata for a given file, such as its length, permissions, and the location of its constituent blocks. The name
 goes back at least as far as UNIX (and probably further back to Multics if not earlier systems); it is short for index node, as the inode number is used to index into an array of on-disk inodes in order to find the inode of that number. The design of the inode is one key part of file system design. Most modern systems have some kind of structure like this for every file they track, but perhaps call them different things (such as dnodes, fnodes, etc.).
 
+\item[immediate reporting (fs journaling)] With write buffering enabled (sometimes called immediate reporting), a disk will inform the OS the write is complete when it simply has been placed in the disk’s memory cache, and has not yet reached disk
+
 \item[Lauer's law] As Hugh Lauer said, when discussing the construction of the Pilot operating system: ``If the same people had twice as much time, they could produce as good of a system in half the code.''
 
 \item[limited direct execution] let the program run directly on the hardware; however, at certain key points in time (such as when a process issues a system call, or a timer interrupt occurs), arrange so that the OS gets involved and makes sure the ``right'' thing happens.   Thus, the OS, with a little hardware support, tries best to get out of the way of the running program, to deliver an \emph{efficient} virtualization.
 
 \item[lock] Generally, Programmers annotate source code with locks, putting them around critical sections, and thus ensure that any such critical section executes as if it were a single \textbf{atomic} instruction.
+
+\item[Log-structured File System] introduced by Rosenblum and Ousterhout, When writing to disk, LFS first buffers all updates (including metadata!) in an in-memory \textbf{segment} (large-ish chunk LFS uses to group writes); when the segment is full, it is written to disk in one long, sequential transfer to an unused part of the disk. LFS never overwrites existing data, but rather \emph{always} writes segments to free locations. Because segments are large, the disk (or RAID) is used efficiently, and performance of the file system approaches its zenith.
 
 \item[LRU] least recently used: take advantage of locality in the memory-reference stream, assuming it is likely that an entry that has not recently been used is a good
 candidate for eviction.
@@ -69,6 +82,16 @@ candidate for eviction.
 
 \item[order violation] The desired order between two (groups of) memory accesses is flipped (i.e., A should always be executed before B, but the order is not enforced during execution)
 
+\item[ordered journaling] User data must be written to disk before metadata and bitmap updates, otherwise when file systems recovers, since the inode points to old value (garbage), garbage will be copied and replayed to data block. Windows NTFS and SGI’s XFS both use some form of metadata journaling. Linux ext3 gives you \textbf{3} options (journaling modes)
+  \begin{enumerate*}[label={\alph*.},font={\color{red!50!black}\bfseries}]
+  \item data: logs both metadata and ata in journal
+  \item ordered: logs metadata only, and data write must happen before journal metadata write/commit
+  \item writeback (unordered): same as ordered but data write can happen at any time.
+  \end{enumerate*}
+All of these modes keep metadata consistent; they vary in their semantics for data.
+
+\item[optimistic crash consistency] technique to reduce the number of times a journal protocol has to wait for disk writes to complete.  this new approach issues as many writes to disk as possible by using a generalized form of the transaction checksum, and includes a few other techniques to detect inconsistencies should they arise. For some workloads, these optimistic techniques can improve performance by an order of magnitude. However, to truly function well, a slightly different disk interface is required
+
 \item[paging] Chop memory into \emph{fixed-sized} pieces, each called a \textbf{page}
 
 \item[page frame] physical memory viewed as an array of fixed-sized slots called page frames; each of these frames can contain a single virtual-memory page.
@@ -79,16 +102,29 @@ candidate for eviction.
 
 \item{pre-allocation policy} When allocating data blocks for a new file. For example, some Linux file systems, such as ext2 and ext3, will look for a sequence of blocks (say 8) that are free when a new file is created and needs data blocks; by finding such a sequence of free blocks, and then allocating them to the newly-created file, the file system guarantees that a portion of the file will be contiguous on the disk, thus improving performance. Such a \textbf{pre-allocation} policy is thus a commonly-used heuristic when allocating space for data blocks.
 
-\item[static partitioning] When dividing a resource among different clients/users, you can use either static partitioning or dynamic partitioning (see above). The static approach simply divides the resource into fixed proportions once; for example, if there are two possible users of memory, you can give some fixed fraction of memory to one user, and the rest to the other.
+\item[recursive update problem]  The problem arises in any file system that never updates in place (such as LFS), but rather moves updates to new locations on the disk. Specifically, whenever an inode is updated, its location on disk changes. If we hadn’t been careful, this would have also entailed an update to
+the directory that points to this file, which then would have mandated
+a change to the parent of that directory, and so on, all the way up the file
+system tree. LFS cleverly avoids this problem with the inode map. Even though
+the location of an inode may change, the change is never reflected in the
+directory itself; rather, the imap structure is updated while the directory
+holds the same name-to-inode-number mapping. Thus, through indirection, LFS avoids the recursive update problem.
 
 \item[SATA] Serial ATA (AT Attachment)
-
 
 \item[segmentation] Chop memory into \textsw{variable-sized} chunks and allocate them based on needs (e.g in base/bound or segmentation approaches)
 
 \item[segmentation fault] a violation or error arising from a memory access on a segmented machine to an illegal address.
 
+\item[small-write problem] both RAID-4 and RAID-5 have the small-write problem where a logical write to a single block causes 4 physical I/Os to take place.
+
+\item[soft updates (journaling)] introduced by Ganger and Patt. This approach carefully orders all writes to the file system to ensure that the on-disk structures are never left in an inconsistent state. For example, by writing a pointed-to data block to disk \emph{before} the inode that points to it, we can ensure that the inode never points to garbage; similar rules can be derived for all the structures of the file system. Implementing Soft Updates can be a challenge, however, requiring
+intricate knowledge of each file system data structure and thus adds a fair amount of complexity to the system.
+
 \item[sparse address space] large address spaces with large amounts of unused address space
+
+\item[static partitioning] When dividing a resource among different clients/users, you can use either static partitioning or dynamic partitioning (see above). The static approach simply divides the resource into fixed proportions once; for example, if there are two possible users of memory, you can give some fixed fraction of memory to one user, and the rest to the other.
+
 
 \item[time-space-trade-offs] Usually, if you wish to make access to a particular data structure faster, you will have to pay a space-usage penalty for the structure.
 
@@ -105,6 +141,15 @@ candidate for eviction.
 
 \item[virtual address] All that in user program address space
 
-
-
 \end{description}
+\section*{FFS writes a lot to create a new file of size one block}
+\begin{itemize}
+\item one for a new inode, one to update the inode bitmap
+\item one to the directory data block that the file is in
+\item one to the directory inode to update it
+\item one to the new data block that is a part of the new file
+\item one to the data bitmap to mark the data block as allocated
+\end{itemize}
+Although FFS places all of these blocks within the same block group, FFS incurs many short seeks and subsequent rotational delays and thus performance falls far short of peak sequential bandwidth
+\section*{Reading a file from disk using LFS}
+Assume we have nothing in memory to begin. The first on-disk data structure we must read is the checkpoint region. The checkpoint region contains pointers (i.e., disk addresses) to the entire inode map, and thus LFS then reads in the entire inode map and caches it in memory. After this point, when given an inode number of a file, LFS simply looks up the inode-number to inode-diskaddress mapping in the imap, and reads in the most recent version of the inode. To read a block from the file, at this point, LFS proceeds exactly as a typical UNIX file system, by using direct pointers or indirect pointers or doubly-indirect pointers as need be. In the common case, LFS should perform the same number of I/Os as a typical file system when reading a file from disk; the entire imap is cached and thus the extra work LFS does during a read is to look up the inode’s address in the imap.
