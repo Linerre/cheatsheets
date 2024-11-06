@@ -10,7 +10,7 @@
 % \input{subs/ch09_sched}
 % \input{subs/ch14_vm_api}
 % \input{subs/ch15_vm_addrtrans}
-% \input{subs/ch16_vm_seg}
+
 % \input{subs/ch20_ptarithm}
 
 % \pagebreak
@@ -35,35 +35,6 @@
 % \input{subs/ch41_ffs}
 % \input{subs/ch42_journaling}
 % \input{subs/ch43_lfs}
-% \input{subs/terms}
-\section*{RAID 0: no mirroring}
-\begin{minipage}{.45\linewidth}
-  \includegraphics[width=\linewidth]{imgs/raid0_strip1}
-\end{minipage}
-\begin{minipage}{.45\linewidth}
-  \includegraphics[width=\linewidth]{imgs/raid0_strip2}
-\end{minipage}
-\begin{itemize}
-\item \textbf{stripe}: blocks in the same row (e.g. blocks 0, 1, 2, 3)
-\item left:  1 block on each disk; chunk size: 4KB, stripe has $4\times 4 = 16$KB
-\item right: 2 blocks on each disk; chunk size: 8KB, stripe has $4\items 8= 32$KB
-\item small chunk size:
-  \begin{enumerate*}[label={\alph*.},font={\color{lbl}\bfseries}]
-  \item many files will get striped across many disks $\to \uparrow$ the parallelism of reads and writes to a single file
-  \item the positioning time to access blocks across multiple disks $\uparrow \because$ the positioning time for the entire request is determined by the maximum
-of the positioning times of the requests across all drives
-  \end{enumerate*}
-\item big chunk size:
-  \begin{enumerate*}[label={\alph*.},font={\color{lbl}\bfseries}]
-  \item reduces such intra-file parallelism; relies on multiple concurrent requests to achieve high throughput
-  \item the positioning time to access blocks across multiple disks $\uparrow \because$ s reduce positioning time: single file on a disk, just the positioning time of that single disk
-  \end{enumerate*}
-\end{itemize}
-\section*{RAID-0 Analysis (assume 4KB chunk size)}
-\begin{itemize}
-\item capacity: $N$ disks each with $B$ blocks, $N\cdot B$ useful capacity
-\item reliability: perfect striping but any disk failure leads to data loss
-\item performance: excellent, all disks utilized often in parallel
-\end{itemize}
+\input{subs/terms}
 \end{multicols*}
 \end{document}

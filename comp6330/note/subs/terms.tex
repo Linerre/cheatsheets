@@ -16,6 +16,31 @@ running program: the \textbf{code} of the program (the instructions); The runnin
 
 \item[condition variable] an explicit queue that threads can put themselves on when some state of execution (i.e., some \textbf{condition}) is \emph{not} as desired (by \textbf{waiting} on the condition); some other thread, when it changes said state, can then wake one (or more) of those waiting threads and thus allow them to continue (by signaling on the condition). The idea goes back to Dijkstra's use of ``private semaphores''; a similar idea was later named a ``condition variable'' by Hoare in his work on monitors.
 
+\item[consistent-update problem] The problem occurs on a write to any RAID that has to update multiple disks during a single logical operation. In this case, let us assume we are considering a mirrored disk array. Imagine the write is issued to the RAID, and then the RAID decides that
+it must be written to two disks, disk 0 and disk 1. The RAID then issues
+the write to disk 0, but just before the RAID can issue the request to disk
+1, a power loss (or system crash) occurs. In this unfortunate case, let us
+assume that the request to disk 0 completed (but clearly the request to
+disk 1 did not, as it was never issued).
+The result of this untimely power loss is that the two copies of the block
+are now \textbf{inconsistent}; the copy on disk 0 is the new version, and the copy
+on disk 1 is the old. What we would like to happen is for the state of both
+disks to change \textbf{atomically}, i.e., either both should end up as the new
+version or neither.
+The general way to solve this problem is to use a \textbf{write-ahead log} of some
+kind to first record what the RAID is about to do (i.e., update two disks
+with a certain piece of data) before doing it. By taking this approach, we
+can ensure that in the presence of a crash, the right thing will happen; by
+running a \textbf{recovery} procedure that replays all pending transactions to the
+RAID, we can ensure that no two mirrored copies (in the RAID-1 case)
+are out of sync.
+One last note: because logging to disk on every write is prohibitively
+expensive, most RAID hardware includes a small amount of non-volatile
+RAM (e.g., battery-backed) where it performs this type of logging. Thus,
+consistent update is provided without the high cost of logging to disk.
+
+\item[context switch] is a mechanism that allows the OS to store the current process state and switch to some other, previously stored context.
+
 \item[convey effect] a number of relatively-short potential consumers of a resource get queued behind a heavyweight resource consumer
 
 \item[Copy-on-write (COW)] This technique never overwrites files or directories in place; rather, it places new updates to previously unused locations on disk. After a number of updates are completed, COW file systems flip the root structure of the file system to include pointers to the newly updated structures. Doing so makes keeping the file system consistent straightforward.  LFS introduces a new approach to updating the disk. Instead of overwriting files in places, LFS always writes to an unused portion of the disk, and then later reclaims that old space through cleaning. This approach, which in database systems is called \textbf{shadow paging} and in file-system-speak is sometimes called copy-on-write, enables highly efficient writing, as LFS can gather all updates into an in-memory segment and then write them out together sequentially
@@ -57,8 +82,9 @@ running program: the \textbf{code} of the program (the instructions); The runnin
 
 \item[garbage collection (file system)] In LFS, it repeatedly writes the latest version of a file (including its inode and data) to new locations on disk. This process, while keeping writes efficient, implies that LFS leaves old versions of file structures scattered throughout the disk. We (rather unceremoniously) call these old versions garbage.
 
-\item[Hill's law] One early source is Mark Hill's dissertation, which studied how to design caches for CPUs. Hill found that simple direct-mapped caches worked better than fancy set-associative designs (one reason is that in caching, simpler designs enable faster lookups). As Hill succinctly summarized
-  his work: ``Big and dumb is better.'' And thus we call this similar advice Hill's Law.
+\item[Hill's law] One early source is Mark Hill's dissertation, which studied how to design caches for CPUs. Hill found that simple direct-mapped caches worked better than fancy set-associative designs (one reason is that in caching, simpler designs enable faster lookups). As Hill succinctly summarized his work: ``Big and dumb is better.'' And thus we call this similar advice Hill's Law.
+
+\item[idle process] If all processes are blocked, \mb{idle} procs should be scheduled. Modern kernels use a low priority idle process that is scheduled and executes if no other process iss ready. The idle process never blocks or executes any I/O. Without the idle process, the scheduler would have to check if no processes are ready to run and would have to conservatively take action. The idle process guarantees that there is always at least one process to run.
 
 \item[inode] Index node. The inode is the generic name that is used in many file systems to describe the structure that holds the metadata for a given file, such as its length, permissions, and the location of its constituent blocks. The name
 goes back at least as far as UNIX (and probably further back to Multics if not earlier systems); it is short for index node, as the inode number is used to index into an array of on-disk inodes in order to find the inode of that number. The design of the inode is one key part of file system design. Most modern systems have some kind of structure like this for every file they track, but perhaps call them different things (such as dnodes, fnodes, etc.).
@@ -110,13 +136,13 @@ All of these modes keep metadata consistent; they vary in their semantics for da
 
 \item[page fault] the act of accessing a page that is not in physical memory.  Upon a page fault, the OS is invoked to service the page fault.  Virtually all systems handle page faults in software.
 
-\item{pre-allocation policy} When allocating data blocks for a new file. For example, some Linux file systems, such as ext2 and ext3, will look for a sequence of blocks (say 8) that are free when a new file is created and needs data blocks; by finding such a sequence of free blocks, and then allocating them to the newly-created file, the file system guarantees that a portion of the file will be contiguous on the disk, thus improving performance. Such a \textbf{pre-allocation} policy is thus a commonly-used heuristic when allocating space for data blocks.
+\item[pre-allocation policy] When allocating data blocks for a new file. For example, some Linux file systems, such as ext2 and ext3, will look for a sequence of blocks (say 8) that are free when a new file is created and needs data blocks; by finding such a sequence of free blocks, and then allocating them to the newly-created file, the file system guarantees that a portion of the file will be contiguous on the disk, thus improving performance. Such a \textbf{pre-allocation} policy is thus a commonly-used heuristic when allocating space for data blocks.
 
 \item[preemptive scheduling] Virtually all modern schedulers are preemptive, and quite willing to stop one process from running in order to run another. This implies that the scheduler employs the mechanisms we learned about previously; in particular, the scheduler can perform a \textbf{context switch}, stopping one running process temporarily and resuming (or starting) another. In the old days of batch computing, a number of \textbf{non-preemptive} schedulers were developed; such systems would run each job to completion before considering whether to run a new job.
 
-\item[process] At any point in time, the process can be described by its state: the contents of memory in its \textbf{address space}, the contents of CPU registers (including the \textbf{program counter} and \textbf{stack pointer}, among others), and information about I/O (such as open files which can be read or written). The \textbf{process API} consists of calls programs can make related to processes. Typically, this includes creation (\texttt{fork()}), destruction (\texttt{exit(), kill(), wait()}), and other useful calls.
+\item[process] At any point in time, the process can be described by its state: the contents of memory in its \textbf{address space}, the contents of CPU registers (including the \textbf{program counter} and \textbf{stack pointer}, among others), and information about I/O (such as open files which can be read or written). The \textbf{process API} consists of calls programs can make related to processes. Typically, this includes creation (\texttt{fork()}), destruction (\texttt{exit(), kill(), wait()}), and other useful calls. A process can launch multiple \textbf{threads} of execution in the same address space. Each thread receives its own stack but they share global data, code, and heap.
 
-\item[process states] Processes exist in one of many different process states, including \mb{running} (\texttt{RUNNING}), \mb{ready to run} \texttt{RUNNABLE}, and blocked (\texttt{SLEEPING}). Different events (e.g., getting scheduled or descheduled, or waiting for an I/O to complete) transition a process from one of these states to the other.
+\item[process states] Processes exist in one of many different process states, including \mb{running} (\texttt{RUNNING}), \mb{ready to run} \texttt{RUNNABLE}, and blocked (\texttt{SLEEPING}), \mb{new}: process being created (to ensure it will not be scheduled), \mb{dead}: this process has terminated (whether parent process has not read out the return value yet). Different events (e.g., getting scheduled or descheduled, or waiting for an I/O to complete) transition a process from one of these states to the other.
 
 \item[process control block (PCB)] A \textbf{process list} (aka. \textbf{task list}) contains information about all processes in the system. Each entry is found in what is sometimes called a process control block (PCB, aka \textbf{process descriptor}) , which is really just a structure that contains information about a specific process.
 
@@ -154,7 +180,7 @@ intricate knowledge of each file system data structure and thus adds a fair amou
 
 \item[sparse address space] large address spaces with large amounts of unused address space
 
-\item[static partitioning] When dividing a resource among different clients/users, you can use either static partitioning or dynamic partitioning (see above). The static approach simply divides the resource into fixed proportions once; for example, if there are two possible users of memory, you can give some fixed fraction of memory to one user, and the rest to the other.
+\item[static partitioning] When dividing a resource among different clients/users, you can use either static partitioning or dynamic partitioning (see above). The static approach simply divides the resource into fixed proportions once; for example, if there're 2 possible users of memory, can give some fixed fraction of memory to one user and the rest to the other.
 
 \item[starvation (scheduling)]  if there are ``too many'' interactive jobs in the system, they will combine to consume all CPU time, and thus long-running jobs will never receive any CPU time (they \textbf{starve}). We'd like to make some progress on these jobs even in this scenario
 
@@ -189,46 +215,188 @@ User B -> 10  (B's currency) to B1  -> 100 (global currency)
 
 \item[virtual address] All that in user program address space
 
+\item[zombie process] A process is in a zombie state if it’s terminated but not yet removed from the process table. This could happen if the parent process did not execute a \texttt{wait()} syscall for a child process, and the child process terminates. Always execute \texttt{wait()} syscall to prevent child procs from becoming zombies. Alternatively, handle the \texttt{SIGCHILD} signal, triggered when a child process terminates.  Unix/Linux distinguishes two states of a terminated process: a \texttt{zombie} state and a \texttt{dead} state.
 \end{description}
-\section*{FFS writes a lot to create a new file of size one block}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% PROCESS STUFF %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Process API (available on any modern OS)}
+The process API enables a proc to control itself and other procs through a set of system calls:
+  \begin{enumerate*}[label={\alph*.},font={\color{red!50!black}\bfseries}]
+  \item \texttt{fork()} creates a new child process (a copy of the process)
+  \item \texttt{exec()} executes a new program
+  \item \texttt{exit()} terminates the current process
+  \item \texttt{wait()} blocks parent until child terminates
+  \end{enumerate*}
 \begin{itemize}
-\item one for a new inode, one to update the inode bitmap
-\item one to the directory data block that the file is in
-\item one to the directory inode to update it
-\item one to the new data block that is a part of the new file
-\item one to the data bitmap to mark the data block as allocated
+\item Create: An operating system must include some method to create new processes. When you type a command into the shell, or double-click on an application icon, the OS is invoked to create a new process to run the program you have indicated
+\item Destroy: As there is an interface for process creation, systems also provide an interface to destroy processes forcefully. Of course, many processes will run and just exit by themselves when complete; when they don’t, however, the user may wish to kill them, and thus an interface to halt a runaway process is quite useful
+\item Wait: it is useful to wait for a process to stop running; thus some kind of waiting interface is often provided
+\item Miscellaneous Control: Other than killing or waiting for a process, there are sometimes other controls that are possible. For example, most operating systems provide some kind of method to suspend a process (stop it from running for a while) and then resume it (continue)
+\item Status: there're usually interfaces to get some status info about a process as well how long it has run for or what state it is in
 \end{itemize}
-Although FFS places all of these blocks within the same block group, FFS incurs many short seeks and subsequent rotational delays and thus performance falls far short of peak sequential bandwidth
-\section*{Reading a file from disk using LFS}
-Assume we have nothing in memory to begin. The first on-disk data structure we must read is the checkpoint region. The checkpoint region contains pointers (i.e., disk addresses) to the entire inode map, and thus LFS then reads in the entire inode map and caches it in memory. After this point, when given an inode number of a file, LFS simply looks up the inode-number to inode-diskaddress mapping in the imap, and reads in the most recent version of the inode. To read a block from the file, at this point, LFS proceeds exactly as a typical UNIX file system, by using direct pointers or indirect pointers or doubly-indirect pointers as need be. In the common case, LFS should perform the same number of I/Os as a typical file system when reading a file from disk; the entire imap is cached and thus the extra work LFS does during a read is to look up the inode’s address in the imap.
-\section*{Process API}
-These APIs, in some form, are available on any modern operating system.
+\section*{API \texttt{fokr()} (return twice)}
+\begin{enumerate}
+\item OS allocates data structures for new process (child)
+\item OS makes a copy of caller's (parent's) address space
+\item the child is made ready and added to the list of processes
+\item \texttt{fork()} returns different values for parent(child pid)/child(0)
+\item parent and child continue execution in \mo{their own separate copy} of their address space
+\end{enumerate}
+\section*{API \texttt{exec()} (never returns on success; returns -1 on error/failure)}
 \begin{itemize}
-\item Create: An operating system must include some method to create new processes. When you type a command into the shell, or double-click on an application icon, the OS is invoked to create a new process to run the program you have indicated.
-\item Destroy: As there is an interface for process creation, systems also provide an interface to destroy processes forcefully. Of course, many processes will run and just exit by themselves when complete; when they don’t, however, the user may wish to kill them, and thus an interface to halt a runaway process is quite useful.
-\item Wait: Sometimes it is useful to wait for a process to stop running; thus some kind of waiting interface is often provided.
-\item Miscellaneous Control: Other than killing or waiting for a process, there are sometimes other controls that are possible. For example, most operating systems provide some kind of method to suspend a process (stop it from running for a while) and then resume it (continue it running).
-\item Status: There are usually interfaces to get some status information about a process as well, such as how long it has run for, or what state it is in.
+\item replaces address space, load new program from disk
+\item program can pass cmd line args and environment variables
+\item old address space/state destroyed except for \texttt{STDIN}, \texttt{STDOUT}, \texttt{STDERR}, allowing parent to redirect/rewire child's output
 \end{itemize}
-\section*{Process States}
-In a simplified view, a process can be in one of three states:
+\section*{API \texttt{wait()} (wait for child to reap it) }
 \begin{itemize}
+\item child processes tied to their parent(s)
+\item \texttt{exit(int retval)} takes a return value argument
+\item parent can \texttt{wait()} for termination of child and read child's return val
+\end{itemize}
+\section*{Reasons for the need for \texttt{fork()} and \texttt{exec()}}
+Assume a user wants to start a different program. For that, the operating system needs to create a new process and create a new address space to load the program:
+\begin{itemize}
+\item \texttt{fork()} creates a new process with a copy of this address space
+\item \texttt{exec()} creates a new address space for a program
+\item \texttt{clone()} adds a thread (of execution) to this address space
+\end{itemize}
+\section*{\texttt{init} process (\texttt{pid == 1}, parent of all) and orphan process}
+\begin{itemize}
+\item \texttt{init} responsible for starting other processes, reaping `zombie's, adopting orphans
+\item when parent terminates but one of its children still running $\to$ orphan
+\item orphans processes adopted by \texttt{init} process in the end
+\item needed particularly for background (long-running daemon) services:
+  \begin{enumerate*}[label={\alph*.},font={\color{red!50!black}\bfseries}]
+  \item parent process deliberately creates a child
+  \item parent exits and orphans the child
+  \item \texttt{init} adopts the child (say, \texttt{systemd})
+  \item common examples: web/databse servers, monitoring programs
+  \end{enumerate*}
+\item benefits:
+  \begin{enumerate*}[label={\alph*.},font={\color{red!50!black}\bfseries}]
+  \item runs independently
+  \item continues running even if user logs out
+  \item clean process hierarchy
+  \item no direct parent needed to monitor it
+  \end{enumerate*}
+\end{itemize}
+\section*{Process States (simplified 3 states)}
+\begin{enumerate}
 \item Running: In the running state, a process is running on a processor. This means it is executing instructions
 \item Ready: In the ready state, a process is ready to run but for some reason the OS has chosen not to run it at this given moment.
-\item Blocked: In the blocked state, a process has performed some kind of operation that makes it not ready to run until some other event takes place. A common example: when a process initiates an I/O request to a disk, it becomes blocked and thus some other process can use the processor.
+\item Blocked: In the blocked state, a process has performed some kind of operation that makes it not ready to run until some other event takes place. For example: when a process initiates an I/O request to a disk, it becomes blocked and thus some other process can use the processor
+\end{enumerate}
+\section*{Distinction program / process / thread}
+\begin{itemize}
+\item program: consists of an executable on disk. contains all information to boostrap a process
+\item a running instance of a program; has data section and stack initialized
+\item a process can have multiple threads in the same address space (computing on the same data)
+\end{itemize}
+\section*{Issues with running program directly on hardware}
+\begin{itemize}
+\item Process could do something illegal (read/write to memory that does not belong to the process, access hardware directly)
+\item Process could run forever (OS must stay in control)
+\item Process could do something slow, e.g., I/O (OS may want to switch to another process)
+\end{itemize}
+\textbf{Solution}: OS maintains some control with help from hardware. For example, the OS maintains timers to intercept the execution at regular intervals and the process may not execute privileged instructions that access the hardware directly.
+\section*{Process isolation policy}
+\begin{itemize}
+\item most operation systems isolate processes from
+  \begin{enumerate*}[label={\alph*.},font={\color{red!50!black}\bfseries}]
+  \item each other
+  \item the OS
+  \end{enumerate*}
+\item isolation is a core requirement for security:
+  \begin{enumerate*}[label={\alph*.},font={\color{red!50!black}\bfseries}]
+  \item constrains bugs to the process
+  \item enables privilege isolation
+  \item enables compartmentalization (breaking complex systems into independent fault domains)
+  \end{enumerate*}
+\end{itemize}
+\section*{Process isolation mechanism}
+\begin{itemize}
+\item Virtual memory: one (virtual) address space per process
+\item Different execution modes: OS executes at super privileges; procs at user mode
+\end{itemize}
+\section*{Kernel switch from one process to another (transparent to process)}
+\begin{itemize}
+\item assume one CPU and system has several \texttt{ready} processes
+\item processes may \texttt{yeild()} or execute I/O operations
+\item OS uses config. timer interrupts to take control back from user procs
+\item context switch saves running process's state in kernel data structure
+\item context switch restores state of the next-to-run process
+\item context switch transfers control to next process and returns
+\end{itemize}
+\section*{Reasons for context swith}
+\begin{itemize}
+\item the process completes and/or exits
+\item the process executes a slow hardware operation (loading from disk) and OS switches to another ready-to-run task
+\item the hardware requires OS help and issue an interrupt
+\item the OS decides to preempt the task and switch to another task (i.e. the procs has used up its time slices)
+\end{itemize}
+\section*{Context switch code and 2 types of saves/restores}
+A function call that returns asynchronously: process A starts the execution of the context switch but process B continues execution after the return of the function:
+\begin{enumerate*}[label={\alph*.},font={\color{red!50!black}\bfseries}]
+\item The function saves all registers in a scratch area (on the process's kernel stack or in a predefined area of the \textsw{task} struct)
+\item OS switches address space
+\item function restores all registers from the scratch area
+\item OS returns to process B
+\end{enumerate*}
+\begin{enumerate}
+\item when timer interrupt occurs: the \mo{user registers} of the running proc get implicitly saved by the \emph{hardware}, using kernel stack of that proc
+\item when OS decides to switch from A to B: the \mo{kernel registers} are explicitly saved by the software (i.e., the OS), but this time into memory in the proc structure of the proc
+\end{enumerate}
+\begin{lstlisting}[language={[x86masm]Assembler}]
+# void ctx_swtch(struct context *old, struct context *new)
+# Save old registers
+movl 4(%esp), %eax # load ptr to old into eax
+popl 0(%eax)
+ # store old IP to old
+movl %esp, 4(%eax) # store stack pointer
+movl %ebx, 8(%eax) # store other registers
+...
+movl %ebp, 28(%eax)
+# Load new registers
+movl 4(%esp), %eax # load ptr to new into eax
+movl 28(%eax), %ebp # restore other registers
+...
+movl 8(%eax), %ebx
+movl 4(%eax), %esp # stack switch (from now on new stack)
+pushl 0(%eax)
+ # store return addr
+ret
+ # finally return into new ctxt
+\end{lstlisting}
+\section*{Why reboot is useful}
+\begin{itemize}
+\item it moves software back to a known and likely more tested state
+\item it also reclaim stale or leaked resources (e.g., memory) which may otherwise be hard to handle
+\item reboots are easy to automate
+\end{itemize}
+\section*{Scheduler metrics and possible goals of a scheduler}
+\begin{itemize}
+\item \textbf{utilization}: time of CPU executing a program (maximize)
+\item \textbf{turnaround time}:  total global time from proc creation to proc exit (minimize)
+\item \textbf{response time}: time from ready to being scheduled (minimize)
+\item \textbf{fairness}: all procs get same amt of CPU over time (no starvation)
+\item \textbf{progress}: allow proc to make forward progress (minimize kernel interrupts)
+\end{itemize}
+\section*{Key CPU virtualization terms (mechanisms)}
+\begin{itemize}
+\item Typical user applications run in \mo{user mode}, and use a \mo{system call} to \mo{trap} into the kernel to request operating system services
+\item The trap ix saves register state carefully, changes the hardware status to kernel mode, and jumps into the OS to a pre-specified destination: the \mo{trap table}, which must be set up by the OS at boot time, and make sure that they cannot be readily modified by user programs. All of this is part of the \mo{limited direct execution} protocol which runs programs efficiently but without loss of OS control
 \end{itemize}
 \section*{Stride Scheduling}
-a deterministic fair-share scheduler, Each job in the system has a stride, which is inverse in proportion to the number of tickets it has. In our example above, with jobs A, B, and C, with 100, 50, and 250 tickets,
-respectively, we can compute the stride of each by dividing some large number by the number of tickets each process has been assigned. For example, if we divide 10,000 by each of those ticket values, we obtain the following stride values for A, B, and C: 100, 200, and 40. We call this value the \textbf{stride} of each process; every time a process runs, we will increment a counter for it (called its \textbf{pass} value) by its stride to track its global progress.
+a deterministic fair-share scheduler, Each job in the system has a stride, which is inverse in proportion to the number of tickets it has. Given jobs A, B, C with 100, 50, 250 tickets, respectively, we can compute the stride of each by dividing some large number by the number of tickets each process has been assigned. For example, if we divide 10,000 by each of those ticket values, we obtain the following stride values for A, B, and C: 100, 200, and 40. We call this value the \textbf{stride} of each process; every time a process runs, we will increment a counter for it (called its \textbf{pass} value) by its stride to track its global progress.
 
-The scheduler then uses the stride and pass to determine which process should run next. The basic idea is simple: at any given time, pick
-the process to run that has the lowest pass value so far; when you run
-a process, increment its pass counter by its stride  A pseudocode implementation is provided by Waldspurger:
+The scheduler then uses the stride and pass to determine which process should run next. The basic idea is simple: at any given time, pick the process to run that has the \mo{lowest} pass value so far; when you run a process, increment its pass counter by its stride:
 \begin{lstlisting}[language=c]
-curr = remove_min(queue);    // pick client with min pass
-schedule(curr);              // run for quantum
+curr = remove_min(queue);      // pick client with min pass
+schedule(curr);                // run for quantum
 curr->pass += curr->stride;  // update pass using stride
-insert(queue, curr);         // return curr to queue
+insert(queue, curr);           // return curr to queue
 \end{lstlisting}
 \includegraphics[width=\linewidth]{imgs/sched_stride}
 \begin{itemize}
@@ -245,7 +413,7 @@ insert(queue, curr);         // return curr to queue
 \item stride sched gets them exactly right at the end of each scheduling cycle
 \item lottery has no global state $\to$ much easier to incorporate new procs
 \end{itemize}
-\section*{RAID Advantages (transparently: looks like a big disk to host system)}
+\section*{RAID Advantages (looks like a big disk to host system)}
 \begin{enumerate}
 \item performance: multiple disks in parallel can greatly speed up I/O times
 \item capacity: large data sets demand large disks
@@ -261,3 +429,108 @@ insert(queue, curr);         // return curr to queue
 \item reliability: In alignment with fault model: only an entire disk can fail
 \item performance: present a set of typical workloads to find out
 \end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% RAID %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{RAID 0: no mirroring}
+\begin{minipage}{.45\linewidth}
+  \includegraphics[width=\linewidth]{imgs/raid0_strip1}
+\end{minipage}
+\begin{minipage}{.55\linewidth}
+  \includegraphics[width=\linewidth]{imgs/raid0_strip2}
+\end{minipage}
+\begin{itemize}
+\item \textbf{stripe}: blocks in the same row (e.g. blocks 0, 1, 2, 3)
+\item left:  1 block on each disk; chunk size: 4KB, stripe has $4\times 4 = 16$KB
+\item right: 2 blocks on each disk; chunk size: 8KB, stripe has $4\times 8= 32$KB
+\item small chunk size:
+  \begin{enumerate*}[label={\alph*.},font={\color{lbl}\bfseries}]
+  \item many files will get striped across many disks $\to \uparrow$ the parallelism of reads and writes to a single file
+  \item the positioning time to access blocks across multiple disks $\uparrow \because$ the positioning time for the entire request is determined by the maximum
+of the positioning times of the requests across all drives
+  \end{enumerate*}
+\item big chunk size:
+  \begin{enumerate*}[label={\alph*.},font={\color{lbl}\bfseries}]
+  \item reduces such intra-file parallelism; relies on multiple concurrent requests to achieve high throughput
+  \item the positioning time to access blocks across multiple disks $\uparrow \because$ s reduce positioning time: single file on a disk, just the positioning time of that single disk
+  \end{enumerate*}
+\end{itemize}
+\section*{Evaluating RAID Performance: 2 metrics + 2 workloads}
+\begin{enumerate}
+\item single-request latency: shows parallelism potential during one I/O op
+\item stead-state throughput:
+  \begin{enumerate*}[label={\alph*.},font={\color{lbl}\bfseries}]
+  \item total bandwidth during concurrent requests
+  \item critical in high-performance settings
+  \item main focus of analysis
+  \end{enumerate*}
+\end{enumerate}
+\begin{enumerate}
+\item sequential:
+  \begin{enumerate*}[label={\alph*.},font={\color{lbl}\bfseries}]
+  \item requests come in large contiguous chunks: 1MB of data from block $x$ to $x+1$ MB
+  \item common in many envs (e.g. file searching) and important for performance analysis
+  \end{enumerate*}
+\item random:
+  \begin{enumerate*}[label={\alph*.},font={\color{lbl}\bfseries}]
+  \item small individual requests
+  \item each targets random disk locations: 4KB at addr 10, then 50,000, etc; important for DBMS
+  \end{enumerate*}
+\end{enumerate}
+\begin{itemize}
+\item sequential access: most efficient $\because$ minimal $T_{\text{seek}}$ and $T_{\text{rot.}}$ but maximum $T_{\text{dtransfer}}$. assume transfer rate: $S$MB/s
+\item random access: least efficient $\because$ large $T_{\text{seek}}$ and $T_{\text{rot.}}$ but minimal $T_{\text{dtransfer}}$. assume transfer rate: $R$MB/s; generally: $S \gg R$
+\item assume on average: a sequential transfers 10MB: a random trans: 10KB
+\item on average seek time $T_{\text{seek}} = 7$ms, rotational delay $T_{\text{rot.}} = 3$ms, transfer rate of disk: 50MB/s
+\item $S \approx 50$MB/s (bandwidth) $\because$ large time spent transferring; $S/R \approx 50$
+\end{itemize}
+\[
+  S = \frac{\text{amount of data}}{\text{time to access}} = \frac{10\;\text{MB}}{T_{\text{seek}}+T_{\text{rot.}}+\frac{10\;\text{MB}}{50\;\text{MB/s}}} = \frac{10\;\text{MB}}{210\;\text{ms}} = 47.62\text{MB/s}
+\]
+\[
+  R = \frac{\text{amount of data}}{\text{time to access}} = \frac{10\;\text{KB}}{T_{\text{seek}}+T_{\text{rot.}}+\frac{10\;\text{KB}}{50\;\text{MB/s}}} = \frac{10\;\text{KB}}{10.195\;\text{ms}} = 0.981\text{MB/s}
+\]
+\section*{RAID-0 Analysis (assume 4KB chunk size)}
+\begin{itemize}
+\item capacity: $N$ disks each with $B$ blocks, $N\cdot B$ useful capacity
+\item reliability: perfect striping but any disk failure leads to data loss
+\item performance: excellent, all disks utilized often in parallel
+\item latency: good, identical to that of a single disk
+\item stead-state throughput: sequential = $N \cdot S$MB/s; random = $N\cdot R$MB/s
+\end{itemize}
+\section*{RAIDs simplified summary}
+\begin{itemize}
+\item Mirrored Systems Write Performance:
+  \begin{itemize}
+  \item Average seek time is higher than single disk
+  \item Uses maximum of two seeks (one per disk)
+  \item Random write performance slightly lower than single disk
+  \end{itemize}
+\item RAID-4/5 Parity Updates
+  \begin{itemize}
+  \item First read of old parity: requires full seek and rotation
+  \item Second write of parity: only needs rotation
+  \item RAID5 has replaced RAID4 in most marketplace because RAID-5 is basically identical to RAID-4 except in the few cases where it is better. The only place where RAID4 is still in use is systems that know they will never perform anything other than a large write, thus avoiding the smallwrite problem altogether; in those cases, RAID-4 is sometimes used as it is slightly simpler to build.
+  \end{itemize}
+\item Mirrored RAIDs have 2× perf. penalty compared to other approaches
+\item RAID 01: two stripes (RAID0) that are mirrored (RAID1)
+\item RAID 10: stripe (RAID0) a set of mirrored devices (RAID1)
+\end{itemize}
+\includegraphics[width=\linewidth]{imgs/raid_compare}
+\begin{minipage}{.5\linewidth}
+  \includegraphics[width=\linewidth]{imgs/raid01}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+  \includegraphics[width=\linewidth]{imgs/raid10}
+\end{minipage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% FILE SYSTEM %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{FFS writes a lot to create a new file of size one block}
+\begin{itemize}
+\item one for a new inode, one to update the inode bitmap
+\item one to the directory data block that the file is in
+\item one to the directory inode to update it
+\item one to the new data block that is a part of the new file
+\item one to the data bitmap to mark the data block as allocated
+\end{itemize}
+Although FFS places all of these blocks within the same block group, FFS incurs many short seeks and subsequent rotational delays and thus performance falls far short of peak sequential bandwidth
+\section*{Reading a file from disk using LFS}
+Assume we have nothing in memory to begin. The first on-disk data structure we must read is the checkpoint region. The checkpoint region contains pointers (i.e., disk addresses) to the entire inode map, and thus LFS then reads in the entire inode map and caches it in memory. After this point, when given an inode number of a file, LFS simply looks up the inode-number to inode-diskaddress mapping in the imap, and reads in the most recent version of the inode. To read a block from the file, at this point, LFS proceeds exactly as a typical UNIX file system, by using direct pointers or indirect pointers or doubly-indirect pointers as need be. In the common case, LFS should perform the same number of I/Os as a typical file system when reading a file from disk; the entire imap is cached and thus the extra work LFS does during a read is to look up the inode’s address in the imap.
