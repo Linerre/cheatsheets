@@ -7,326 +7,62 @@
 
 % Each section goes into this env
 \begin{multicols*}{3}
-\section*{An NFA which accepts all strings that end in `01'}
-\begin{minipage}{\linewidth}
-  \centering
-  \begin{tikzpicture}[node distance=0.3cm]
-    \node[comp, shape=circle, initial, initial where=left] (q0) at (0,0) {$q_{0}$};
-    \node[comp, shape=circle] (q1) at (2,0) {$q_{1}$};
-    \node[comp, shape=circle, accepting] (q2) at (4,0) {$q_{2}$};
-    \path[->]
-    (q0) edge[loop] node[above] {0,1} (q0)
-    (q0) edge node[above] {0} (q1)
-    (q1) edge node[above] {1} (q2)
-    ;
-  \end{tikzpicture}
-\end{minipage}
-\[
-  A = (Q,\Sigma,\delta,q_{0},F) = (\{q_{0},q_{1},q_{2}\},\{0,1\},\delta,q_{0},\{q_{2}\})
-\]
-\begin{enumerate}
-\item $Q$ is a finite set of states
-\item $\Sigma$ is a finite set of input symbols (alphabet)
-\item $q_{0} \in Q$ is the initial state
-\item $F \subseteq Q$ (or $A \subseteq Q$) is the set of final or accepting states
-\item $\delta$, \emph{transition function}, takes a state in $Q$ and an input symbol in $\Sigma$ as arguments and returns a subset of $Q$:
-\end{enumerate}
-\begin{equation*}
-  Q \eqnmark[red]{n1}{\times} (\Sigma \cup \{\Lambda\}) \to 2^{Q}
-\end{equation*}
-\annotate[yshift=-.1em]{below,right}{n1}{Cartesian product}
 
+\section*{Object Types}
 \begin{minipage}{.5\linewidth}
-  \centering
-  \begin{tabular}{r||l|l}
-    state & 0 & 1 \\
-    \hline
-    \hline
-    $\to\; q_{0}$    & $\{q_{0}, q_{1}\}$ & $\{q_{0}\}$\\
-    $q_{1}$          & $\emptyset$      & $\{q_{2}\}$\\
-    $*q_{2}$         & $\emptyset$      & $\emptyset$
-  \end{tabular}
+\begin{lstlisting}[language=c]
+// inherits from 'Root'
+type S = object {}
+// with fields only
+type Shape = object {
+  name: Text;
+  border: bool
+// optional ; for last field
+}
+// access fields like java
+Rect.name; Rect.area;
+// obj type with supertype
+type Rect = Shape object {
+  width: int;
+  height: int;
+}
+\end{lstlisting}
 \end{minipage}
 \begin{minipage}{.5\linewidth}
   \flushleft
   \begin{itemize}
-  \item transition table shows how transition function $\delta$ works
-  \item For NFA, each $\delta(s_{i}, w)$ returns a set (may be $\emptyset$)
-  \item $\delta(s_{i}, input)$ can also return $\emptyset$
+  \item \texttt{Root} is pre-declared, traced, and with no fields
+  \item \texttt{object} is like \verb|^struct{}|
+  \item Object can be \texttt{null}
+  \item Objects \mr{cannot} be dereferenced
+  \item To copy data record of one obj into another, the fields must be assigned one by one
+  \item a field/method in subtype \mb{masks} any field/method with the same name in supertype
+  \item Object assignment is \mb{reference assignment}
   \end{itemize}
 \end{minipage}
 
-\section*{The Extended Transition Function $\delta^{*}$ (or $\hat{\delta}$) of an NFA}
-Given an NFA $M = (Q,\Sigma,q_{0},A,\delta)$, its extended transition function is defined as:
-\begin{equation*}
-  {\delta^{*}}: Q \times \Sigma^{*} \to 2^{Q}
-\end{equation*}
-\begin{enumerate}
-\item For every $q \in Q, \delta^{*}(q,\Lambda) = \Lambda(\{q\})$ ($\epsilon$-closure for every $q$)
-\item For every $q \in Q$, every $y \in \Sigma^{*}$ and every $\sigma \in \Sigma$:
-  \begin{equation*}
-    \delta^{*}(q,y\sigma) = \Lambda\left(\bigcup\{\delta(p,\sigma)\;|\;p \in \delta^{*}(q,y)\}\right)
-  \end{equation*}
-\item input string $w = y\sigma$ where $\sigma$ is final symbol of $w$ and $y$ is the rest ($y$ often starts as empty $\Lambda$ and grows longer)
-\item \ml{first} compute $\delta(q,y)$ and gets a set $P\subseteq Q:\{p_{1},p_{2},\cdots,p_{k}\}$
-\item \ml{then} for each $p_{k} \in P$, compute $\delta(p_{k},\sigma) \to$ set for next loop
-\item A string $x \in \Sigma^{*}$ is accepted by $M$ if $\delta^{*}(q_{0},x) \cap A \neq \emptyset$
-\item The language $L(M)$ accepted by $M$ is the set of all strings accepted by $M$ ($\Sigma^{*}$ is the set of all strings over $\Sigma$)
-\end{enumerate}
-\section*{Processing `00101' for the NFA above using its $\delta^{*}$ from $q_{0}$}
-\begin{enumerate}
-\item $\delta^{*}(q_{0},\Lambda) = \{q_{0}\}$ (input string $w = 00101 = \Lambda 00101$)
-\item $\delta^{*}(q_{0},0) = \delta(q_{0},0) = \{q_{0}, q_{1}\}$
-\item $\delta^{*}(q_{0},00) = \delta(q_{0},0) \cup \delta(q_{1},0) = \{q_{0}, q_{1}\} \cup \emptyset = \{q_{0}, q_{1}\}$
-\item $\delta^{*}(q_{0},001) = \delta(q_{0},1) \cup \delta(q_{1},1) = \{q_{0}\} \cup \{q_{2}\} = \{q_{0}, q_{2}\}$
-\item $\delta^{*}(q_{0},0010) = \delta(q_{0},0) \cup \delta(q_{2},0) = \{q_{0}, q_{1}\} \cup \emptyset = \{q_{0}, q_{1}\}$
-\item $\delta^{*}(q_{0},00101) = \delta(q_{0},1) \cup \delta(q_{1},1) = \{q_{0}\} \cup \{q_{2}\} = \{q_{0}, q_{2}\}$
-\end{enumerate}
-The above means: starting in state $q_{0}$, after processing $w$, the NFA will stay in any state in the set $\{q_{0},q_{2}\}$
-
-% DFA constructed from the above NFA
-\section*{NFA to DFA: subset construction}
-\begin{enumerate}
-\item In theory, given an NFA $N$ with $n$ states, its equivalent DFA $D$ will have (up to) $2^{n}$ states
-\item In practice, most states of $D$ are \mb{inaccessible} from start state and can be thrown away
-\item $A_{D}$ (or $F_{D}$) is a set. Each $S$ in $A_{D}$ is a set of states:
-  \begin{itemize}
-  \item $S$ is a set of some or all states from $Q_{N}$: $S \subseteq Q_{N}$
-  \item $S$ includes \mb{at least 1} accepting state of $N$: $S \cap F_{N} \neq \emptyset$
-  \end{itemize}
-\item For each $S \subseteq Q_{N}$ and for each input symbol $a \in \Sigma$:
-  \begin{equation*}
-    \delta_{D}(S,a) = \bigcup_{p \in S}\;\delta_{N}(p,a)
-  \end{equation*}
-  \begin{enumerate}[label={\alph*.}]
-  \item for every $p \in S$, find all $\delta(p,a)$ for $N$
-  \item take the union of all those states resulted in the above
-  \end{enumerate}
-\end{enumerate}
-
-
-\begin{minipage}{.6\linewidth}
-  \centering
-  \begin{tabular}{r||l|l}
-    ($2^{n}$) states & 0 & 1 \\
-    \hline
-    \hline
-    $\emptyset$ & $\emptyset$ & $\emptyset$ \\
-    $\to\; \{q_{0}\}$    & $\{q_{0},q_{1}\}$ & $\{q_{0}\}$\\
-    $\{q_{1}\}$          & $\emptyset$      & $\{q_{2}\}$\\
-    $*\{q_{2}\}$         & $\emptyset$      & $\emptyset$\\
-    $\{q_{0},q_{1}\}$ & $\{q_{0},q_{1}\}$ & $\{q_{0},q_{2}\}$\\
-    $*\{q_{0},q_{2}\}$ & $\{q_{0},q_{1}\}$ & $\{q_{0}\}$\\
-    $*\{q_{1},q_{2}\}$ & $\emptyset$ & $\{q_{2}\}$\\
-    $*\{q_{0},q_{1},q_{2}\}$ & $\{q_{0},q_{1}\}$ & $\{q_{0},q_{2}\}$\\
-    \hline
-    \hline
-    \multicolumn{3}{l}{*: set with accepting state of $N$}
-  \end{tabular}
-\end{minipage}
-\begin{minipage}{.4\linewidth}
-  \begin{tabular}{r||l|l}
-    states & 0 & 1 \\
-    \hline
-    \hline
-    $A$ & $A$ & $A$ \\
-    $\to\;B$  & $E$ & $B$\\
-    $C$       & $A$ & $D$\\
-    $*D$      & $A$ & $A$\\
-    $E$       & $E$ & $F$\\
-    $*F$      & $E$ & $B$\\
-    $*G$      & $A$ & $D$\\
-    $*H$    & $E$ & $F$\\
-    \hline
-    \hline
-    \multicolumn{3}{l}{*set is accepting state}
-  \end{tabular}
-\end{minipage}
-\begin{enumerate}
-\item Starting in $B$, in this case, only $B$, $E$, $F$ are reachable: $B\to E$, $E\to F$ and $F\to B$
-\item Other 5 states inaccessible from $B$ (may not exist at all)
-\item \mo{lazy evaluation} for constructing transition table entries:
-  \begin{enumerate}[label={\alph*.}]
-  \item $\{q_{0}\} (\in Q_{N})$ as $N$'s start state, is accessible
-  \item If $S \subseteq Q_{n}$ is accessible, then for each input symbol $a$, $\delta_{D}(S,a)$ (\{states\}) will also be accessible. For example:
-    \begin{align*}
-      \delta_{D}(\{q_{0},q_{1}) & = \delta_{N}(q_{0},1) \cup \delta_{N}(q_{1}, 1)\\
-                                & = \{q_{0}\} \cup \{q_{2}\} \\
-                                & = \{q_{0},q_{2}\}
-    \end{align*}
-  \item Use these accessible set(s) as $Q_{D}$ to draw DFA diagram
-  \end{enumerate}
-\end{enumerate}
 \begin{minipage}{\linewidth}
-  \centering
-  \begin{tikzpicture}[node distance=0.4cm]
-    \node[comp,shape=ellipse, initial, initial where=left] (q0) at (0,0) {\{$q_{0}$\}};
-    \node[comp,shape=ellipse] (q0q1) at (2,0) {\{$q_{0},q_{1}$\}};
-    \node[comp,shape=ellipse, accepting] (q0q2) at (4.5,0) {\{$q_{0},q_{2}$\}};
-    \path[->]
-    (q0) edge[loop] node[above] {1} (q0)
-    (q0) edge node[above] {0} (q0q1)
-    (q0q1) edge[loop] node[above] {0} (q0q1)
-    (q0q1) edge node[above] {1} (q0q2)
-    (q0q2) edge[bend left] node[below] {0} (q0q1)
-    (q0q2) edge[in=-45, out=-120] node[below] {1} (q0)
-    ;
-  \end{tikzpicture}
+\begin{lstlisting}[language=c]
+// object type with methods
+type Rect = Shape object {
+  name: Text; width, height: int;
+  useless();          // equivalent to useless() = Null;
+  area(): int = Area; // identifer sig = proc;
+  // `area' takes no args, calls `Area' and returns int
+}
+// method declared as proc before/after obj definition
+proc Area(self: Rect): int {
+  return self.width * self.height;
+}
+\end{lstlisting}
 \end{minipage}
-
-% Eclose
-\section*{Compute $\epsilon$-CLOSE($q$) (or ECLOSE($q$)) with recursion}
-% \begin{enumerate}
-% \end{enumerate}
-\begin{minipage}{0.52\linewidth}
-  \flushleft
-\begin{enumerate}
-\item A state $q$, itself is in \textsc{eclose}($q$) (\mr{even w/t $\epsilon$ arc})
-\item Suppose on input $\epsilon$, $q$ can transit to states $p_{1},\cdots,p_{n}$ (the result of $\delta(q,\epsilon)$), all these states are in \textsc{eclose}($q$)
-\item For every $r \in \delta(p_{i},\epsilon)$ where $1 \leq i \leq n$, $r$ is in \textsc{eclose}($q$)
-\end{enumerate}
-\end{minipage}
-\begin{minipage}{0.48\linewidth}
-\begin{tikzpicture}[node distance=0.5cm]%reduce vertical space around graph
-  \node[comp, shape=circle, initial] (q1) {$q_{1}$};
-  \node[comp, shape=circle, above right=of q1] (q2) {$q_{2}$};
-  \node[comp, shape=circle, right=of q2] (q4) {$q_{4}$};
-  \node[comp, shape=circle, below=of q4] (q5) {$q_{5}$};
-  \node[comp, shape=circle, accepting, below right=of q1] (q3) {$q_{3}$};
-  \node[text width=3cm, below=of q1, yshift=-.3cm, xshift=-.6cm] (e) {
-    \small{\textsc{eclose}(\(q_{1}\))=\(\{q_{1},q_{2},q_{3},q_{4},q_{5}\}\)}
-  };
-
-  \path[->]
-  (q1) edge node[above,sloped]{\(\varepsilon\)}(q2)
-  (q1) edge node[below,sloped]{\(\varepsilon\)}(q3)
-  (q2) edge node[above]{\(\varepsilon\)}(q4)
-  (q4) edge node[left]{\(\varepsilon\)}(q5)
-  (q5) edge node[above,sloped]{a}(q3);
-\end{tikzpicture}
-\end{minipage}
-
-\section*{Eliminate $\epsilon$-transitions from NFA $N = (Q_{N},\Sigma,\delta,q_{0},F_{N})$}
-\begin{enumerate}
-\item For each $q \in Q_{N}$, compute $\epsilon$-closure $\delta(q,\epsilon)$
-\item Copy $N$ to get $N'$ and remove all $\epsilon$ transition arcs in $N'$
-\item For every \(q \in Q_{N}\), if $\delta(q,\epsilon)$ contains any \(p \in F_{N}\), \mo{mark} $q$ as an accepting state in $N'$
-\item For every \textsc{eclose}($q$) set in step 1: for every $s \in$ \textsc{eclose}($q$), if $s \overset{a}{\to}t \in Q_{N}$, then put an arc $q \overset{a}{\to} t$ in $N'$. For example: \textsc{eclose}($q_{0}$) = \{$q_{0}, q_{1}, q_{2}$\} and $q_{1}\overset{a}{\to}q_{3}$ in $N$: $q_{0}\overset{a}{\to}q_{3}$ in $N'$
-\end{enumerate}
-\begin{minipage}{0.5\linewidth}
-  \centering
-  \begin{tikzpicture}[node distance=0.6cm]
-    \node[comp, shape=circle, initial] (q0) {$q_{0}$};
-    \node[comp, shape=circle, right=of q0] (q1) {$q_{1}$};
-    \node[comp, shape=circle, right=of q1] (q2) {$q_{2}$};
-    \node[comp, shape=circle, below=of q1] (q3) {$q_{3}$};
-    \node[comp, shape=circle, accepting, right=of q3] (q4) {$q_{4}$};
-    \node[below=of q0, xshift=-1cm] (n1) {$N$};
-
-    \path[->]
-    (q0) edge node[above]{\(\varepsilon\)}(q1)
-    (q0) edge node[below,sloped]{d}(q3)
-    (q1) edge node[above]{\(\varepsilon\)}(q2)
-    (q1) edge node[left]{a}(q3)
-    (q2) edge[bend left] node[right]{c}(q4)
-    (q3) edge node[above]{\(\varepsilon\)}(q4)
-    (q4) edge[bend left] node[left]{b}(q2);
-  \end{tikzpicture}
-\end{minipage}
-\begin{minipage}{0.5\linewidth}
-  \begin{tikzpicture}[node distance=0.6cm]
-    \node[comp, shape=circle, initial,] (q0) {$q_{0}$};
-    \node[comp, shape=circle, right=of q0] (q1) {$q_{1}$};
-    \node[comp, shape=circle, accepting, below=of q1] (q3) {$q_{3}$};
-    \node[comp, shape=circle, right=of q3] (q2) {$q_{2}$};
-    \node[comp, shape=circle, accepting, right=of q1] (q4) {$q_{4}$};
-    \node[below=of q0, xshift=-1cm] (n1) {$N'$};
-
-    \path[->]
-    (q0) edge[draw=red] node[below,sloped]{a,d}(q3)
-    (q0) edge[out=30, in=140,draw=red] node[above]{c}(q4)
-    (q1) edge[draw=red] node[above]{c}(q4)
-    (q1) edge node[left]{a}(q3)
-    (q2) edge[bend left] node[left]{c}(q4)
-    (q3) edge[draw=red] node[above]{b}(q2)
-    (q4) edge[bend left] node[right]{b}(q2);
-  \end{tikzpicture}
-\end{minipage}
-\section*{Minimize DFA}
-Given an DFA, there is an equivalent DFA with minimum-number of states and such DFA is unique
-\begin{enumerate}
-\item \mr{remove} any state unreachable from start state
-\item \mr{split} states into \mb{final} group and \mb{non-final} group
-\item \mr{find} where each state goes on some input
-\item if 2 states with same input go to different groups, split out
-\item if there is only one state in a group, the state is unique
-\item repeat the steps 3-5 until no splitting for any group
-\end{enumerate}
-\vspace{-1em}
-\begin{minipage}{0.45\linewidth}
-  \begin{align*}
-    & [[S_{0},S_{1},S_{2},T_{1},T_{2}],[S_{3},S_{4}]] && \text{(remove unreachable)}\\
-    & [[S_{0},S_{1},S_{2},T_{1},T_{2}],[S_{3},S_{4}]] && \leftarrow 0\quad \text{(init)}\\
-    & [[S_{0},S_{1},S_{2},T_{1},T_{2}],[S_{3},S_{4}]] && \leftarrow 1\\
-    & [[S_{0},T_{1},T_{2}],[S_{1}],[S_{2}],[S_{3},S_{4}]] && \leftarrow 0\\
-    & [[T_{1},T_{2}],[S_{0}],[S_{1}],[S_{2}],[S_{3},S_{4}]] &&  \leftarrow 1\\
-    & [[T_{1},T_{2}],[S_{0}],[S_{1}],[S_{2}],[S_{3},S_{4}]] &&  \leftarrow 0\\
-    & [[T_{1},T_{2}],[S_{0}],[S_{1}],[S_{2}],[S_{3},S_{4}]] && (\text{cannot split further}) \\
-    & T_{1} \equiv T_{2}, S_{3} \equiv S_{4} && (\text{found equivalent states})
-  \end{align*}
-\end{minipage}
-% DFA minimisation
-\begin{minipage}{0.6\linewidth}
-  \begin{tikzpicture}[node distance=0.6cm]
-    \node[comp, shape=circle, initial, initial where=below] (s0) {$S_{0}$};
-    \node[comp, shape=circle, right=of s0] (s1) {$S_{1}$};
-    \node[comp, shape=circle, right=of s1] (s2) {$S_{2}$};
-    \node[comp, shape=circle, accepting, right=of s2] (s3) {$S_{3}$};
-    \node[comp, shape=circle, accepting, below=of s3] (s4) {$S_{4}$};
-    \node[comp, shape=circle, below=of s1] (t2) {$T_{1}$};
-    \node[comp, shape=circle, below=of s2] (r1) {$R_{1}$};
-
-    % Calculate the midpoint between S3 and S4
-    \coordinate (midpoint) at ($(s3)!0.5!(s4)$);
-
-    \node[comp, shape=circle, right=1cm of midpoint] (t1) {$T_{2}$};
-    \draw[red, line width=1pt] (r1.south west) -- (r1.north east);
-    \draw[red, line width=1pt] (r1.north west) -- (r1.south east);
-
-    \path[->]
-    (s0) edge node[above]{0}(s1)
-    (s0) edge node[below,sloped]{1}(t2)
-    (s1) edge node[above]{1}(s2)
-    (s1) edge node[right]{0}(t2)
-    (s2) edge node[above]{1}(s3)
-    (s2) edge node[below,sloped]{0}(t2)
-    (s3) edge[bend left] node[right]{1}(s4)
-    (s3) edge node[above,sloped]{0}(t1)
-    (s4) edge node[below]{0}(t1)
-    (s4) edge[bend left] node[right, xshift=-.1cm]{1}(s3)
-    (r1) edge node[below,sloped,xshift=-.2cm,yshift=.1cm]{0}(s3)
-    (r1) edge node[right]{1}(s2)
-    (t1) edge[loop above] node{0,1}(t1);
-  \end{tikzpicture}
-\end{minipage}
-\begin{minipage}{0.42\linewidth}
-  \begin{tikzpicture}[node distance=.8cm]
-    \node[comp, shape=circle, initial, initial where=below] (s0) {$S_{0}$};
-    \node[comp, shape=circle, right=of s0] (s1) {$S_{1}$};
-    \node[comp, shape=circle, right=of s1] (s2) {$S_{2}$};
-    \node[comp, shape=circle, accepting, below=of s2] (s3) {$S_{3}$};
-    \node[comp, shape=circle, below=of s1] (t1) {$T_{1}$};
-
-    \path[->]
-    (s0) edge node[above]{0}(s1)
-    (s0) edge node[above,sloped]{1}(t1)
-    (s1) edge node[above]{1}(s2)
-    (s1) edge node[right]{0}(t1)
-    (s2) edge node[right]{1}(s3)
-    (s2) edge node[below,sloped]{0}(t1)
-    (s3) edge node[below]{0}(t1)
-    (t1) edge[loop left] node{0,1}(t1);
-  \end{tikzpicture}
-\end{minipage}
+\begin{itemize}
+\item In \texttt{= proc}, \texttt{proc} must be a top-level procedure constant
+\item If \mo{\texttt{= proc}} is omitted (\texttt{useless();}), \texttt{= null} is assigned
+\item If \texttt{proc} is \mb{non-null}, its 1st param must have mode \texttt{val} and type some supertype of \texttt{T} (\texttt{Shape} in the above example)
+\item For proc \texttt{Area}, dropping its 1st param (\texttt{self: Rect}) results in the exactly same sig as \texttt{area()} in the obj definition
+\end{itemize}
+% \item methods accept the object as \mr{1st} arg
+  % \item methods can be invoked, but \mr{not} read or written
 \end{multicols*}
 \end{document}
