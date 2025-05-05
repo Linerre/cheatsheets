@@ -46,7 +46,7 @@ type Rect = Shape object {
 // object type with methods
 type Rect = Shape object {
   name: Text; width, height: int;
-  useless();          // equivalent to useless() = Null;
+  useless();           // equivalent to useless() = null;
   area(): int = Area; // identifer sig = proc;
   // `area' takes no args, calls `Area' and returns int
 }
@@ -57,8 +57,8 @@ proc Area(self: Rect): int {
 \end{lstlisting}
 \end{minipage}
 \begin{itemize}
-\item In \texttt{= proc}, \texttt{proc} must be a top-level procedure constant
-\item If \mo{\texttt{= proc}} is omitted (\texttt{useless();}), \texttt{= null} is assigned
+\item In \mo{\texttt{= proc}}, \texttt{proc} must be a top-level procedure constant
+\item If \texttt{= proc} \mo{omitted} (\texttt{useless();}), \mo{\texttt{= null}} is assigned
 \item If \texttt{proc} is \mb{non-null}, its 1st param must have mode \texttt{val} and type some supertype of \texttt{T} (\texttt{Shape} in the above example)
 \item For proc \texttt{Area}, dropping its 1st param (\texttt{self: Rect}) results in the exactly same sig as \texttt{area()} in the obj definition
 \end{itemize}
