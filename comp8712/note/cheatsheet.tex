@@ -8,12 +8,12 @@
 % Each section goes into this env
 \begin{multicols*}{3}
 
-\section*{Object Types}
+\section*{Object Types (declaration and inheritance)}
 \begin{minipage}{.5\linewidth}
 \begin{lstlisting}[language=c]
-// inherits from 'Root'
+// S inherits from `Root'
 type S = object {}
-// with fields only
+// object with fields only
 type Shape = object {
   name: Text;
   border: bool
@@ -50,7 +50,7 @@ type Rect = Shape object {
   area(): int = Area; // identifer sig = proc;
   // `area' takes no args, calls `Area' and returns int
 }
-// method declared as proc before/after obj definition
+// proc declared before/after obj def and must be global
 proc Area(self: Rect): int {
   return self.width * self.height;
 }
@@ -62,7 +62,49 @@ proc Area(self: Rect): int {
 \item If \texttt{proc} is \mb{non-null}, its 1st param must have mode \texttt{val} and type some supertype of \texttt{T} (\texttt{Shape} in the above example)
 \item For proc \texttt{Area}, dropping its 1st param (\texttt{self: Rect}) results in the exactly same sig as \texttt{area()} in the obj definition
 \end{itemize}
-% \item methods accept the object as \mr{1st} arg
-  % \item methods can be invoked, but \mr{not} read or written
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=c]
+type
+  A = object { a: int; p() },
+  AB = A object { b: int };
+// since every `AB' is an `A', so `AB' has method `p'
+// candidates for `p' of both `A' and `AB'
+proc Pa(self: A) { ... }
+proc Pab(self: AB) { ... }
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[language=c]
+// ok: `p' expects/accepts `AB' obj as its 1st arg
+type T1 = AB object { p = Pab };
+// ok: `p' expects `A' obj as its 1st arg
+type T2 = A object { p = Pa };
+// ok: `Pa' expects `A', but each `AB' is also an `A'
+type T3 = AB object { p = Pa };
+// static error: because not every `A' is an `AB'
+type T4 = A object { p = Pab };
+\end{lstlisting}
+\end{minipage}
+\section*{Object method overriding and overloading}
+\begin{lstlisting}[language=c]
+type
+  A = object { m() = P },   // assume P(self: A)
+  B = A object { m = Q },   // assume Q(self: A)
+  C = A object { m() = Q };
+// A,B,C are alloc-ed by `New'; a,b,c are refs -> them
+var a = New(A), b = New(B), c = New(C);
+a.m() // invoke P(a) where a is an instance of A
+b.m() // invoke Q(b) where b is an instance of B and A
+c.m() // invoke Q(c) where c is an instance of C and A
+
+a = b; a.m(); // activates Q(b) as b's m overrides a's
+a = c; a.m(); // activates P(c), c's 1st method
+// to visit c's 2dn method, use c.m() <- overloading
+\end{lstlisting}
+\begin{itemize}
+\item \texttt{c} method suite has \mb{2} methods: \texttt{Q(c)}, \texttt{P(c)} $\to$ \mo{overloading}
+\item \texttt{b} method suite has \mb{1} methods: \texttt{Q(b)}$\to$ \mo{overriding}
+\end{itemize}
+\includegraphics*[width=\linewidth]{img/overloadevsoverride}
 \end{multicols*}
 \end{document}
