@@ -1,0 +1,67 @@
+\documentclass[10pt,a4paper,landscape]{article}
+\input{preamble}
+
+\begin{document}
+% Suppress page number for all pages
+\pagestyle{empty}
+
+% Each section goes into this env
+\begin{multicols*}{3}
+\section*{Access to non-local data (real gloabls)}
+\begin{itemize}
+\item visible \mo{everywhere}
+\item naming convention gives an address (a \mo{label})
+\item initialization requires cooperation
+\end{itemize}
+\section*{Access to non-local data (lexical nesting)}
+\begin{itemize}
+\item view variables as (\textsf{level,offset}) pairs (compile-time)
+\item chain of non-local access links (static chain)
+  \begin{itemize}
+  \item proc $P$ defines a local variable $v$
+  \item (nested) proc $Q$ can modify $v$ of $P$ and only be called by $P$
+  \item $P_0\overset{call}{\to}Q_0, Q_1\overset{call}{\to}P_1\overset{call}{\to}P_2\overset{call}{\to}Q_2,Q_3,Q_4$
+  \item $Q_{0,1}$ have context $P_0$ and see $v \in P_0$
+  \item $Q_{2,3,4}$ have context $P_2$ and see $v \in P_2$
+  \item at anytime, each proc needs a pointer to its outside context; each subclass needs a pointer to its parent (ctx) class
+  \end{itemize}
+\item more expensive find (run-time)
+\end{itemize}
+\begin{itemize}
+\item How to map a name into a (level,offset) pair? (compile-time)
+  \begin{enumerate}[start=0]
+  \item use \mb{block-structure symbol table}
+  \item look up a name, wants its most recent declaration
+  \item declaration may be at current level or any lower level
+  \end{enumerate}
+\item Given a (level,offset) pair, what's the address? (run-time)
+  \begin{itemize}
+  \item access links (static links/chain explain above), or
+  \item displays (deprecated and less effective)
+  \end{itemize}
+\end{itemize}
+\section*{Find the value specified by ($l,o$)}
+\begin{itemize}
+\item need current procedure level $k$
+\item $k = l \Rightarrow$ local value
+\item $k > l \Rightarrow$ find $l$'s activation record (stack frame)
+\item $k < l$ cannot occur
+\end{itemize}
+\section*{Maintain access links (static links)}
+\begin{itemize}
+\item calling level k + 1 procedure
+  \begin{enumerate}
+  \item pass my \texttt{FP} as access link
+  \item my backward chain will work for lower levels
+  \end{enumerate}
+\item calling procedure at level $l < k$
+  \begin{enumerate}
+  \item find link to level $l - 1$ and pass it
+  \item its access link will work for lower levels
+  \end{enumerate}
+\end{itemize}
+\begin{minipage}{\linewidth}
+  \includegraphics*[width=\linewidth]{img/access_link}
+\end{minipage}
+\end{multicols*}
+\end{document}

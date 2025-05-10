@@ -1,0 +1,172 @@
+\documentclass[10pt,a4paper,landscape]{article}
+\input{preamble}
+
+\begin{document}
+% Suppress page number for all pages
+\pagestyle{empty}
+
+% Each section goes into this env
+\begin{multicols*}{3}
+\section*{Ordinal Types: enumeration}
+\begin{lstlisting}[language=c]
+type T = enum {id_1, id_2, ..., id_n};
+type E = enum {}; // The empty enumeration is allowed
+\end{lstlisting}
+\begin{itemize}
+\item \texttt{id\_i} are distinct identifiers
+\item The type \texttt{T} is an ordered set of \texttt{n} values
+\item the expr \texttt{T.id\_i} denotes the \mb{ith} value of the type in \mo{increasing} order
+\item Integers and enumeration elements are collectively called ordinal values
+\item the base type of an ordinal value \texttt{v} is int if \texttt{v} is an integer
+\item otherwise it is the unique enumeration type that contains \texttt{v}
+\end{itemize}
+\section*{Ordinal Types: subrange}
+\begin{lstlisting}[language=c]
+// Lo and Hi are all ordinal Val's with same base type
+type T = Lo..Hi; type U = 1..100; // 1 to 100, inclusive
+type E = 100..20; // E is an empty subrange
+\end{lstlisting}
+\begin{itemize}
+\item The values of \texttt{T} are all the values from \texttt{Lo} to \texttt{Hi} \mo{inclusive}
+\item \texttt{Lo} and \texttt{Hi} must be constant expressions
+\item If \texttt{Lo} exceeds \texttt{Hi}, the subrange is empty
+\end{itemize}
+\section*{Pre-declared Ordinal Types }
+\begin{itemize}
+\item \texttt{int}: All integers naturally represented by the impl.
+\item \texttt{byte}: Behaves just like the subrange \texttt{0..(1<<8)-1}.
+\item \texttt{bool}: The enumeration enum \texttt{{false, true}}.
+\item \texttt{char}: An enumeration containing at least 256 elements.
+\end{itemize}
+Each distinct enumeration type introduces a new collection of values, but a subrange type reuses the values from the underlying type. For example:
+\begin{lstlisting}[language=c]
+type
+  T1 = enum {A, B, C}; // T1 and T2 are the same type
+  T2 = enum {A, B, C}; // e.g. T1.C == T2.C
+  U1 = T1.A..T1.C; // U1 and U2 are also the same type
+  U2 = T1.A..T2.C; // T1 and U1 are distinct
+  V = enum {A, B}; // V.A, V.B NOT related to T1.A, T1.B
+\end{lstlisting}
+\begin{itemize}
+\item \texttt{T1} and \texttt{U1} contain same values but are distinct
+\item the expanded definition of \texttt{T1} is an enumeration
+\item the expanded definition of \texttt{U1} is a subrange
+\end{itemize}
+\section*{Reference Types}
+\begin{lstlisting}[language=c]
+type T = ^Type; // ^ is the ref operator
+\end{lstlisting}
+\begin{itemize}
+\item A reference value is either \texttt{null} or the address of a variable, called the \mb{referent}
+\item A reference type is either traced or untraced
+\item When all traced refs to a piece of allocated storage are gone, the implementation reclaims the storage
+\item A general type is traced if
+  \begin{enumerate*}[label={\alph*},font={\color{red!50!black}\bfseries}]
+  \item it is a traced reference type
+  \item a record type, any of whose field types is traced; or
+  \item an array type whose element type is traced
+  \end{enumerate*}
+\end{itemize}
+\section*{Pre-declared reference types}
+\begin{itemize}
+\item \texttt{Refany}: Contains all traced references.
+\item \texttt{Address} : Contains all untraced references.
+\item \texttt{Null}: Contains only \texttt{null}
+\end{itemize}
+\section*{Procedure Types: \texttt{null} or a triple consisting of the below}
+\begin{enumerate}
+\item the \mo{body}, which is a block,
+\item the \mo{signature}, which specifies the procedure’s formal arguments. and result type
+\item the \mo{environment}, which is the scope with respect to which variable names in the body will be interpreted.
+\end{enumerate}
+\begin{itemize}
+\item \mb{function} proc: a procedure that returns a result
+\item \mb{top-level} proc: declared in outermost scope of a module
+\item \mb{local} proc: can be passed as a parameter but not assigned, since in a stack implementation a local proc becomes invalid when the frame for the proc containing it is popped
+\item \mb{procedure constant}: an identifier declared as a proc, as opposed to a proc var which is a var declared with a proc type
+\end{itemize}
+\begin{lstlisting}[language=c]
+// use `proc' keyword to define a procedure `p1'
+proc p1(arg1: Type1, arg2: Type2): Type3 {
+  // proc body that implements something
+}
+// declare a proc type `p2'
+type T2 = proc p2(arg1: Type1, arg2: Type2);
+// same-type args can use shorthand
+type T3 = proc p3(arg1, arg2: SomeType): OtherType;
+// each arg can have a mode of `val', `var', `readonly'
+type T4 = proc p4(val arg1: Type1, var arg2: Type2);
+// arg2 has the default mode: `val'
+type T5 = proc p5(readonly arg1: Type1, arg2: Type2);
+// mode has shorthand form too:
+type T6 = proc p6(var arg1, arg2, arg3: SomeType);
+{
+   // use the above declared procs in this block
+}
+\end{lstlisting}
+\texttt{signature1} \mo{covers} \texttt{signature2} if:
+\begin{itemize}
+\item They have the same number of params, and corresponding paras have the same type and mode
+\item They have the same result type, or neither has a result type
+\end{itemize}
+\section*{Subtyping rules in general}
+\begin{itemize}
+\item \texttt{T<:U} means \texttt{T} is a \mb{subtype} of \texttt{U} and \texttt{U} is a \mb{supertype} of \texttt{T}
+\item If \texttt{T<:U}, then every value of type T is also a value of type U. The converse does not hold
+\end{itemize}
+\section*{Ordinal subtyping}
+For ordinal type \texttt{T} and \texttt{U}, we have \texttt{T<:U} if they have the same base type and every member of \texttt{T} is a member of \texttt{U}. That is, subtyping on ordinal types reflects the subset relation on the value sets
+\section*{Array subtyping}
+Array type \texttt{A} is a subtype of array type \texttt{B} if
+\begin{itemize}
+\item they have the same ultimate element type
+\item the same number of dimensions
+\item for each dimension:
+  \begin{itemize}[label=$\ast$]
+  \item either both are open (as in the first m dimensions), or
+  \item A is fixed and B is open (as in the next n dimensions)
+  \item they are both fixed and have the same size (as in the last p dimensions)
+  \end{itemize}
+\end{itemize}
+\begin{lstlisting}[language=c]
+// in 1st m dims, both A and B are open
+// in next n dims, A is fixed and B is open
+// in the last dim, both A and B are fixed
+   ([])^m  [j_1] ... [j_n] [k_1] ... [k_p] A
+<: ([])^m  ([])^n            [i_1] ... [i_p] B
+
+if Number(i_i) == Number(k_i)  for i = 1, ..., p
+\end{lstlisting}
+\section*{Other subtyping rules}
+\begin{itemize}
+\item \texttt{Refany} contains all traced refs, and \texttt{null} is a member of every ref type
+\begin{lstlisting}[language=c]
+Null <: ^T <: Refany
+\end{lstlisting}
+\item \texttt{null} is a member of every procedure type
+\begin{lstlisting}[language=c]
+Null <: (A): R for any A and R
+\end{lstlisting}
+\item for procedure types, \texttt{T<:U} if they are the same except for param names
+\begin{lstlisting}[language=c]
+(A): Q <: (B): R // if sig (B): R covers sig (A): Q
+\end{lstlisting}
+\item every object is a reference, \texttt{null} is a member of every object type, and every subtype is included in its supertype
+\begin{lstlisting}[language=c]
+Root <: Refany
+Null <: T object { ... } <: T
+\end{lstlisting}
+\item \texttt{<:} is \mo{reflexive} and \mo{transitive}
+\begin{lstlisting}[language=c]
+T <: T  for all T
+T <: U  and  U <: V  implies  T <: V  for all T, U, V.
+\end{lstlisting}
+\item Note that \texttt{T<:U} and \texttt{U<:T} \emph{does not} imply that T and U are the same
+\item The language predeclares the below type:
+\begin{lstlisting}[language=c]
+Text <: Refany
+\end{lstlisting}
+\end{itemize}
+
+\end{multicols*}
+\end{document}
