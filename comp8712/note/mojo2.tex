@@ -61,7 +61,7 @@ type T = ^Type; // ^ is the ref operator
 \item A reference type is either traced or untraced
 \item When all traced refs to a piece of allocated storage are gone, the implementation reclaims the storage
 \item A general type is traced if
-  \begin{enumerate*}[label={\alph*},font={\color{red!50!black}\bfseries}]
+  \begin{enumerate*}[label={\alph*.},font={\color{red!50!black}\bfseries}]
   \item it is a traced reference type
   \item a record type, any of whose field types is traced; or
   \item an array type whose element type is traced
@@ -161,7 +161,7 @@ Null <: T object { ... } <: T
 T <: T  for all T
 T <: U  and  U <: V  implies  T <: V  for all T, U, V.
 \end{lstlisting}
-\item Note that \texttt{T<:U} and \texttt{U<:T} \emph{does not} imply that T and U are the same
+\item \texttt{T<:U} and \texttt{U<:T} \mr{\emph{does not}} imply that T and U are the same
 \item The language predeclares the below type:
 \begin{lstlisting}[language=c]
 Text <: Refany

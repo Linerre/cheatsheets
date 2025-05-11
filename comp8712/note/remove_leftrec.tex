@@ -1,0 +1,77 @@
+\documentclass[10pt,a4paper,landscape]{article}
+\input{preamble}
+
+\begin{document}
+% Suppress page number for all pages
+\pagestyle{empty}
+
+% Each section goes into this env
+\begin{multicols*}{3}
+\section*{Eliminate left-recursion by converting it to right recursion}
+\begin{itemize}
+\item Suppose the following grammar ($\beta$ \emph{does not} start with $A$):
+  \[
+A\to A\alpha \gor \beta
+  \]
+\item Recursively applying $A$, we can have the following string
+  \[
+s = A\alpha \to A\alpha\alpha \overset{*}{\to} \beta\underbracket[0.5pt][3pt]{\alpha\cdots\alpha}_{\alpha^{*}} = \beta\alpha^{*}
+  \]
+\item Then grammar $A$ is equivalent to $A' \to\beta\alpha^{*}$ and thus
+  \begin{align*}
+    A\to &\; \beta A' \\
+    A'\to &\; \alpha A'\gor \varepsilon
+  \end{align*}
+\end{itemize}
+\section*{A simple example}
+\begin{align*}
+  E\to &\; E + T \\
+  E\to &\; T
+\end{align*}
+\begin{enumerate}
+\item since $E\to E + T\gor T$, we have $\beta = T$
+\item since $E \overset{*}{\to} T (+ T)^{*}$, we have $E' = (+ T)^{*} = + T E' \gor \varepsilon$
+\begin{align*}
+  E\to &\; T E' \\
+  E'\to &\; + T E' \gor \varepsilon
+\end{align*}
+\end{enumerate}
+\section*{Multiple left recursions}
+\begin{align*}
+  A\to &\; A\alpha_1\gor A\alpha_2 \gor \cdots \gor A\alpha_n & (n \geq 0)\\
+  A\to &\; \beta_1\gor\beta_2\gor\cdots\gor\beta_m  & (m \geq 0)
+\end{align*}
+The above grammar can be re-written as follows:
+\begin{align*}
+  A\to &\; \beta_1 A'\gor\beta_2 A'\gor\cdots\gor\beta_m A'  & (m \geq 0) \\
+  A'\to &\; \alpha_1 A'\gor \alpha_2 A' \gor \cdots \gor \alpha_n A' & (n \geq 0) \\
+  A'\to &\; \varepsilon
+\end{align*}
+\section*{A simple example}
+\[
+\begin{pmatrix}
+  X\to&\; X \gamma_1 \\
+  X\to&\; X \gamma_2 \\
+  \cdots             \\
+  X\to&\; X \gamma_n \\
+  X\to&\; \alpha_1   \\
+  X\to&\; \alpha_2   \\
+  \cdots             \\
+  X\to&\; \alpha_m
+\end{pmatrix}
+\implies
+\begin{pmatrix}
+  X\to&\; \alpha_1 X' \\
+  X\to&\; \alpha_2 X' \\
+  \cdots             \\
+  X\to&\; \alpha_m X' \\
+  X'\to&\;\gamma_1 X' \\
+  X'\to&\; \gamma_2 X' \\
+  \cdots             \\
+  X'\to&\; \gamma_n X' \\
+  X'\to&\; \varepsilon
+\end{pmatrix}
+\]
+
+\end{multicols*}
+\end{document}
