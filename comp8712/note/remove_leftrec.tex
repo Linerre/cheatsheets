@@ -72,6 +72,40 @@ The above grammar can be re-written as follows:
   X'\to&\; \varepsilon
 \end{pmatrix}
 \]
+\section*{Remove indirect left-recursions: an example}
+\begin{minipage}{.5\linewidth}
+\begin{align}
+  S\to &\; Q \\
+  Q\to &\; QED \gor q \\
+  D\to &\; NFA \gor d \\
+  N\to &\; DFA \gor n
+\end{align}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{align}
+  A\to & a \\
+  E\to &\; e \gor \varepsilon \\
+  F\to &\; f
+\end{align}
+\end{minipage}
+\section*{Step 1: Re-arrange grammar in terms of dependencies}
+\begin{align*}
+  Q\to &\; QED \gor q & (1)\\
+  E\to &\; e \gor \varepsilon &(2) \\
+  D\to &\; NFA \gor d & (\mr{3})\\
+  N\to &\; DFA \gor n & (\mr{4})\\
+  F\to &\; f          & (5)\\
+  A\to &\; a            & (6)
+\end{align*}
+\section*{Step 2: Turn indirect left-recursion into direct one}
+$(\mr{3})$ and $(\mr{4})$ show $ D\to N\to D$ (indirect) and thus:
+\begin{align*}
+  Q\to &\; QED \gor q & (1)\\
+  E\to &\; e \gor \varepsilon &(2) \\
+  D\to &\; \mb{DFA}\mo{FA} \gor \mb{n}\mo{FA} \gor d &(\mr{3})\\
+  F\to &\; f          & (5)\\
+  A\to &\; a          & (6)
+\end{align*}
 
 \end{multicols*}
 \end{document}
