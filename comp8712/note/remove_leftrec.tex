@@ -92,20 +92,96 @@ The above grammar can be re-written as follows:
 \begin{align*}
   Q\to &\; QED \gor q & (1)\\
   E\to &\; e \gor \varepsilon &(2) \\
-  D\to &\; NFA \gor d & (\mr{3})\\
-  N\to &\; DFA \gor n & (\mr{4})\\
+  D\to &\; NFA \gor d & (\mb{3})\\
+  N\to &\; DFA \gor n & (\mo{4})\\
   F\to &\; f          & (5)\\
   A\to &\; a            & (6)
 \end{align*}
 \section*{Step 2: Turn indirect left-recursion into direct one}
-$(\mr{3})$ and $(\mr{4})$ show $ D\to N\to D$ (indirect) and thus:
+\begin{itemize}
+\item $(\mb{3})$ and $(\mo{4})$ show $ D\to N\to D$ (\mr{indirect} left recursion)
+\item turn it into \mr{direct} left recursion $(\mb{3})$ by \mr{substitution}
+\end{itemize}
 \begin{align*}
   Q\to &\; QED \gor q & (1)\\
   E\to &\; e \gor \varepsilon &(2) \\
-  D\to &\; \mb{DFA}\mo{FA} \gor \mb{n}\mo{FA} \gor d &(\mr{3})\\
+  D\to &\; \mo{DFA}\mb{FA} \gor \mo{n}\mb{FA} \gor d &(\mb{3})\\
   F\to &\; f          & (5)\\
   A\to &\; a          & (6)
 \end{align*}
-
+\section*{Step 3: Remove direct left-recursion(s)}
+\begin{itemize}
+\item Production $(1)$ has direct left-recursion with below format:
+  \[
+    Q\to \; Q\overbracket[0.5pt][2pt]{ED}^{\alpha} \gor \overbracket[0.5pt][3pt]{q}^{\beta}
+  \]
+\item Eliminate the left-recursion by rewriting it to:
+  \begin{align*}
+    Q\to &\; q Q' & (1)\\
+    Q'\to &\; EDQ' \gor \varepsilon &(2)
+  \end{align*}
+\item Production $(3)$ has direct left-recursion with below format:
+  \[
+    D\to \; D\overbracket[0.5pt][2pt]{FAFA}^{\alpha} \gor \overbracket[0.5pt][2pt]{nFA}^{\beta_1} \overbracket[0.5pt][4.5pt]{q}^{\beta_2}
+  \]
+\item Eliminate left-recursion in $(3)$ and keep other productions:
+  \begin{align*}
+    D\to &\; nFA D' \gor d D' & (3)\\
+    D'\to &\; FAFAD' \gor \varepsilon &(4)\\
+    F\to &\; f          & (5)\\
+    A\to &\; a          & (6)\\
+    E\to &\; e \gor \varepsilon &(7)
+  \end{align*}
+\end{itemize}
+\section*{Left refactoring}
+\begin{itemize}
+\item Given a production where the RHS share common prefix
+\[
+  A\to \alpha\beta \gor \alpha\gamma
+\]
+\item backtracking and lookahead $\to$ overhead + slow compilation
+\item \mo{solution}: re-write the production to the following
+  \begin{align*}
+    A\to &\; \alpha A' \\
+    A'\to &\; \beta \gor \gamma
+  \end{align*}
+\end{itemize}
+\section*{Example 1}
+\begin{enumerate}[start=0]
+\item Given a grammar with the following productions
+  \begin{align*}
+    E\to &\; T + E \gor T \\
+    T\to &\; \textsf{int} \gor \textsf{int} * T \\
+    T\to &\; (E)
+  \end{align*}
+\item identify \mb{common} prefix(es)
+  \begin{align*}
+    E\to &\; \mb{T} + E \gor \mb{T} \\
+    T\to &\; \mb{\textsf{int}} \gor \mb{\textsf{int}} * T \\
+    T\to &\; (E)
+  \end{align*}
+\item re-write the grammar to remove \mb{common} prefix(es)
+  \begin{align*}
+    E\to &\; \mb{T} E'\\
+    E'\to &\; + E \gor \varepsilon \\
+    T\to &\; \mb{\textsf{int}}\,T' \\
+    T'\to &\; \mb{\textsf{int}} * T \gor \varepsilon \\
+    T\to &\; (E)
+  \end{align*}
+\end{enumerate}
+\section*{Example 2}
+\begin{enumerate}
+\item Identify the \mb{common} prefix(es)
+  \begin{align*}
+    \textsf{stmt} \to &\quad \textsf{\mb{if expr then stmt} else stmt} \\
+                      &\gor \mb{\textsf{if expr then stmt}}
+  \end{align*}
+\item re-write the grammar to remove \mb{common} prefix(es)
+  \begin{align*}
+    \textsf{stmt} \to &\quad \textsf{if expr then stmt}\; E' &(1) \\
+     E'\to &\quad \textsf{else stmt} \gor \varepsilon        &(2)
+  \end{align*}
+\item $(2)$ is still ambiguous but it's easy to tell $\varepsilon$ from non-empty
+\end{enumerate}
 \end{multicols*}
 \end{document}
