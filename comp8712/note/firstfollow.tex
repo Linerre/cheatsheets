@@ -1,30 +1,34 @@
 \documentclass[10pt,a4paper,landscape]{article}
 \input{preamble}
 \begin{document}
-% Suppress page number for all pages
+%
 \pagestyle{empty}
 \begin{multicols*}{3}
-\section*{Rules for \textsc{FIRST} set for a given $G = (N,\Sigma,P,S)$}
+\section*{\textsc{FIRST} set rules for a given $G\text{rammar} = (N,\Sigma,P,S)$}
 \begin{enumerate}
-\item a terminal's \textsf{FIRST} is the terminal itself ($a\in \Sigma$ or $a = \varepsilon$)
+\item A terminal's \textsf{FIRST} is the terminal itself ($a\in \Sigma$ or $a = \varepsilon$)
   \begin{align*}
     \mathsf{FIRST}(a)           =&\; \{a\}           \tag{1.1}\\
     \mathsf{FIRST}(\varepsilon) =&\; \{\varepsilon\} \tag{1.2}
   \end{align*}
-\item for a given production $X \to\; Y_1Y_2\cdots Y_n$ ($\in P$)
+\item For a given production $X \to\; Y_1Y_2\cdots Y_n$
   \begin{align*}
     \mathsf{FIRST}(X) =&\; \mathsf{FIRST}(Y_1Y_2\cdots Y_n) \tag{2}
   \end{align*}
-\item \mb{skip} nullable $Y$s and \mb{stop} at 1st non-nullable $Y$:
+\item For $Y_i\,(1 \leq i \leq n)$ of $Y_1Y_2\cdots Y_iY_{i+1}$
+  \begin{itemize}
+  \item \mb{skip} if $Y_i\overset{\ast}{\Rightarrow}{\varepsilon}$ (i.e., \textsf{nullable}$(Y_i)$) and check if \textsf{nullable}$(Y_{i+1})$
+  \item \mb{stop} at $Y_{i+1}$ if \textsf{nullable}$(Y_1\cdots Y_i) \;\land\; \neg \mathsf{nullable}(Y_{i+1})$
+  \end{itemize}
   \begin{align*}
     & \mathsf{FIRST}(Y_1Y_2\cdots Y_n) = \nonumber\\
-    & \mathsf{FIRST}(Y_1)
+    & \mathsf{FIRST}
 \bigcup_{Y_1\overset{*}{\Rightarrow}\varepsilon}^{\text{iff}} \mathsf{FIRST}(Y_2) \quad\cdots\, \bigcup_{Y_1\cdots Y_{n-1}\overset{*}{\Rightarrow}\varepsilon}^{\text{iff}} \mathsf{FIRST}(Y_n) \tag{3}
   \end{align*}
-\item[]
-\item for multi-production $X$: $X\to Y_1Y_2\cdots Y_n \gor Z_1Z_2\cdots Z_m$
+\
   \begin{align*}
-\mathsf{FIRST}(X) =\; \mathsf{FIRST}(Y_1\cdots Y_n) \cup \mathsf{FIRST}(Z_1\cdots Z_m) \tag{4}
+     X\to &\; Y_1Y_2\cdots Y_n \gor Z_1Z_2\cdots Z_m \nonumber \\
+\mathsf{FIRST}(X) =&\; \mathsf{FIRST}(Y_1\cdots Y_n) \cup \mathsf{FIRST}(Z_1\cdots Z_m) \tag{4}
   \end{align*}
 \end{enumerate}
 \section*{Example of FIRST set}
@@ -33,37 +37,127 @@
     P \to &\; E \quad  &E \to &\; aFT  \\
     F \to &\; TG\quad  &F \to &\; c    \\
     T \to &\; a \quad  &T \to &\; \varepsilon  \\
-    G \to &\; b
+    G \to &\
   \end{align*}
 \end{minipage}
 \begin{minipage}{.5\linewidth}
   \begin{tabular}{c|l}
     & \textsf{FIRST} \\
-    \hline
+    \
     P &  $\mset{a}$\\
-    \hline
+    \
     E &  $\mset{a}$\\
-    \hline
+    \
     F &  $\mset{a,b,c,\varepsilon}$\\
-    \hline
+    \
     T & $\mset{a,\varepsilon}$ \\
-    \hline
+    \
     G & $\mset{b}$ \\
-    \hline
+    \
   \end{tabular}
 \end{minipage}
 \begin{align*}
   \mathsf{FIRST}(G) &= \mathsf{FIRST}(b) = \mset{b} \tag{2,1.1} \\
   \mathsf{FIRST}(T) &= \mathsf{FIRST}(a) \cup \mathsf{FIRST}(\varepsilon) \tag{4}\\
-                    &= \mathsf{FIRST}(a) \cup \mathsf{FIRST}(\varepsilon) \tag{1.1,1.2} \\
-                    &= \mset{a} \cup \mset{\varepsilon} = \mset{a,\varepsilon} \\
+                    &= \mset{a} \cup \mset{\varepsilon} \tag{1.1,1.2} \\
+                    &= \mset{a,\varepsilon} \\
   \mathsf{FIRST}(F) &= \mathsf{FIRST}(TG) \cup \mathsf{FIRST}(c) \tag{4} \\
                     &= \mathsf{FIRST}(T) \bigcup_{T\overset{*}{\Rightarrow}\varepsilon}^{\text{iff}} \mathsf{FIRST}(G) \cup \mathsf{FIRST}(c) \tag{3,1} \\
                     &= \mset{a,\varepsilon} \cup \mset{b} \cup \mset{c} = \mset{a,b,c,\varepsilon} \\
   \mathsf{FIRST}(E) &= \mathsf{FIRST}(aFT) \tag{2} \\
-                    &= \mathsf{FIRST}(a) \hcancel{\cup \mathsf{FIRST}(F) \cup \mathsf{FIRST}(T)} = \mset{a} \tag{3,1} \\
+                    &= \mathsf{FIRST}(a) \hcancel{\cup \mathsf{FIRST}(F) \cup \mathsf{FIRST}(T)} \tag{3,1} \\
+                    &= \mset{a} \\
   \mathsf{FIRST}(P) &= \mathsf{FIRST}(E) = \mset{a} \tag{2}
 \end{align*}
 
+\section*{FOLLOW set def of $G\text{rammar}=(N,\Sigma, P, S)$}
+\begin{itemize}
+\item A \textsf{FOLLOW} set of a non-terminal symbol $A$ ($\in N$) consists of all terminal symbols that appear immediately to the right of $A$ (immediately after $A$) in any derivation of $G$
+\item \textsf{FOLLOW} set is determined for \mb{non-terminal}
+\end{itemize}
+\section*{Rules to calculate the FOLLOW set in $G=(N,\Sigma, P, S)$}
+\begin{enumerate}
+\item For each non-terminal $n\,(\in N)$, \mo{init} its \textsf{FOLLOW} set as \mset{}
+\item[] For the start symbol, include \$ (\texttt{EOF}) in ints init \textsf{FOLLOW}
+  \begin{align*}
+    \mathsf{FOLLOW}(n) &= \mset{}  \tag{R1} \\
+    \mathsf{FOLLOW}(S) &= \mset{\$} \tag{R1}
+  \end{align*}
+\item Given the a production $A\to \alpha B \beta$ where
+  \begin{itemize}
+  \item $\alpha$ and $\beta$ are sequences of terminals and non-terminals
+  \item $B$ is non-terminal
+  \end{itemize}
+  \begin{align*}
+    \mathsf{FOLLOW}(B) \supseteq \mathsf{FIRST}(\beta) \tag{R2}
+  \end{align*}
+\item If $\beta = \varepsilon$ or $\beta \overset{\ast}{\Rightarrow} $
+  \begin{align*}
+    \mathsf{FOLLOW}(B) \supseteq \mathsf{FOLLOW}(A) \tag{R3}
+  \end{align*}
+\
+\end{enumerate}
+\section*{Example of FOLLOW set}
+\begin{minipage}{.4\linewidth}
+  \begin{align*}
+    E \to &\; T E'   \\
+    E'\to &\; + T E' \\
+          &\gor \varepsilon \\
+    T \to &\; F T' \\
+    T'\to &\; * F T' \\
+          &\gor \varepsilon \\
+    F \to &\; (E) \\
+          &\gor \mathsf{id}
+  \end{align*}
+\end{minipage}
+\begin{minipage}{.6\linewidth}
+  \begin{tabular}{c|l|l}
+    & \textsf{FIRST} & \textsf{FOLLOW} \\
+    \
+    $+$ &  $\mset{+}$ & -          \\
+    \
+    $*$ &  $\mset{*}$ & -        \\
+    \
+    $($ &  $\mset{(}$ & -         \\
+    \
+    $)$ &  $\mset{)}$ & -        \\
+    \
+    $E$ &  $\mset{(,\mathsf{id}}$ & ? \\
+    \
+    $E'$ &  $\mset{(,\mathsf{id}}$ & ? \\
+    \
+    $T$ &  $\mset{*,\varepsilon}$ & ? \\
+    \
+    $T'$ & $\mset{(, \mathsf{id}}$ & ? \\
+    \
+    $F$ & $\mset{b}$ & \\
+    \
+  \end{tabular}
+\end{minipage}
+\begin{itemize}
+\item Init \textsf{FOLLOW} set as \
+  \begin{align*}
+    \mathsf{FOLLOW}(E) &\overset{\text{init}}{\to} \mset{\$} \tag{R1} \\
+    \mathsf{FOLLOW}(E') &\overset{\text{init}}{\to} \mset{} \tag{R1} \\
+    \mathsf{FOLLOW}(T) &\overset{\text{init}}{\to} \mset{} \tag{R1} \\
+    \mathsf{FOLLOW}(T') &\overset{\text{init}}{\to} \mset{} \tag{R1} \\
+    \mathsf{FOLLOW}(F) &\overset{\text{init}}{\to} \mset{} \tag{R1} \\
+  \end{align*}
+\item \mb{$E$} on RHS of $F\to (E)\gor \mathsf{id}$
+  \begin{align*}
+    \mathsf{FOLLOW}(E) \supseteq \mathsf{FIRST}(\mathtt{)}) = \mset{\$, )} \tag{R2}
+  \end{align*}
+\item \mb{$E'$} on RHS (end) of $E\to TE'$ and $E'\to\; + TE' \gor \varepsilon$
+  \begin{align*}
+    \mathsf{FOLLOW}(E') &\supseteq \mathsf{FOLLOW}(E) = \mset{\$, )} \tag{R3} \\
+    \mathsf{FOLLOW}(E') &\supseteq \mathsf{FOLLOW}(E') \tag{R3,R4} \\
+  \end{align*}
+\item \mb{$T$} on RHS of $E\to TE'$ and $E'\to\; +TE' \gor $
+  \begin{align*}
+    \mathsf{FOLLOW}(T) &\supseteq \mathsf{FIRST}(E') = \mset{\$, )} \tag{R2} \\
+    \mathsf{FOLLOW}(T) &\supseteq \mathsf{FOLLOW}(E) \tag{R3} \\
+    \mathsf{FOLLOW}(T) &= \mset{\$, )}
+  \end{align*}
+\end{itemize}
 \end{multicols*}
 \end{document}
