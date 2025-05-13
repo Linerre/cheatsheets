@@ -1,0 +1,69 @@
+\documentclass[10pt,a4paper,landscape]{article}
+\input{preamble}
+\begin{document}
+% Suppress page number for all pages
+\pagestyle{empty}
+\begin{multicols*}{3}
+\section*{Rules for \textsc{FIRST} set for a given $G = (N,\Sigma,P,S)$}
+\begin{enumerate}
+\item a terminal's \textsf{FIRST} is the terminal itself ($a\in \Sigma$ or $a = \varepsilon$)
+  \begin{align*}
+    \mathsf{FIRST}(a)           =&\; \{a\}           \tag{1.1}\\
+    \mathsf{FIRST}(\varepsilon) =&\; \{\varepsilon\} \tag{1.2}
+  \end{align*}
+\item for a given production $X \to\; Y_1Y_2\cdots Y_n$ ($\in P$)
+  \begin{align*}
+    \mathsf{FIRST}(X) =&\; \mathsf{FIRST}(Y_1Y_2\cdots Y_n) \tag{2}
+  \end{align*}
+\item \mb{skip} nullable $Y$s and \mb{stop} at 1st non-nullable $Y$:
+  \begin{align*}
+    & \mathsf{FIRST}(Y_1Y_2\cdots Y_n) = \nonumber\\
+    & \mathsf{FIRST}(Y_1)
+\bigcup_{Y_1\overset{*}{\Rightarrow}\varepsilon}^{\text{iff}} \mathsf{FIRST}(Y_2) \quad\cdots\, \bigcup_{Y_1\cdots Y_{n-1}\overset{*}{\Rightarrow}\varepsilon}^{\text{iff}} \mathsf{FIRST}(Y_n) \tag{3}
+  \end{align*}
+\item[]
+\item for multi-production $X$: $X\to Y_1Y_2\cdots Y_n \gor Z_1Z_2\cdots Z_m$
+  \begin{align*}
+\mathsf{FIRST}(X) =\; \mathsf{FIRST}(Y_1\cdots Y_n) \cup \mathsf{FIRST}(Z_1\cdots Z_m) \tag{4}
+  \end{align*}
+\end{enumerate}
+\section*{Example of FIRST set}
+\begin{minipage}{.5\linewidth}
+  \begin{align*}
+    P \to &\; E \quad  &E \to &\; aFT  \\
+    F \to &\; TG\quad  &F \to &\; c    \\
+    T \to &\; a \quad  &T \to &\; \varepsilon  \\
+    G \to &\; b
+  \end{align*}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+  \begin{tabular}{c|l}
+    & \textsf{FIRST} \\
+    \hline
+    P &  $\mset{a}$\\
+    \hline
+    E &  $\mset{a}$\\
+    \hline
+    F &  $\mset{a,b,c,\varepsilon}$\\
+    \hline
+    T & $\mset{a,\varepsilon}$ \\
+    \hline
+    G & $\mset{b}$ \\
+    \hline
+  \end{tabular}
+\end{minipage}
+\begin{align*}
+  \mathsf{FIRST}(G) &= \mathsf{FIRST}(b) = \mset{b} \tag{2,1.1} \\
+  \mathsf{FIRST}(T) &= \mathsf{FIRST}(a) \cup \mathsf{FIRST}(\varepsilon) \tag{4}\\
+                    &= \mathsf{FIRST}(a) \cup \mathsf{FIRST}(\varepsilon) \tag{1.1,1.2} \\
+                    &= \mset{a} \cup \mset{\varepsilon} = \mset{a,\varepsilon} \\
+  \mathsf{FIRST}(F) &= \mathsf{FIRST}(TG) \cup \mathsf{FIRST}(c) \tag{4} \\
+                    &= \mathsf{FIRST}(T) \bigcup_{T\overset{*}{\Rightarrow}\varepsilon}^{\text{iff}} \mathsf{FIRST}(G) \cup \mathsf{FIRST}(c) \tag{3,1} \\
+                    &= \mset{a,\varepsilon} \cup \mset{b} \cup \mset{c} = \mset{a,b,c,\varepsilon} \\
+  \mathsf{FIRST}(E) &= \mathsf{FIRST}(aFT) \tag{2} \\
+                    &= \mathsf{FIRST}(a) \hcancel{\cup \mathsf{FIRST}(F) \cup \mathsf{FIRST}(T)} = \mset{a} \tag{3,1} \\
+  \mathsf{FIRST}(P) &= \mathsf{FIRST}(E) = \mset{a} \tag{2}
+\end{align*}
+
+\end{multicols*}
+\end{document}

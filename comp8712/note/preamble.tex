@@ -97,9 +97,12 @@
 \setlength\belowdisplayshortskip{-4pt}
 \setlength\tabcolsep{5pt}
 \newcommand{\gor}{\;|\;}
+\newcommand{\mset}[1]{\{#1\}}
 \newcommand{\num}{\texttt{\#}~}
 \newcommand{\mr}[1]{\textcolor{Magenta}{#1}}
 \newcommand{\mb}[1]{\textcolor{Cerulean}{#1}}
 \newcommand{\mo}[1]{\textcolor{Maroon}{#1}}
 \newcommand{\ml}[1]{\textcolor{lbl}{#1}}
+\newcommand{\hcancel}[2][red]{\setbox0=\hbox{$#2$}%
+\rlap{\raisebox{.45\ht0}{\textcolor{#1}{\rule{\wd0}{1pt}}}}#2}
 \renewcommand{\arraystretch}{1.2}

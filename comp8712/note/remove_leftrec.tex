@@ -135,15 +135,15 @@ The above grammar can be re-written as follows:
 \end{itemize}
 \section*{Left refactoring}
 \begin{itemize}
-\item Given a production where the RHS share common prefix
+\item A grammar where the RHS share common prefix ($\alpha \neq \varepsilon$)
 \[
-  A\to \alpha\beta \gor \alpha\gamma
+  A\to \alpha\beta_1 \gor \alpha\beta_2 \gor \cdots \gor \alpha\beta_n
 \]
 \item backtracking and lookahead $\to$ overhead + slow compilation
 \item \mo{solution}: re-write the production to the following
   \begin{align*}
     A\to &\; \alpha A' \\
-    A'\to &\; \beta \gor \gamma
+    A'\to &\; \beta_1 \gor \beta_2 \gor \cdots \gor \beta_n
   \end{align*}
 \end{itemize}
 \section*{Example 1}
