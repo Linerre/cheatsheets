@@ -43,17 +43,17 @@
 \begin{minipage}{.5\linewidth}
   \begin{tabular}{c|l}
     & \textsf{FIRST} \\
-    \
+    \hline
     P &  $\mset{a}$\\
-    \
+    \hline
     E &  $\mset{a}$\\
-    \
+    \hline
     F &  $\mset{a,b,c,\varepsilon}$\\
-    \
+    \hline
     T & $\mset{a,\varepsilon}$ \\
-    \
+    \hline
     G & $\mset{b}$ \\
-    \
+    \hline
   \end{tabular}
 \end{minipage}
 \begin{align*}
@@ -72,7 +72,7 @@
 
 \section*{FOLLOW set def of $G\text{rammar}=(N,\Sigma, P, S)$}
 \begin{itemize}
-\item A \textsf{FOLLOW} set of a non-terminal symbol $A$ ($\in N$) consists of all terminal symbols that appear immediately to the right of $A$ (immediately after $A$) in any derivation of $G$
+\item A \textsf{FOLLOW} set of a non-terminal symbol $A$ ($\in N$) consists of all terminal symbols that appear immediately to the \mr{right} of $A$ (immediately after $A$) in any derivation of $G$
 \item \textsf{FOLLOW} set is determined for \mb{non-terminal}
 \end{itemize}
 \section*{Rules to calculate the FOLLOW set in $G=(N,\Sigma, P, S)$}
@@ -83,19 +83,19 @@
     \mathsf{FOLLOW}(n) &= \mset{}  \tag{R1} \\
     \mathsf{FOLLOW}(S) &= \mset{\$} \tag{R1}
   \end{align*}
-\item Given the a production $A\to \alpha B \beta$ where
+\item Given the a production \mo{$A\to \alpha B \beta$} where
   \begin{itemize}
-  \item $\alpha$ and $\beta$ are sequences of terminals and non-terminals
-  \item $B$ is non-terminal
+  \item \mo{$\alpha$} and \mo{$\beta$} are sequences of terminals and non-terminals
+  \item \mo{$B$} is non-terminal
   \end{itemize}
   \begin{align*}
     \mathsf{FOLLOW}(B) \supseteq \mathsf{FIRST}(\beta) \tag{R2}
   \end{align*}
-\item If $\beta = \varepsilon$ or $\beta \overset{\ast}{\Rightarrow} $
+\item If $\mo{\beta} = \varepsilon$ or $\mo{\beta} \overset{\ast}{\Rightarrow}\varepsilon$
   \begin{align*}
     \mathsf{FOLLOW}(B) \supseteq \mathsf{FOLLOW}(A) \tag{R3}
   \end{align*}
-\
+\item Repeat R2 and R3 until no new symbols added
 \end{enumerate}
 \section*{Example of FOLLOW set}
 \begin{minipage}{.4\linewidth}
@@ -113,29 +113,29 @@
 \begin{minipage}{.6\linewidth}
   \begin{tabular}{c|l|l}
     & \textsf{FIRST} & \textsf{FOLLOW} \\
-    \
+    \hline
     $+$ &  $\mset{+}$ & -          \\
-    \
+    \hline
     $*$ &  $\mset{*}$ & -        \\
-    \
+    \hline
     $($ &  $\mset{(}$ & -         \\
-    \
+    \hline
     $)$ &  $\mset{)}$ & -        \\
-    \
-    $E$ &  $\mset{(,\mathsf{id}}$ & ? \\
-    \
-    $E'$ &  $\mset{(,\mathsf{id}}$ & ? \\
-    \
-    $T$ &  $\mset{*,\varepsilon}$ & ? \\
-    \
-    $T'$ & $\mset{(, \mathsf{id}}$ & ? \\
-    \
-    $F$ & $\mset{b}$ & \\
-    \
+    \hline
+    $E$ &  $\mset{(, \mathsf{id}}$ & \mset{\$, )} \\
+    \hline
+    $E'$ &  $\mset{+, \varepsilon}$ & \mset{\$, )} \\
+    \hline
+    $T$ &  $\mset{(, \mathsf{id}}$ & \mset{+, \$, )} \\
+    \hline
+    $T'$ & $\mset{*, \varepsilon}$ & \mset{+, \$, )} \\
+    \hline
+    $F$ & $\mset{(, \mathsf{id}}$ & \mset{+, *, \$, )}\\
+    \hline
   \end{tabular}
 \end{minipage}
 \begin{itemize}
-\item Init \textsf{FOLLOW} set as \
+\item Init \textsf{FOLLOW} set as empty for each non-terminal
   \begin{align*}
     \mathsf{FOLLOW}(E) &\overset{\text{init}}{\to} \mset{\$} \tag{R1} \\
     \mathsf{FOLLOW}(E') &\overset{\text{init}}{\to} \mset{} \tag{R1} \\
@@ -143,21 +143,55 @@
     \mathsf{FOLLOW}(T') &\overset{\text{init}}{\to} \mset{} \tag{R1} \\
     \mathsf{FOLLOW}(F) &\overset{\text{init}}{\to} \mset{} \tag{R1} \\
   \end{align*}
-\item \mb{$E$} on RHS of $F\to (E)\gor \mathsf{id}$
+\item For $\mb{E}$ in $F\to (\mb{E})\gor \mathsf{id}$
   \begin{align*}
-    \mathsf{FOLLOW}(E) \supseteq \mathsf{FIRST}(\mathtt{)}) = \mset{\$, )} \tag{R2}
+    \mathsf{FOLLOW}(E) &\supseteq \mathsf{FIRST}(\mathtt{\mo{)}}) \tag{R2} \\
+    \therefore \mathsf{FOLLOW}(E) &=\mset{\$, \mo{)}}
   \end{align*}
-\item \mb{$E'$} on RHS (end) of $E\to TE'$ and $E'\to\; + TE' \gor \varepsilon$
+\item For $\mb{E'}$ in $E\to T\mb{E'}$ and
   \begin{align*}
-    \mathsf{FOLLOW}(E') &\supseteq \mathsf{FOLLOW}(E) = \mset{\$, )} \tag{R3} \\
-    \mathsf{FOLLOW}(E') &\supseteq \mathsf{FOLLOW}(E') \tag{R3,R4} \\
+    \mathsf{FOLLOW}(E') &\supseteq \mathsf{FOLLOW}(E) = \mset{\$,)} \tag{R3}
   \end{align*}
-\item \mb{$T$} on RHS of $E\to TE'$ and $E'\to\; +TE' \gor $
+\item For $\mb{E'}$ in $E'\to\; + T\mb{E'} \gor \varepsilon$
   \begin{align*}
-    \mathsf{FOLLOW}(T) &\supseteq \mathsf{FIRST}(E') = \mset{\$, )} \tag{R2} \\
-    \mathsf{FOLLOW}(T) &\supseteq \mathsf{FOLLOW}(E) \tag{R3} \\
-    \mathsf{FOLLOW}(T) &= \mset{\$, )}
+    \mathsf{FOLLOW}(E') &\supseteq \mathsf{FOLLOW}(E') \tag{R3} \\
+    \therefore \mathsf{FOLLOW}(E') &= \mset{\$, \mo{)} }
+  \end{align*}
+\item For $\mb{T}$ in $E\to \mb{T}E'$
+    \begin{align*}
+      \mathsf{FOLLOW}(T) &\supseteq \mathsf{FIRST}(E') = \mset{+} \tag{R2} \\
+      \mathsf{FOLLOW}(T) &\supseteq \mathsf{FOLLOW}(E) \tag{R3} \\
+      \therefore \mathsf{FOLLOW}(T) &= \mset{+,\$,)}
+    \end{align*}
+\item For $\mb{T}$ in $E'\to\; +\mb{T}E' \gor \varepsilon$
+  \begin{align*}
+    \mathsf{FOLLOW}(T) &\supseteq \mathsf{FIRST}(E') \tag{R2} \\
+    \mathsf{FOLLOW}(T) &\supseteq \mathsf{FOLLOW}(E') \tag{R3} \\
+    \therefore \mathsf{FOLLOW}(T) &= \mset{+,\$,)}
+  \end{align*}
+\item For $\mb{T'}$ in $T\to F\mb{T'}$ and
+  \begin{align*}
+    \mathsf{FOLLOW}(T') &\supseteq \mathsf{FIRST}(T) = \mset{+, \$, )} \tag{R3}
+  \end{align*}
+\item For $\mb{T'}$ in $T'\to\; *F\mb{T'} \gor \varepsilon$
+  \begin{align*}
+    \mathsf{FOLLOW}(T') &\supseteq \mathsf{FIRST}(T') = \mset{+, \$, )} \tag{R3}\\
+    \therefore \mathsf{FOLLOW}(T') &= \mset{+, \$, )}
+  \end{align*}
+\item For $\mb{F}$ in $T\to \mb{F}T'$
+  \begin{align*}
+    \mathsf{FOLLOW}(F) &\supseteq \mathsf{FIRST}(T') = \mset{*} \tag{R2} \\
+    \mathsf{FOLLOW}(T') &\supseteq \mathsf{FOLLOW}(T) = \mset{+, \$, )} \tag{R3} \\
+    \therefore \mathsf{FOLLOW}(F) &= \mset{+, * , \$, )}
+  \end{align*}
+\item For $\mb{F}$ in $T'\to\; *\mb{F}T' \gor \varepsilon$
+  \begin{align*}
+    \mathsf{FOLLOW}(F) &\supseteq \mathsf{FIRST}(T') = \mset{*}  \tag{R2} \\
+    \mathsf{FOLLOW}(F) &\supseteq \mathsf{FOLLOW}(T') = \mset{+, \$, )} \tag{R3} \\
+    \therefore \mathsf{FOLLOW}(F) &= \mset{+, * , \$, )}
   \end{align*}
 \end{itemize}
+
+
 \end{multicols*}
 \end{document}
