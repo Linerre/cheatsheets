@@ -1,0 +1,23 @@
+\documentclass[10pt,a4paper,landscape]{article}
+\input{preamble}
+\begin{document}
+\pagestyle{empty}
+\begin{multicols*}{3}
+\section*{Predictive parsing - LL (1)}
+\begin{align*}
+  E \to\;& E + T \gor T         \tag{1} \\
+  T \to\;& T * F \gor F         \tag{2} \\
+  F \to\;& (E) \gor \mathsf{id} \tag{3}
+\end{align*}
+\section*{Step 1: Eliminate left recursion (if any or skip if none)}
+\begin{align*}
+  E  \to&\; TE'                    \tag{1} \\
+  E' \to&\; + TE' \gor \varepsilon \tag{2} \\
+  T  \to&\; FT'                    \tag{3} \\
+  T' \to&\; * FT' \gor \varepsilon \tag{4} \\
+  F  \to&\; (E) \gor \mathsf{id}   \tag{5}
+\end{align*}
+\section*{Step 2: Remove common prefix by left refactoring}
+\mb{NO} common prefix shared by any 2 productions, so skip
+\end{multicols*}
+\end{document}
