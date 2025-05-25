@@ -12,7 +12,7 @@
   T'\, & \to\; *\,FT' \gor \varepsilon \tag{4} \\
   F\,  & \to\; (E)    \gor \mathsf{id} \tag{5}
 \end{align*}
-\section*{Step 2: Remove common prefix by left refactoring}
+\section*{Step 2: Remove common prefix by left factoring}
 \mb{NO} common prefix shared by any 2 productions, so skip
 
 \section*{Step 3: Collect FIRST and FOLLOW sets}
@@ -126,4 +126,79 @@
   \hline
   \end{tabular}
   \end{center}
+\end{itemize}
+\section*{LL (1) parsing example (suppose stack top is the left end)}
+\begin{enumerate}
+\item \mb{Update stack} stack top is a non-terminal; try to replace it with RHS of its production(s)
+\item \mb{Input match} stack top is terminal; match with current input symbol; remove the symbol from input; pop stack
+\item \mb{Accept}: stack = input buffer = \$
+\item \mb{Error}: when there is a mismatch, throws error
+\end{enumerate}
+\begin{minipage}{\linewidth}
+\centering
+\begin{tabular}{l|l|l|l}
+  \hline
+  Stack & Input buffer                          & Action  & Use Production  \\
+  \hline
+  $E\$$ & $\mathsf{id}*\mathsf{id}+\mathsf{id}\$$ & Update stack & $E\to TE'$\\
+  $TE'\$$ & $\mathsf{id}*\mathsf{id}+\mathsf{id}\$$ & Update stack &$T\to FT'$\\
+  $FT'E'\$$ & $\mathsf{id}*\mathsf{id}+\mathsf{id}\$$ & Update stack$^{\mr{1}}$ &$F\to \mathsf{id}$\\
+  $\mathsf{id}T'E'\$$ & $\mathsf{id}*\mathsf{id}+\mathsf{id}\$$ & Match &\\
+  $T'E'\$$ & $*\mathsf{id}+\mathsf{id}\$$ & Update stack$^{\mr{2}}$ & $T'\to *FT'$\\
+  $*FT'E'\$$ & $*\mathsf{id}+\mathsf{id}\$$ & Match & \\
+  $FT'E'\$$ & $\mathsf{id}+\mathsf{id}\$$ & Update stack &$F\to \mathsf{id}$ \\
+  $\mathsf{id}T'E'\$$ & $\mathsf{id}+\mathsf{id}\$$ & Match & \\
+  $T'E'\$$ & $+\mathsf{id}\$$ & Update stack$^{\mr{3}}$ & $T'\to \varepsilon$\\
+  $E'\$$ & $+\mathsf{id}\$$ & Update stack & $E'\to +TE'$\\
+  $+TE'\$$ & $+\mathsf{id}\$$ & Match & \\
+  $TE'\$$ & $\mathsf{id}\$$ & Update stack & $T\to FT'$\\
+  $FT'E'\$$ & $\mathsf{id}\$$ & Update stack & $F\to \mathsf{id}$\\
+  $\mathsf{id}T'E'\$$ & $\mathsf{id}\$$ & Match & \\
+  $T'E'\$$ & $\$$ & Update stack & $T'\to \varepsilon$ \\
+  $E'\$$ & $\$$ & Update stack & $E'\to \varepsilon$ \\
+  $\$$ & $\$$ & Accept &  \\
+  \hline
+  \multicolumn{4}{l}{\mr{1}: LL(1) parser knows $F\to \mathsf{id}$ if it sees \textsf{id} ahead}\\
+  \hline
+  \multicolumn{4}{l}{\mr{2}: LL(1) parser knows $T'\to *FT'$ if it sees \textsf{*} ahead}\\
+  \hline
+  \multicolumn{4}{l}{\mr{3}: LL(1) parser knows $T'\to \varepsilon$ if it sees other stuff ahead}\\
+  \hline
+\end{tabular}
+\end{minipage}
+\begin{itemize}
+\item \textbf{Use Prod.} shows the leftmost derivation and parse tree
+  \begin{center}
+    \begin{tikzpicture}[level distance=8mm]
+      \node {$E$}
+      [sibling distance=40mm]
+      child {
+        node {$T$}
+        [sibling distance=20mm]
+        child {
+          node {$F$} child { node {\mr{$\mathsf{id}$}} }
+        }
+        child {
+          node {$T'$}
+          [sibling distance=8mm]
+          child  {node {\mr{*}}}
+          child  {node {$F$} child {node {\mr{$\mathsf{id}$}}}}
+          child  {node {$T'$} child {node {\mr{$\varepsilon$}}}}
+        }
+      }
+      child {
+        node {$E'$}
+        [sibling distance=16mm]
+        child  {node {\mr{+}}}
+        child  {
+          node {$T$}
+          child {node {$F$} child {node {\mr{$\mathsf{id}$}}}}
+          child {node {$T'$} child {node {\mr{$\varepsilon$}}}}
+        }
+        child  {node {$E'$} child {node {\mr{$\varepsilon$}}}}
+      };
+    \end{tikzpicture}
+    \end{center}
+\item leaf nodes from left to right build the original input string
+\[\mathsf{id} * \mathsf{id} + \mathsf{id} \]
 \end{itemize}
