@@ -96,7 +96,7 @@
   $I$ & + & $x$  &\$       & $T$ & $E$  \\
   \hline
    1  &   & $s5$ &         &$g3$& $g2$ \\
-   2  &$r1$ &$r1$&$r1$     && \\
+   2  &   &      &$a$      && \\
    3  &$s4,r2$&$r2$&$r2$   && \\
    4  &   &$s5$&           &$g3$&$g6$ \\
    5  &$r3$&$r3$&$r3$      &    & \\
@@ -116,7 +116,45 @@
     that the grammar is not LR(0).
   }
 \end{minipage}
-
+\section*{Use FOLLOW to build SLR and remove S/R conflict}
+\begin{enumerate}
+\item in each state $I$, identify all the reduce items like $A\to \alpha\lrd$ (dot at the end) where $\alpha \in \Sigma$ (terminals plus \$).
+  \begin{itemize}
+  \item In $I_2$, $S\to E\lrd\$$
+  \item In $I_3$, $E\to T\lrd$
+  \item In $I_5$, $T\to x\lrd$
+  \item In $I_6$, $E\to T + E\lrd$
+  \end{itemize}
+\item for each reduce item above, compute \textsf{FOLLOW}(LHS)
+  \begin{itemize}
+  \item $\mfn{follow}(S) = \mset{\$}$ (just init the set to include \$)
+  \item $\mfn{follow}(T) = \mfn{follow}(E) \cup \mfn{first}(+) = \mset{+,\$}$
+  \item $\mfn{follow}(E) = \mset{\$}$
+  \end{itemize}
+\item for each token $X$ in each computed follow set above, put a reduce action $(I, X, A\to \alpha)$ (on lookahead $X$, reduce by rule $A\to \alpha$) in SLR table
+  \begin{itemize}
+  \item $(I_2, \$, S\to E\$)$, put $a$ ($r0$) at $(I_2, \$)$
+  \item $(I_3, \$, E\to T)$, put $r2$ at $(I_3, \$)$
+  \item $(I_5, +, T\to x)$, put $r3$ at $(I_5, +)$
+  \item $(I_5, \$, T\to x)$, put $r3$ at $(I_5, \$)$
+  \item $(I_6, \$, E\to T + E)$, put $r1$ at $(I_6, \$)$
+  \end{itemize}
+\end{enumerate}
+\begin{center}
+\begin{tabular}{l|lll|ll}
+  State &\multicolumn{3}{c}{Action} & \multicolumn{2}{c}{Goto}  \\
+  \hline
+  $I$ & + & $x$  &\$       & $T$ & $E$  \\
+  \hline
+   1  &   & $s5$ &         &$g3$& $g2$ \\
+   2  &   &      &$a$      &    & \\
+   3  &$s4$&     &$r2$     && \\
+   4  &   &$s5$&           &$g3$&$g6$ \\
+   5  &$r3$&&$r3$          &    & \\
+   6  &    &    &$r1$      &    & \\
+  \hline
+\end{tabular}
+\end{center}
 
 \end{multicols*}
 \end{document}
