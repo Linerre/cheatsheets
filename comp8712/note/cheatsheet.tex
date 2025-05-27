@@ -4,227 +4,119 @@
 \begin{document}
 % Suppress page number for all pages
 \pagestyle{empty}
-
 % Each section goes into this env
 \begin{multicols*}{3}
-\section*{LR(0) item, closure, goto}
+% \input{sec/LR0}
+\section*{Conflicts in LR parsing}
 \begin{itemize}
-\item \mb{item}: a grammar rule with a dot(\textbf{.}) that indicates a
-  parser position in its RHS: $A \to \alpha\beta\gamma$ thus can have the following:
-  \begin{align*}
-    A &\to \lrd\alpha\beta\gamma \\
-    A &\to \alpha\lrd\beta\gamma \\
-    A &\to \alpha\beta\lrd\gamma \\
-    A &\to \alpha\beta\gamma\lrd
-  \end{align*}
-\item $X \to\varepsilon$ has its own item: $X\to\lrd$
-\item When dot already at the end, no change to the item $X\to A\lrd$
-\item \mb{closure}: for item $A\to\alpha\lrd B\beta$ where $B$ is a \mo{non-terminal}. If $B$ has multiple productions $B\to \gamma_1 \gor \cdots \gor \gamma_n$, then \mo{all} $B\to\lrd\gamma_i\;(1 \leq i \leq n)$ should be in the same state as the item
-\item \mb{goto}: for item $A\to\alpha\lrd X\beta$ where $X$ can be a terminal or non-terminal, then create a new state that must contains
+\item \mb{shift} the dot past the input symbol currently before the dot
+\item[] Before: $X\to \lrd A\beta$; After: $X\to A\lrd\beta$
+\item \mb{reduce}: when dot at the end of item, RHS of the production can be replaced with the LHS
+\item In a state $I$, expect to have either a reduce or a shift action, not both. Otherwise, there is a \mo{conflict}:
   \begin{enumerate}
-  \item item $A\to\alpha X\lrd\beta$ (i.e. pass $X$), plus
-  \item the closure of the above item
+  \item \mb{S}/\mb{R} conflict: state $I$ has a reduce \textbf{AND} a shift action
+  \item \mb{R}/\mb{R} conflict: state $I$ has two reduce actions
   \end{enumerate}
-\item \textbf{closure} is about adding new \textbf{items} to a LR(0) DFA state
-\item \textbf{goto} is about creating transitions and states in LR(0) DFA
 \end{itemize}
-\section*{Example: create LR(0) DFA (parsing table and states)}
+\section*{Example: A grammar with S/R conflict}
 \begin{align*}
-  S&\to (L)   \tag{1} \\
-  S&\to x     \tag{2} \\
-  L&\to S     \tag{3} \\
-  L&\to L,S   \tag{4}
+  S&\to E\$   \tag{0} \\
+  E&\to T + E \tag{1} \\
+  E&\to T     \tag{2} \\
+  T&\to x     \tag{3}
 \end{align*}
+\section*{DFA with R/S conflict}
+\begin{tikzpicture}
+  % I1
+  \node (i1) [lrst, anchor=north east] {
+    $S\to \lrd E\$$\\
+    $E\to \lrd T + E$\\
+    $E\to \lrd T$\\
+    $T\to \lrd x$
+  };
+  \node [above=1mm of i1.north east, font=\footnotesize\bf]{1};
 
-\section*{Step 1: Augment the grammar to include a start symbol}
-\begin{align*}
-  S'&\to S\$  \tag{0} \\
-  S&\to (L)   \tag{1} \\
-  S&\to x     \tag{2} \\
-  L&\to S     \tag{3} \\
-  L&\to L,S   \tag{4}
-\end{align*}
-Also if there is any rule like $X\to N_1 \gor N_2 \dots$, rewrite it to
-\begin{align*}
-  X\to N_1 & X\to N_2 \cdots
-\end{align*}
-\section*{Step 2: Create start state for LR(0) DFA}
-\begin{enumerate}
-\item start with \textbf{starting item} $S'\to \lrd S\$$ and create state 1
-  \begin{center}
-    \begin{tikzpicture}[state/.style=draw]
-    \node (s1) [state] {
-      \begin{tabular}{ll}
-         $S'$ & $\to\lrd S\$$  \\
-         $S$  & $\to\lrd (L)$  \\
-         $S$  & $\to\lrd x$
-      \end{tabular}
-    };
-    \node (m1) [right=2mm of s1.north east,font=\bf\small]{1};
-    \end{tikzpicture}
-  \end{center}
-\item there is no non-terminals before \mr{\textbf{.}} so need \textbf{goto}
-\item In state 1, use goto to create edges and new states
-  \begin{itemize}
-  \item \textbf{goto}($x$) $\Rightarrow$ state 2
-  \end{itemize}
-  \begin{center}
-    \begin{tikzpicture}[state/.style=draw]
-      \node (s2) [state] {
-        \begin{tabular}{ll}
-          $S$ & $\to x\lrd$
-        \end{tabular}
-      };
-      \node (m2) [right=1mm of s2.north east,font=\bf\small]{2};
-    \end{tikzpicture}
-  \end{center}
-  \begin{itemize}
-  \item \textbf{goto}(left-paren) $\Rightarrow$ state 3
-  \end{itemize}
-  \begin{center}
-    \begin{tikzpicture}[state/.style=draw]
-      \node (s3) [state] {
-        \begin{tabular}{ll}
-          $S$ & $\to (\lrd L)$
-        \end{tabular}
-      };
-      \node (m3) [right=1mm of s3.north east,font=\bf\small]{3};
-    \end{tikzpicture}
-  \end{center}
-\item In state 3, $L$ is a non-terminal so need to add \textbf{closure}($L$)
-\item[] Similarly, $S$ is a non-termina so need to add \textbf{closure}($S$) when done with $L$. Last two items also appear in state 1
-  \begin{center}
-    \begin{tikzpicture}[state/.style=draw]
-    \node (s3) [state] {
-      \begin{tabular}{ll}
-         $S$ & $\to (\lrd L)$ \\
-         $L$ & $\to \lrd S$ \\
-         $L$ & $\to \lrd L,S$ \\
-         $S$ & $\to \lrd (L)$ \\
-         $S$ & $\to \lrd x$ \\
-      \end{tabular}
-    };
-    \node (m3) [right=1mm of s3.north east,font=\bf\small]{3};
-    \end{tikzpicture}
-  \end{center}
-\item In state 1, \textbf{goto}($S$) and get state 4
-  \begin{center}
-    \begin{tikzpicture}[state/.style=draw]
-    \node (s4) [state] {
-      \begin{tabular}{ll}
-         $S$ & $\to S\lrd\$$
-      \end{tabular}
-    };
-    \node (m4) [right=1mm of s4.north east,font=\bf\small]{4};
-    \end{tikzpicture}
-  \end{center}
-\item In state 3, closure is done, we need goto (start with easy)
-  \begin{itemize}
-  \item \textbf{goto}($x$), item $S\to x\lrd \Rightarrow$ existing state 2
-  \item \textbf{goto}(\textsf{left-pare}), item $S\to (\lrd L)\Rightarrow$ existing state 3
-  \item \textbf{goto}($L$), item $S\to (L\lrd)\Rightarrow$ new state 5
-  \item \textbf{goto}($L$), item $L\to L\lrd,S\Rightarrow$ new state 5
-  \begin{center}
-    \begin{tikzpicture}[state/.style=draw]
-    \node (s5) [state] {
-      \begin{tabular}{ll}
-         $S$ & $\to (L\lrd)$ \\
-         $L$ & $\to L\lrd,S$
-      \end{tabular}
-    };
-    \node (m5) [right=1mm of s5.north east,font=\bf\small]{5};
-    \end{tikzpicture}
-  \end{center}
-  \item \textbf{goto}($S$), item $L\to S\lrd\Rightarrow$ new state 7
-  \begin{center}
-    \begin{tikzpicture}[state/.style=draw]
-    \node (s7) [state] {
-      \begin{tabular}{ll}
-         $L$ & $\to S\lrd$
-      \end{tabular}
-    };
-    \node (m7) [right=1mm of s7.north east,font=\bf\small]{7};
-    \end{tikzpicture}
-  \end{center}
-  \end{itemize}
-\item In state 5, need \textbf{goto} as there's no closure to be computed
-  \begin{itemize}
-  \item \textbf{goto}(\textsf{right-paren}), item $S\to (L)\lrd \Rightarrow$ new state 6
-    \begin{center}
-      \begin{tikzpicture}[state/.style=draw]
-        \node (s6) [state] {
-          \begin{tabular}{ll}
-            $S$ & $\to (L)\lrd$
-          \end{tabular}
-        };
-        \node (m6) [right=1mm of s6.north east,font=\bf\small]{6};
-      \end{tikzpicture}
-    \end{center}
-  \item \textbf{goto}(,), item $L\to L,\lrd S \Rightarrow$ new state 8
-    \begin{center}
-      \begin{tikzpicture}[state/.style=draw]
-        \node (s8) [state] {
-          \begin{tabular}{ll}
-            $S$ & $\to L,\lrd S$
-          \end{tabular}
-        };
-        \node (m8) [right=1mm of s8.north east,font=\bf\small]{8};
-      \end{tikzpicture}
-    \end{center}
-  \end{itemize}
-\item In state 8, $S$ is non-terminal so need add \textbf{closure}($S$)
-  \begin{center}
-    \begin{tikzpicture}[state/.style=draw]
-      \node (s8) [state] {
-        \begin{tabular}{ll}
-          $S$ & $\to L,\lrd S$ \\
-          $S$ & $\to \lrd(L)$ \\
-          $S$ & $\to \lrd x$
-        \end{tabular}
-      };
-      \node (m8) [right=1mm of s8.north east,font=\bf\small]{8};
-    \end{tikzpicture}
-  \end{center}
-\item In state 8, now apply goto rule:
-  \begin{itemize}
-  \item \textbf{goto}($S$), item $S\to (L,S)\lrd \Rightarrow$ new state 9
-    \begin{center}
-      \begin{tikzpicture}[state/.style=draw]
-        \node (s9) [state] {
-          \begin{tabular}{ll}
-            $S$ & $\to L,S\lrd$ \\
-          \end{tabular}
-          % $S\to (L,S)\lrd$
-        };
-        \node (m9) [right=1mm of s9.north east,font=\bf\small]{9};
-      \end{tikzpicture}
-    \end{center}
-  \item \textbf{goto}(\textsf{left-paren}), item $S\to (\lrd L) \Rightarrow$ existing state 3
-  \item \textbf{goto}($x$), item $S\to x\lrd \Rightarrow$ existing state 2
-  \end{itemize}
-\end{enumerate}
-\includegraphics[width=\linewidth]{img/LR0}
-\section*{Step 3: draw parse table (row is state, col is symbol)}
+  %I2
+  \node (i2) [lrst, right=12mm of i1.north east, anchor=north west] {
+    $S\to E\lrd\$$
+  };
+  \node (m2) [above=1mm of i2.north east, font=\footnotesize\bf]{2};
 
-\begin{itemize}
-\item In edege $I\overset{X}{\to} J$, if $X$ is \mb{terminal}, \emph{shift} $J$ at $(I,X)$
-\item In edege $I\overset{X}{\to} J$, if $X$ is \mb{non-terminal}, \emph{goto} $J$ at $(I,X)$
-\item For each $I$ with an item $S'\to S\lrd\$$, \mb{accept} at $(I,\$)$
-\item For any $I$ with item $A\to \gamma\lrd$, \mb{reduce $n$} ($n$ is this production's num in the grammar) at $(I,Y)$ for every $Y$
-\end{itemize}
-\begin{tabular}{r|lllll|ll}
-  state $I$& (   & )   & $x$ &,    & $\$$ & $S$  & $L$ \\
+  %I3
+  \node (i3) [lrst, right=12mm of i1.east, anchor=north west] {
+    $E\to T\lrd + E$\\
+    $E\to T\lrd $
+  };
+  \node (m3) [right=1mm of i3.north east, font=\footnotesize\bf]{3};
+
+  %I5
+  \node (i5) [lrst, below=15mm of i1.south, anchor=north] {
+    $T\to x\lrd$
+  };
+  \node (m5) [above=1mm of i5.north east, font=\footnotesize\bf]{5};
+
+  %I4
+  \node (i4) [lrst, below=6mm of i3, anchor=north] {
+    $E\to T + \lrd E$\\
+    $E\to \lrd T$\\
+    $E\to \lrd T + E$ \\
+    $T\to \lrd x$
+  };
+  \node (m4) [right=1mm of i4.north east, font=\footnotesize\bf]{4};
+
+  %I6
+  \node (i6) [lrst, right=10mm of i4, anchor=west] {
+    $E\to T + E\lrd$
+  };
+  \node (m6) [above=1mm of i6.north east, font=\footnotesize\bf]{6};
+
+  % note
+  \node(note)[right=8mm of i3.north east, anchor=west, text width=3cm, font=\small] {
+    In $I_3$, there is a shift action (over $+$) and a reduce action (dot at the end) $\to$ S/R conflict in $I_3$ and \mr{not} a LR(0) grammar
+  };
+
+  % paths
+  \draw[->] (i1.east |- i2.west) -- (i2.west) node[midway, above]{$E$}  ;
+  \draw[->] (i1.mid east |- i3.west) -- (i3.west) node[midway, above]{$T$}  ;
+  \draw[->] (i1) edge node[left]{$x$} (i5) ;
+  \draw[->]
+  ([xshift=4mm]i3.south) -- ([xshift=4mm]i4.north) node[midway,right] {$+$};
+  \draw[->]
+  ([xshift=-4mm]i4.north) -- ([xshift=-4mm]i3.south) node[midway,left] {$T$};
+  \draw[->] (i4) edge node[above]{$E$} (i6);
+  \draw[->] (i4.west |- i5.east) -- (i5.east) node[midway, above]{$x$};
+
+\end{tikzpicture}
+\section*{Parse table with R/S conflict}
+\begin{minipage}{.7\linewidth}
+\begin{center}
+\begin{tabular}{l|lll|ll}
+  State &\multicolumn{3}{c}{Action$^1$} & \multicolumn{2}{c}{Goto$^2$}  \\
   \hline
-  1        &$s3$ &     &$s2$ &     &      & $g4$ &      \\
-  2        &$r2$ &$r2$ &$r2$ &$r2$ & $r2$ &      &      \\
-  3        &$r3$ &     &$r2$ &     &      & $g7$ & $g5$ \\
-  4        &     &     &     &     & $a$  &      &    \\
-  5        &     &$s6$ &     &$s8$ &      &      &    \\
-  6        &$r1$ &$r1$ &$r1$ &$r1$ &$r1$  &      &    \\
-  7        &$r3$ &$r3$ &$r3$ &$r3$ &$r3$  &      &    \\
-  8        &$s3$ &     &$s2$ &     &      & $g9$ &    \\
-  9        &$r4$ &$r4$ &$r4$ &$r4$ &$r4$  &      &    \\
+  $I$ & + & $x$  &\$       & $T$ & $E$  \\
+  \hline
+   1  &   & $s5$ &         &$g3$& $g2$ \\
+   2  &$r1$ &$r1$&$r1$     && \\
+   3  &$s4,r2$&$r2$&$r2$   && \\
+   4  &   &$s5$&           &$g3$&$g6$ \\
+   5  &$r3$&$r3$&$r3$      &    & \\
+   6  &$r1$&$r1$&$r1$      &    & \\
+  \hline
+  \multicolumn{6}{l}{\footnotesize 1: Action (s/r) only on terminals and \$}\\
+  \hline
+  \multicolumn{6}{l}{\footnotesize 2: Goto only on non-terminals}\\
   \hline
 \end{tabular}
+\end{center}
+\end{minipage}
+\begin{minipage}{.3\linewidth}
+  {\small
+    In state 3, on symbol +, there is a duplicate entry: The parser must shift
+    into state 4 and also reduce by production 2. This is a conflict and indicates
+    that the grammar is not LR(0).
+  }
+\end{minipage}
+
+
 \end{multicols*}
 \end{document}
