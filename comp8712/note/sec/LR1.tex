@@ -1,0 +1,247 @@
+\section*{Conflicts in LR parsing}
+\begin{itemize}
+\item \mb{shift} the dot past the input symbol currently before the dot
+\item[] Before: $X\to \lrd A\beta$; After: $X\to A\lrd\beta$
+\item \mb{reduce}: when dot at the end of item, RHS of the production can be replaced with the LHS
+\item In a state $I$, expect to have either a reduce or a shift action, not both. Otherwise, there is a \mo{conflict}:
+  \begin{enumerate}
+  \item \mb{S}/\mb{R} conflict: state $I$ has a reduce \textbf{AND} a shift action
+  \item \mb{R}/\mb{R} conflict: state $I$ has two reduce actions
+  \end{enumerate}
+\end{itemize}
+\section*{Example: A grammar with S/R conflict}
+\begin{minipage}{.5\linewidth}
+\begin{align*}
+  _0\quad S&\to E\$   \\
+  _1\quad E&\to T + E
+\end{align*}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{align*}
+  _2\quad E&\to T \\
+  _3\quad T&\to x
+\end{align*}
+\end{minipage}
+\section*{grammar DFA with R/S conflict}
+\begin{tikzpicture}
+  % I1
+  \node (i1) [lrst, anchor=north east] {
+    $S\to \lrd E\$$\\
+    $E\to \lrd T + E$\\
+    $E\to \lrd T$\\
+    $T\to \lrd x$
+  };
+  \node [above=1mm of i1.north east, font=\footnotesize\bf]{1};
+
+  %I2
+  \node (i2) [lrst, right=12mm of i1.north east, anchor=north west] {
+    $S\to E\lrd\$$
+  };
+  \node (m2) [above=1mm of i2.north east, font=\footnotesize\bf]{2};
+
+  %I3
+  \node (i3) [lrst, right=12mm of i1.east, anchor=north west] {
+    $E\to T\lrd + E$\\
+    $E\to T\lrd $
+  };
+  \node (m3) [right=1mm of i3.north east, font=\footnotesize\bf]{3};
+
+  %I5
+  \node (i5) [lrst, below=15mm of i1.south, anchor=north] {
+    $T\to x\lrd$
+  };
+  \node (m5) [above=1mm of i5.north east, font=\footnotesize\bf]{5};
+
+  %I4
+  \node (i4) [lrst, below=6mm of i3, anchor=north] {
+    $E\to T + \lrd E$\\
+    $E\to \lrd T$\\
+    $E\to \lrd T + E$ \\
+    $T\to \lrd x$
+  };
+  \node (m4) [right=1mm of i4.north east, font=\footnotesize\bf]{4};
+
+  %I6
+  \node (i6) [lrst, right=10mm of i4, anchor=west] {
+    $E\to T + E\lrd$
+  };
+  \node (m6) [above=1mm of i6.north east, font=\footnotesize\bf]{6};
+
+  % note
+  \node(note)[right=8mm of i3.north east, anchor=west, text width=3cm, font=\small] {
+    In $I_3$, there are a shift action (over $+$) and a reduce action (dot at the end) $\to$ a S/R conflict in $I_3$ and the grammar is \mr{not} LR(0)
+  };
+
+  % paths
+  \draw[->] (i1.east |- i2.west) -- (i2.west) node[midway, above]{$E$}  ;
+  \draw[->] (i1.mid east |- i3.west) -- (i3.west) node[midway, above]{$T$}  ;
+  \draw[->] (i1) edge node[left]{$x$} (i5) ;
+  \draw[->]
+  ([xshift=4mm]i3.south) -- ([xshift=4mm]i4.north) node[midway,right] {$+$};
+  \draw[->]
+  ([xshift=-4mm]i4.north) -- ([xshift=-4mm]i3.south) node[midway,left] {$T$};
+  \draw[->] (i4) edge node[above]{$E$} (i6);
+  \draw[->] (i4.west |- i5.east) -- (i5.east) node[midway, above]{$x$};
+
+\end{tikzpicture}
+\section*{Grammar parse table with R/S conflict}
+\begin{minipage}{.7\linewidth}
+\begin{center}
+\begin{tabular}{l|lll|ll}
+  State &\multicolumn{3}{c}{Action$^1$} & \multicolumn{2}{c}{Goto$^2$}  \\
+  \hline
+  $I$ & + & $x$  &\$       & $T$ & $E$  \\
+  \hline
+   1  &   & $s5$ &         &$g3$& $g2$ \\
+   2  &   &      &$a$      && \\
+   3  &$s4,r2$&$r2$&$r2$   && \\
+   4  &   &$s5$&           &$g3$&$g6$ \\
+   5  &$r3$&$r3$&$r3$      &    & \\
+   6  &$r1$&$r1$&$r1$      &    & \\
+  \hline
+  \multicolumn{6}{l}{\footnotesize 1: Action (s/r) only on terminals and \$}\\
+  \hline
+  \multicolumn{6}{l}{\footnotesize 2: Goto only on non-terminals}\\
+  \hline
+\end{tabular}
+\end{center}
+\end{minipage}
+\begin{minipage}{.3\linewidth}
+  {\small
+    In state 3, on symbol +, there is a duplicate entry: The parser must shift
+    into state 4 and also reduce by production 2. This is a conflict and indicates
+    that the grammar is \mr{not} LR(0).
+  }
+\end{minipage}
+\section*{Use FOLLOW to build SLR and remove S/R conflict}
+\begin{enumerate}
+\item in each state $I$, identify all the reduce items like $A\to \alpha\lrd$ (dot at the end) where $\alpha \in \Sigma$ (terminals plus \$).
+  \begin{itemize}
+  \item In $I_2$, $S\to E\lrd\$$, need  $\mfn{follow}(S)$
+  \item In $I_3$, $E\to T\lrd$, need $\mfn{follow}(E)$
+  \item In $I_5$, $T\to x\lrd$, need $\mfn{follow}(T)$
+  \item In $I_6$, $E\to T + E\lrd$, need $\mfn{follow}(E)$
+  \end{itemize}
+\item for each reduce item above, compute \textsf{FOLLOW}(LHS)
+  \begin{itemize}
+  \item $\mfn{follow}(S) = \mset{\$}$ (just init the set to include \$)
+  \item $\mfn{follow}(T) = \mfn{follow}(E) \cup \mfn{first}(+) = \mset{+,\$}$
+  \item $\mfn{follow}(E) = \mset{\$}$
+  \end{itemize}
+\item for each token $X$ in each computed follow set above, put a reduce action $(I, X, A\to \alpha)$ (on lookahead $X$, reduce by rule $A\to \alpha$) in SLR table
+  \begin{itemize}
+  \item $(I_2, \$, S\to E\$)$, put $a$ ($r0$) at $(I_2, \$)$
+  \item $(I_3, \$, E\to T)$, put $r2$ at $(I_3, \$)$
+  \item $(I_5, +, T\to x)$, put $r3$ at $(I_5, +)$
+  \item $(I_5, \$, T\to x)$, put $r3$ at $(I_5, \$)$
+  \item $(I_6, \$, E\to T + E)$, put $r1$ at $(I_6, \$)$
+  \end{itemize}
+\end{enumerate}
+\begin{center}
+\begin{tabular}{l|lll|ll}
+  State &\multicolumn{3}{c}{Action} & \multicolumn{2}{c}{Goto}  \\
+  \hline
+  $I$ & + & $x$  &\$       & $T$ & $E$  \\
+  \hline
+   1  &   & $s5$ &         &$g3$& $g2$ \\
+   2  &   &      &$a$      &    & \\
+   3  &$s4$&     &$r2$     && \\
+   4  &   &$s5$&           &$g3$&$g6$ \\
+   5  &$r3$&&$r3$          &    & \\
+   6  &    &    &$r1$      &    & \\
+  \hline
+\end{tabular}
+\end{center}
+
+\section*{LR(1) items $(A\to \alpha\lrd\beta, x)$ with 3 parts; closure, goto}
+\begin{itemize}
+\item a grammar production: $A\to\ldots$
+\item a right-hand-side position (represent by the \mr{dot} $\lrd$)
+\item a lookahead symbol $(A\to \alpha\lrd\beta, \mo{x})$
+\item The idea is that an item $(A\to\alpha\beta\lrd,x)$ indicates that
+  \begin{itemize}
+  \item the sequence $\alpha$ is on top of the stack
+  \item at the head of the input is a string derivable from $\beta x$
+  \end{itemize}
+\item $\beta$ can be terminal or non-terminal, $x$ can be $\$$(\texttt{EOF})
+\item In pseudo code, $X$ in item $(A\to \alpha\lrd X\beta, z)$ is non-terminal
+\end{itemize}
+\includegraphics*[width=\linewidth]{img/LR1_closure_goto}
+\section*{Example: A LR(1) grammar and its parsing table}
+\begin{minipage}{.5\linewidth}
+\begin{align*}
+  _0\quad S'&\to S\$  \\
+  _1\quad S&\to V = E \\
+  _2\quad S&\to E
+\end{align*}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{align*}
+  _3\quad  E&\to V   \\
+  _4\quad  V&\to x   \\
+  _5\quad  V&\to *E
+\end{align*}
+\end{minipage}
+\begin{itemize}
+\item According to the pseudo code, lookahead for prod 0 is $\mfn{first}(\$)$. ``()'' around items are dropped for simplicity
+
+  \begin{minipage}{\linewidth}
+    \centering
+    \begin{tikzpicture}
+      \node (i0)[lrst] {
+        \dm{(} $S' \to\lrd S$,\quad\mr{?} \dm{)}
+      };
+      \node (m1)[right=0.2mm of i0.north east,font=\small\bf] {\dm{1}};
+
+      \node (i1)[lrst, right=20mm of i0.east] {
+        $S' \to\lrd S$,\$
+      };
+      \node (m1)[right=1mm of i1.north east,font=\small\bf] {1};
+      \draw[->] (i0) -- (i1);
+    \end{tikzpicture}
+  \end{minipage}
+\item $S$ is non terminal, need to compute closure($I_1$):
+  \begin{enumerate}
+  \item Add items via closure rule; for each item, prod. ends with \$ and lookahead is unknown(?), except prod 0
+  \item For $S\to V = E$, $w=\mfn{first}(=E\$)$, need to add items $(V\to \lrd x, =)$ and $(V\to \lrd * E, =)$ to $I_1$
+  \item For $S\to E$, $w=\mfn{first}(\$)$, $(E\to \lrd V, \$)$ already in $I_1$
+  \item For $E\to V$, $w=\mfn{first}(\$) = \mset{\$}$, $(V\to \lrd\cdots, \$)$ in $I_1$
+  \end{enumerate}
+\end{itemize}
+\begin{minipage}{\linewidth}
+  \begin{tikzpicture}
+    \node (i0)[lrst] {
+      \begin{tabular}{ll}
+        \dm{(} $S' \to\lrd S$   \$&, \$     \dm{)} \\
+        \dm{(} $S \to\lrd V=E $ \$&, \mr{?} \dm{)} \\
+        \dm{(} $S \to\lrd E   $ \$&, \mr{?} \dm{)} \\
+        \dm{(} $E \to\lrd V   $ \$&, \mr{?} \dm{)} \\
+        \dm{(} $V \to\lrd x   $ \$&, \mr{?} \dm{)} \\
+        \dm{(} $V \to\lrd *E  $ \$&, \mr{?} \dm{)}
+      \end{tabular}
+    };
+    \node (m0)[right=0.2mm of i0.north east,font=\small\bf] {\dm{1}};
+
+    \node (i1)[lrst, right=6mm of i0.east] {
+      \begin{tabular}{ll}
+        $S' \to\lrd S$   \$&, \$ \\
+        $S \to\lrd V=E $ \$&, \$  \\
+        $S \to\lrd E   $ \$&, \$ \\
+        $E \to\lrd V   $ \$&, \$ \\
+        $V \to\lrd x   $ \$&, \$ $\gor$ = \\
+        $V \to\lrd *E  $ \$&, \$ $\gor$ =
+      \end{tabular}
+    };
+    \node (m1)[right=0.1mm of i1.north east,font=\small\bf] {1};
+    \draw[->] (i0) -- (i1);
+  \end{tikzpicture}
+\end{minipage}
+\begin{itemize}
+\item Repeat the above steps to get the entire DFA diagram
+\end{itemize}
+\includegraphics*[width=\linewidth]{img/LR1_DFA}
+\includegraphics*[width=\linewidth]{img/LR1_parsing_table}
+\begin{itemize}
+\item Wherever dot at a prod end, there is a reduce for that prod
+\item Whenever dot is to the left of a terminal or non-terminal, there is a corresponding shift or goto
+\end{itemize}

@@ -58,7 +58,7 @@
 
 % Parse Trees
 \usepackage{tikz}
-\usetikzlibrary{ arrows, automata, bbox, calc, positioning, tikzmark, decorations.pathmorphing, decorations.pathreplacing, decorations.shapes, shapes.geometric, graphs}
+\usetikzlibrary{ arrows, arrows.meta, automata, bbox, calc, positioning, tikzmark, decorations.pathmorphing, decorations.pathreplacing, decorations.shapes, shapes.geometric, graphs}
 % \usegdlibrary{trees}
 \tikzset{
   >=stealth',
@@ -78,6 +78,10 @@
   initial text=start,
   % initial where=right
 }
+
+% algorithm
+\usepackage{algpseudocode}
+
 \usepackage{annotate-equations}
 % Place a figure env right here via [H] option
 \usepackage{float}
@@ -107,6 +111,7 @@
 \newcommand{\mb}[1]{\textcolor{Cerulean}{#1}}
 \newcommand{\mo}[1]{\textcolor{Maroon}{#1}}
 \newcommand{\ml}[1]{\textcolor{lbl}{#1}}
+\newcommand{\dm}[1]{\textcolor{dmm}{#1}}
 \newcommand{\hcancel}[2][red]{\setbox0=\hbox{$#2$}%
 \rlap{\raisebox{.45\ht0}{\textcolor{#1}{\rule{\wd0}{1pt}}}}#2}
 \renewcommand{\arraystretch}{1.2}
