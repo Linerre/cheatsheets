@@ -10,22 +10,28 @@
 % \input{sec/LR1}
 
 \section*{Example of LR(1) DFA and parsing table $a.k.a$ CLR(1)}
-\begin{minipage}{.5\linewidth}
+% \begin{minipage}{.5\linewidth}
 \begin{align*}
   _1\quad S&\to XX \\
   _2\quad X&\to aX \\
   _3\quad X&\to b
 \end{align*}
-\end{minipage}
-\begin{minipage}{.5\linewidth}
+% \end{minipage}
+% \begin{minipage}{.5\linewidth}
+% \begin{align*}
+%   _0\quad S'&\to S \\
+%   _1\quad S&\to XX \\
+%   _2\quad X&\to aX \\
+%   _3\quad X&\to b
+% \end{align*}
+% \end{minipage}
+\section*{Step 1: Add a new a start symbol (see above right)}
 \begin{align*}
   _0\quad S'&\to S \\
   _1\quad S&\to XX \\
   _2\quad X&\to aX \\
   _3\quad X&\to b
 \end{align*}
-\end{minipage}
-\section*{Step 1: Add a new a start symbol (see above right)}
 \section*{Step 2: Compute closures and gotos to build the DFA}
 \begin{itemize}
 \item For start state $I_0$, compute \textbf{closure}($I_0$) and \textbf{goto}($I_0$). For special prod $S'\to S\$$, its lookahead is \textbf{always} \$
@@ -383,7 +389,7 @@
     \hline
   \end{tabular}
 \end{minipage}
-\section*{LALR parsing table (see the right table above)}
+\section*{LALR parsing table (see the right table in middle col)}
 \begin{itemize}
 \item In the LR(1) DFA, there're several states with same productions but diff LAs: $I_3$ and $I_7$; $I_8$ and $I_9$; $I_6$ and $I_4$
 \item merge such similar states into one: $I_{37}$, $I_{89}$, $I_{46}$
