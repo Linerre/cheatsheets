@@ -202,7 +202,7 @@
   \end{minipage}
 \item $S$ is non terminal, need to compute closure($I_1$):
   \begin{enumerate}
-  \item Add items via closure rule; for each item, prod. ends with \$ and lookahead is unknown(?), except prod 0
+  \item Add items via closure rule; for each item, lookahead is unknown(?) for now, except prod 0
   \item For $S\to V = E$, $w=\mfn{first}(=E\$)$, need to add items $(V\to \lrd x, =)$ and $(V\to \lrd * E, =)$ to $I_1$
   \item For $S\to E$, $w=\mfn{first}(\$)$, $(E\to \lrd V, \$)$ already in $I_1$
   \item For $E\to V$, $w=\mfn{first}(\$) = \mset{\$}$, $(V\to \lrd\cdots, \$)$ in $I_1$
@@ -212,24 +212,24 @@
   \begin{tikzpicture}
     \node (i0)[lrst] {
       \begin{tabular}{ll}
-        \dm{(} $S' \to\lrd S$   \$&, \$     \dm{)} \\
-        \dm{(} $S \to\lrd V=E $ \$&, \mr{?} \dm{)} \\
-        \dm{(} $S \to\lrd E   $ \$&, \mr{?} \dm{)} \\
-        \dm{(} $E \to\lrd V   $ \$&, \mr{?} \dm{)} \\
-        \dm{(} $V \to\lrd x   $ \$&, \mr{?} \dm{)} \\
-        \dm{(} $V \to\lrd *E  $ \$&, \mr{?} \dm{)}
+        \dm{(} $S' \to\lrd S$   &, \$     \dm{)} \\
+        \dm{(} $S \to\lrd V=E $ &, \mr{?} \dm{)} \\
+        \dm{(} $S \to\lrd E   $ &, \mr{?} \dm{)} \\
+        \dm{(} $E \to\lrd V   $ &, \mr{?} \dm{)} \\
+        \dm{(} $V \to\lrd x   $ &, \mr{?} \dm{)} \\
+        \dm{(} $V \to\lrd *E  $ &, \mr{?} \dm{)}
       \end{tabular}
     };
     \node (m0)[right=0.2mm of i0.north east,font=\small\bf] {\dm{1}};
 
     \node (i1)[lrst, right=6mm of i0.east] {
       \begin{tabular}{ll}
-        $S' \to\lrd S$   \$&, \$ \\
-        $S \to\lrd V=E $ \$&, \$  \\
-        $S \to\lrd E   $ \$&, \$ \\
-        $E \to\lrd V   $ \$&, \$ \\
-        $V \to\lrd x   $ \$&, \$ $\gor$ = \\
-        $V \to\lrd *E  $ \$&, \$ $\gor$ =
+        $S' \to\lrd S$   &, \$ \\
+        $S \to\lrd V=E $ &, \$  \\
+        $S \to\lrd E   $ &, \$ \\
+        $E \to\lrd V   $ &, \$ \\
+        $V \to\lrd x   $ &, \$ $\gor$ = \\
+        $V \to\lrd *E  $ &, \$ $\gor$ =
       \end{tabular}
     };
     \node (m1)[right=0.1mm of i1.north east,font=\small\bf] {1};
