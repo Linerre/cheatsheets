@@ -9,7 +9,7 @@
 % \input{sec/LR0}
 % \input{sec/LR1}
 
-\section*{Example of LR(1) DFA and parsing table $\to$ LALR}
+\section*{Example of LR(1) DFA and parsing table $a.k.a$ CLR(1)}
 \begin{minipage}{.5\linewidth}
 \begin{align*}
   _1\quad S&\to XX \\
@@ -42,23 +42,6 @@
 \end{minipage}
 \item $S$ is non-terminal, need to add new items to $I_0$
 
-  %TODO: move this to another standalone sheet
-%   \begin{enumerate}
-%   \item if prev item prod $A\to \lrd S\beta\$$, $\beta$ is a \mo{terminal}
-%     \[
-%       \textsf{LA} = \mfn{first}(\beta\$) = \mfn{first}(\beta)
-%       \underset{\beta \overset{*}{\Rightarrow} \varepsilon}{\overset{\text{iff}}{\bigcup}}\mfn{first}(\$)
-%     \]
-%   \item if prev item pord $A\to \lrd SX\$$, $X$ is \mb{non-terminal}
-%     \[
-% \textsf{LA} = \mfn{first}(X\$) = \mfn{first}(X) \underset{X \overset{*}{\Rightarrow} \varepsilon}{\overset{\text{iff}}{\bigcup}}\mfn{first}(\$)
-%     \]
-%   \item if prev item pord $A\to \lrd SX\beta\$$, $X$ \mb{non-term}, $\beta$ \mb{term}
-%     \[
-% \textsf{LA} = \mfn{first}(X\beta) = \mfn{first}(X) \underset{X \overset{*}{\Rightarrow} \varepsilon}{\overset{\text{iff}}{\bigcup}}\mfn{first}(\beta)
-%     \]
-%   \item if prev item prod $A\to \lrd S\$$, LA = $\mfn{first}(\$)$ (our case)
-%   \end{enumerate}
 
 \end{itemize}
 \begin{minipage}{\linewidth}
@@ -366,19 +349,134 @@
   \item if item has LA $t_1,t_2,\cdots$, reduce $n$ at $(I, t_i)$ for each $t$
   \end{itemize}
 \end{enumerate}
-\begin{tabular}{l|lll|ll}
-  $I$ & $a$  & $b$  & \$  & $S$  & $X$ \\
-  \hline
-  $0$ & $s4$ & $s3$ &     & $g1$ & $g2$ \\
-  $1$ &      &      & $a$ &      &      \\
-  $2$ & $s6$ & $s7$ &     &      & $g5$ \\
-  $3$ & $r3$ & $r3$ &   &   &  \\
-  $4$ & $s4$  & $s3$  &   &   & $g9$ \\
-  $5$ &   &   & $r1$  &   &  \\
-  $6$ & $s6$  & $s7$  &   &   & $g8$ \\
-  $7$ &   &   & $r3$  &   &  \\
-  $8$ &   &   & $r2$  &   &  \\
-  $9$ & $r2$  & $r2$   & &   &  \\
-\end{tabular}
+\begin{minipage}{.5\linewidth}
+  \begin{tabular}{l|lll|ll}
+    $I$ & $a$  & $b$  & \$  & $S$  & $X$ \\
+    \hline
+    $0$ & $s4$ & $s3$ &     & $g1$ & $g2$ \\
+    $1$ &      &      & $a$ &      &      \\
+    $2$ & $s6$ & $s7$ &     &      & $g5$ \\
+    $3$ & $r3$ & $r3$ &   &   &  \\
+    $4$ & $s4$  & $s3$  &   &   & $g9$ \\
+    $5$ &   &   & $r1$  &   &  \\
+    $6$ & $s6$  & $s7$  &   &   & $g8$ \\
+    $7$ &   &   & $r3$  &   &  \\
+    $8$ &   &   & $r2$  &   &  \\
+    $9$ & $r2$  & $r2$   & &   &  \\
+    \hline
+  \end{tabular}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+  \begin{tabular}{l|lll|ll}
+    $I$ & $a$  & $b$  & \$  & $S$  & $X$ \\
+    \hline
+    $0$ & $s4$ & $s3$ &     & $g1$ & $g2$ \\
+    $1$ &      &      & $a$ &      &      \\
+    $2$ & $s6$ & $s7$ &  &      & $g5$ \\
+    $37$ & $r3$ & $r3$ & $r3$  &   &  \\
+    $46$ & $s46$  & $s37$  &   &   & $g89$ \\
+    $5$ &   &   & $r1$  &   &  \\
+    $89$ & $r2$  & $r2$  & $r2$ &   &  \\
+    \hline
+    \multicolumn{6}{l}{or just leave 1 state in a pair}\\
+    \multicolumn{6}{l}{e.g. in $(I_4, I_6)$, merge to $I_4$}  \\
+    \hline
+  \end{tabular}
+\end{minipage}
+\section*{LALR parsing table (see the right table above)}
+\begin{itemize}
+\item In the LR(1) DFA, there're several states with same productions but diff LAs: $I_3$ and $I_7$; $I_8$ and $I_9$; $I_6$ and $I_4$
+\item merge such similar states into one: $I_{37}$, $I_{89}$, $I_{46}$
+\item update shifts so they shift to the merge states: e.g. $s4\to s46$
+\item \mb{only merge} \mo{shift} actions and \mo{goto}s can be merged
+\item \mb{copy} the reduce actions to the merge state (\mo{iff} no conflict)
+\item if any S/R or R/R conflicts, we can't build LALR table
+\end{itemize}
+\section*{Patterns for computing LAs of an item in LR(1) grammar}
+In a state $I$, given an item of the below form (parens dropped):
+  \[
+    A\to \alpha\lrd X\beta, z
+  \]
+\begin{itemize}
+\item where $X$ is \mb{non-terminal} and $z$ is LAs (might be $t_1\gor t_2\gor\ldots$)
+  \begin{itemize}[leftmargin=3em]
+  \item if $\beta$ is non empty (terminal or non-terminal)
+    \begin{enumerate}
+    \item compute $\mfn{first}(\beta z)$ as a set
+    \item Add all $X\to\lrd \ldots, w$ to $I$, where $w \in \mfn{first}(\beta z)$
+
+      \begin{minipage}{.3\linewidth}
+        \begin{align*}
+          S&\to \lrd V = E &&,\$ \\
+          V&\to \lrd x     &&,\mr{?}  \\
+          V&\to \lrd *E    &&,\mr{?}
+        \end{align*}
+      \end{minipage}
+      \begin{minipage}{.7\linewidth}
+        \begin{align*}
+          S&\to \lrd V = E& &,\$ \\
+          V&\to \lrd x    & &,\mfn{first}(=E)  \\
+          V&\to \lrd *E   & &,\mfn{first}(=E)
+        \end{align*}
+      \end{minipage}
+      \begin{minipage}{.2\linewidth}
+        \begin{align*}
+          S&\to \lrd XX &&,\$ \\
+          X&\to \lrd aX &&,\mr{?}  \\
+          X&\to \lrd b  &&,\mr{?}
+        \end{align*}
+      \end{minipage}
+      \begin{minipage}{.8\linewidth}
+        \begin{align*}
+          S&\to \lrd XX    &&,\$ \\
+          X&\to \lrd aX    &&,\mfn{first}((a\gor b)\cup\$)  \\
+          X&\to \lrd b     &&,\mfn{first}((a\gor b)\cup\$)
+        \end{align*}
+      \end{minipage}
+      \item $\mfn{first}((a\gor b)\cup\$) = a\gor b$ because \$ is considered only when $\mfn{first}(a\gor b)$ is empty, which is \mr{false}
+    \end{enumerate}
+  \item if $\beta$ is empty \textbf{BUT} $z$ is \mr{not} \$
+    \begin{enumerate}
+    \item compute $\mfn{first}(z)$ as a set ($z$ might be $t_1\gor t_2\gor\ldots$)
+    \item Add all $X\to\lrd \ldots, w$ to $I$, where $w \in \mfn{first}(z)$
+
+      \begin{minipage}{.3\linewidth}
+        \begin{align*}
+          X&\to a\lrd X & &, a\gor b \\
+          X&\to \lrd aX & &,\mr{?}  \\
+          V&\to \lrd b  & &,\mr{?}
+        \end{align*}
+      \end{minipage}
+      \begin{minipage}{.7\linewidth}
+        \begin{align*}
+          X&\to a\lrd X & &, a\gor b \\
+          X&\to \lrd aX & &,\mfn{first}(a\gor b) = a\gor b \\
+          V&\to \lrd b  & &,\mfn{first}(a\gor b) = a\gor b
+        \end{align*}
+      \end{minipage}
+    \end{enumerate}
+  \item if $\beta$ is empty \textbf{AND} $z$ \mr{is} \$
+    \begin{enumerate}
+    \item compute $\mfn{first}(\$)$
+    \item Add all $X\to\lrd \ldots, w$ to $I$, where $w =\$$
+
+      \begin{minipage}{.3\linewidth}
+        \begin{align*}
+          X&\to X\lrd X & &, \$ \\
+          X&\to \lrd aX & &,\mr{?}  \\
+          V&\to \lrd b  & &,\mr{?}
+        \end{align*}
+      \end{minipage}
+      \begin{minipage}{.7\linewidth}
+        \begin{align*}
+          X&\to a\lrd X & &, \$ \\
+          X&\to \lrd aX & &,\mfn{first}(\$) = \$ \\
+          V&\to \lrd b  & &,\mfn{first}(\$) = \$
+        \end{align*}
+      \end{minipage}
+    \end{enumerate}
+  \end{itemize}
+\item when $X$ is \mb{terminal}, this may lead to a new state with item $A\to \alpha X\lrd \beta, z$, where $z$ is simply copied over
+\end{itemize}
 \end{multicols*}
 \end{document}
