@@ -1,0 +1,475 @@
+\section*{Example of LR(1) DFA and parsing table $a.k.a$ CLR(1)}
+% \begin{minipage}{.5\linewidth}
+\begin{align*}
+  _1\quad S&\to XX \\
+  _2\quad X&\to aX \\
+  _3\quad X&\to b
+\end{align*}
+% \end{minipage}
+% \begin{minipage}{.5\linewidth}
+% \begin{align*}
+%   _0\quad S'&\to S \\
+%   _1\quad S&\to XX \\
+%   _2\quad X&\to aX \\
+%   _3\quad X&\to b
+% \end{align*}
+% \end{minipage}
+\section*{Step 1: Add a new a start symbol (see above right)}
+\begin{align*}
+  _0\quad S'&\to S \\
+  _1\quad S&\to XX \\
+  _2\quad X&\to aX \\
+  _3\quad X&\to b
+\end{align*}
+\section*{Step 2: Compute closures and gotos to build the DFA}
+\begin{itemize}
+\item For start state $I_0$, compute \textbf{closure}($I_0$) and \textbf{goto}($I_0$). For special prod $S'\to S\$$, its lookahead is \textbf{always} \$
+\begin{minipage}{\linewidth}
+  \centering
+  \begin{tikzpicture}
+    \node (i0) [lrst] {
+      \begin{tabular}{ll}
+        $S'\to \lrd S$ & ,\$
+      \end{tabular}
+    };
+    \node (m0) [right=0.1mm of i0.north east,font=\footnotesize\bf] {0};
+  \end{tikzpicture}
+\end{minipage}
+\item $S$ is non-terminal, need to add new items to $I_0$
+
+
+\end{itemize}
+\begin{minipage}{\linewidth}
+  \begin{tikzpicture}
+    \node (i0) [lrst] {
+      \begin{tabular}{ll}
+        $S'\to \lrd S$ & ,\$ \\
+        $S\to \lrd XX$ & ,\mr{?}
+      \end{tabular}
+    };
+
+    \node (i1) [lrst,right=2mm of i0.east] {
+      \begin{tabular}{ll}
+        $S'\to \lrd S$ & ,\$ \\
+        $S\to \lrd XX$ & ,$\mfn{first}(\$)$
+      \end{tabular}
+    };
+
+    \node (i2) [lrst,right=2mm of i1.east] {
+      \begin{tabular}{ll}
+        $S'\to \lrd S$ & ,\$ \\
+        $S\to \lrd XX$ & ,\$
+      \end{tabular}
+    };
+  \end{tikzpicture}
+\end{minipage}
+\begin{itemize}
+\item $X$ is non-terminal, need to add new items
+\end{itemize}
+\begin{minipage}{\linewidth}
+  \centering
+  \begin{tikzpicture}
+    \node (i1) [lrst,right=5mm of i0.east] {
+      \begin{tabular}{ll}
+        $S'\to \lrd S$ & ,\$ \\
+        $S\to \lrd XX$ & ,$\mfn{first}(\$)$ \\
+        $X\to \lrd aX$ & ,$\mfn{first}(X\$)$ \\
+        $X\to \lrd b$ & ,$\mfn{first}(X\$)$
+      \end{tabular}
+    };
+    \node (m1) [right=0.1mm of i1.north east,font=\footnotesize\bf] {\dm{0}};
+
+    \node (i2) [lrst,right=5mm of i1.east] {
+      \begin{tabular}{ll}
+        $S'\to \lrd S$ & ,\$ \\
+        $S\to \lrd XX$ & ,\$ \\
+        $X\to \lrd aX$ & ,$a \gor b$ \\
+        $X\to \lrd b$  & ,$a \gor b$
+      \end{tabular}
+    };
+    \node (m2) [right=0.1mm of i2.north east,font=\footnotesize\bf] {0};
+
+    \draw[->] (i1) -- (i2);
+  \end{tikzpicture}
+\end{minipage}
+\begin{itemize}
+\item when $I$ \textbf{goto} $I'$, item$_1$ in $I'$ copies LA from its prev in $I$
+\end{itemize}
+\begin{minipage}{\linewidth}
+  \begin{tikzpicture}
+    % I0
+    \node (i0) [lrst] {
+      \begin{tabular}{ll}
+        $S'\to \lrd S$ & ,\$ \\
+        $S\to \lrd XX$ & ,\$ \\
+        $X\to \lrd aX$ & ,$a \gor b$ \\
+        $X\to \lrd b$  & ,$a \gor b$
+      \end{tabular}
+    };
+    \node (m0) [above=0.1mm of i0.north east,font=\footnotesize\bf] {0};
+
+    %I1
+    \node (i1) [lrst,right=10mm of i0.north east, anchor=north west] {
+      \begin{tabular}{ll}
+        $S'\to S\lrd$ & ,\$ \\
+      \end{tabular}
+    };
+    \node (m1) [above=0.1mm of i1.north east,font=\footnotesize\bf] {1};
+
+    %I2
+    \node (i2) [lrst,below=3mm of i1] {
+      \begin{tabular}{ll}
+        $S\to X\lrd X$ & ,\$ \\
+        $X \to \lrd aX$ & ,\$ \\
+        $X \to \lrd b$  & ,\$
+      \end{tabular}
+    };
+    \node (m2) [above=0.1mm of i2.north east,font=\footnotesize\bf] {2};
+    \node (note2) [right=1.5mm of i2.east,text width=2.5cm, font=\footnotesize]{
+      In new state $I_2$, item$_1$ copies over \mo{LA}s from its prev in $I_0$:
+      $S\to X\lrd X$ in $I_2$ copies \mo{\$} from $S\to \lrd XX$ in $I_0$\\
+    };
+
+    %I3
+    \node (i3) [lrst,below=8mm of i0.south west, anchor=north west] {
+      \begin{tabular}{ll}
+        $X \to b\lrd$  & ,$a \gor b$
+      \end{tabular}
+    };
+    \node (m3) [above=0.1mm of i3.north west,font=\footnotesize\bf] {3};
+
+    %I4
+    \node (i4) [lrst,below left=8mm of i2.south,anchor=north] {
+      \begin{tabular}{ll}
+        $X \to a\lrd X$  & ,$a \gor b$ \\
+        $X \to \lrd aX$  & ,$a \gor b$ \\
+        $X \to \lrd b$  & ,$a \gor b$
+      \end{tabular}
+    };
+    \node (m4) [above=0.1mm of i4.north east,font=\footnotesize\bf] {4};
+
+    \node(note0)[below=2mm of i3, text width=3.2cm,font=\footnotesize] {
+      In $I_4$, LAs of item$_2$ and item$_3$ are computed as $\mfn{first}(X\$) = a\gor b$
+    };
+
+    \draw[->] (i0.south -| i3.north) -- (i3.north) node[midway,left]{$b$};
+    \draw[->] (i0.south) -- (i4.north) node[midway,right]{$a$};
+    \draw[->] (i0.east) -- (i2.west) node[midway,above]{$X$};
+    \draw[->] (i0.east |- i1.west) -- (i1.west) node[midway,above]{$S$};
+  \end{tikzpicture}
+\end{minipage}
+\begin{itemize}
+\item \textbf{goto}($I_2, a$) does \mr{\emph{not}} lead to $I_4$,  but lead to $I_6$
+\end{itemize}
+\begin{tikzpicture}
+  % I2
+  \node (i2) [lrst] {
+    \begin{tabular}{ll}
+      $S\to X\lrd X$ & ,\$ \\
+      $X \to \lrd aX$ & ,\$ \\
+      $X \to \lrd b$  & ,\$
+    \end{tabular}
+  };
+  \node (m2) [above=0.1mm of i2.north east,font=\footnotesize\bf] {2};
+
+  % I5
+  \node (i5) [lrst,right=8mm of i2.north east,anchor=north west] {
+    \begin{tabular}{ll}
+      $S \to XX\lrd$  & ,\$
+    \end{tabular}
+  };
+  \node (m5) [above=0.1mm of i5.north east,font=\footnotesize\bf] {5};
+
+  % I6
+  \node (i6) [lrst,below=5mm of i5] {
+    \begin{tabular}{ll}
+      $X \to a\lrd X$  & ,\$ \\
+      $X \to \lrd aX$  & ,\$ \\
+      $S \to \lrd b$   & ,\$ \\
+    \end{tabular}
+  };
+  \node (m6) [above=0.1mm of i6.north east,font=\footnotesize\bf] {6};
+  \node (note6)[
+  right=4mm of m5.north east,anchor=north west,text width=2.8cm,font=\footnotesize] {
+    In $I_2$, shift $a$ leads to $X\to a\lrd X,\$$, due to LA \$ (\mr{not} $a\gor b$), need a new state $I_6$ with all below items\\
+    $(X\to \cdots, \mfn{first}(\$))$ added to $I_6$
+  };
+
+  % I7
+  \node (i7) [lrst,below=5mm of i2] {
+    \begin{tabular}{ll}
+      $X \to \lrd b$  & ,\$
+    \end{tabular}
+  };
+  \node (m7) [below=0.1mm of i7.south east,font=\footnotesize\bf] {7};
+
+  % I8
+  \node (i8) [lrst,right=6mm of i6.south east,anchor=south west] {
+    \begin{tabular}{ll}
+      $X \to aX\lrd $  & ,\$
+    \end{tabular}
+  };
+  \node (m8) [below=0.1mm of i8.south east,font=\footnotesize\bf] {8};
+  \draw[->] (i2.east |- i5.west) -- (i5.west) node[midway, above]{$X$};
+  \draw[->] (i2.east) -- (i6.west) node[midway, above]{$a$};
+  \draw[->] (i2.south) -- (i7.north) node[midway, left]{$b$};
+  \draw[->] (i6.west |- i7.east) -- (i7.east) node[midway, above]{$b$};
+  \draw[->] (i6.east |- i8.west) -- (i8.west) node[midway, above]{$X$};
+  \draw[->]
+  ([xshift=4mm]i6.south west) to [bend right=60] node[above]{$a$}
+  ([xshift=-4mm]i6.south east);
+\end{tikzpicture}
+\begin{itemize}
+\item \mb{complete DFA} is therefore constructed as
+\end{itemize}
+\begin{minipage}{\linewidth}
+  \begin{tikzpicture}
+    % I0
+    \node (i0) [lrst] {
+      \begin{tabular}{ll}
+        $S'\to \lrd S$ & ,\$ \\
+        $S\to \lrd XX$ & ,\$ \\
+        $X\to \lrd aX$ & ,$a \gor b$ \\
+        $X\to \lrd b$  & ,$a \gor b$
+      \end{tabular}
+    };
+    \node (m0) [above=0.1mm of i0.north east,font=\footnotesize\bf] {0};
+
+    % I1
+    \node (i1) [lrst,right=10mm of i0.north east, anchor=north west] {
+      \begin{tabular}{ll}
+        $S'\to S\lrd$ & ,\$ \\
+      \end{tabular}
+    };
+    \node (m1) [above=0.1mm of i1.north east,font=\footnotesize\bf] {1};
+
+    % I2
+    \node (i2) [lrst,below=3mm of i1] {
+      \begin{tabular}{ll}
+        $S\to X\lrd X$ & ,\$ \\
+        $X \to \lrd aX$ & ,\$ \\
+        $X \to \lrd b$  & ,\$
+      \end{tabular}
+    };
+    \node (m2) [above=0.1mm of i2.north east,font=\footnotesize\bf] {2};
+
+    % I3
+    \node (i3) [lrst,below=8mm of i0.south west, anchor=north west] {
+      \begin{tabular}{ll}
+        $X \to b\lrd$  & ,$a \gor b$
+      \end{tabular}
+    };
+    \node (m3) [above=0.1mm of i3.north west,font=\footnotesize\bf] {3};
+
+    % I4
+    \node (i4) [lrst,below=4mm of i2.south,anchor=north] {
+      \begin{tabular}{ll}
+        $X \to a\lrd X$  & ,$a \gor b$ \\
+        $X \to \lrd aX$  & ,$a \gor b$ \\
+        $X \to \lrd b$  & ,$a \gor b$
+      \end{tabular}
+    };
+    \node (m4) [below=0.1mm of i4.south east,font=\footnotesize\bf] {4};
+
+    % I5
+    \node (i5) [lrst,right=8mm of i1.north east,anchor=north west] {
+      \begin{tabular}{ll}
+        $S \to XX\lrd$  & ,\$
+      \end{tabular}
+    };
+    \node (m5) [above=0.1mm of i5.north east,font=\footnotesize\bf] {5};
+
+    % I6
+    \node (i6) [lrst,below=5mm of i5] {
+      \begin{tabular}{ll}
+        $X \to a\lrd X$  & ,\$ \\
+        $X \to \lrd aX$  & ,\$ \\
+        $S \to \lrd b$   & ,\$ \\
+      \end{tabular}
+    };
+    \node (m6) [above=0.1mm of i6.north east,font=\footnotesize\bf] {6};
+
+    % I8
+    \node (i8) [lrst,below=6mm of i6.south,anchor=north] {
+      \begin{tabular}{ll}
+        $X \to aX\lrd $  & ,\$
+      \end{tabular}
+    };
+    \node (m8) [above=0.1mm of i8.north east,font=\footnotesize\bf] {8};
+
+    % I7
+    \node (i7) [lrst,below=3mm of i8.south, anchor=north] {
+      \begin{tabular}{ll}
+        $X \to \lrd b$  & ,\$
+      \end{tabular}
+    };
+    \node (m7) [below=0.1mm of i7.south east,font=\footnotesize\bf] {7};
+
+    %I9
+    \node (i9) [lrst,left=8mm of i4.south west, anchor=south east] {
+      \begin{tabular}{ll}
+        $X \to aX\lrd $  & ,$a\gor b$
+      \end{tabular}
+    };
+    \node (m9) [below=0.1mm of i9.south west, font=\footnotesize\bf] {9};
+
+    \draw[->] (i0.south -| i3.north) -- (i3.north) node[midway,left]{$b$};
+    \draw[->] (i0.south east) -- (i4.north west) node[midway,right]{$a$};
+    \draw[->] (i0.east) -- (i2.west) node[midway,above]{$X$};
+    \draw[->] (i0.east |- i1.west) -- (i1.west) node[midway,above]{$S$};
+    \draw[->] (i2.east) -- (i5.south west) node[midway, left,xshift=1mm]{$X$};
+    \draw[->] (i2.east) -- (i6.west) node[midway, above]{$a$};
+    \draw[->] (i2.south east) -- (i7.west) node[near start, right]{$b$};
+    \draw[->] (i6.south east) to [bend right=-40] node[right]{$b$} (i7.east);
+    \draw[->] (i6) -- (i8) node[midway, left]{$X$};
+    \draw[->]
+    ([yshift=-4mm]i6.north east) to [bend right=-45] node[right]{$a$}
+    ([yshift=4mm]i6.south east);
+    \draw[->] (i4.west) -- (i3.east) node[midway,right]{$b$};
+    \draw[->]
+    ([xshift=-4mm]i4.south east) to [bend right=-45] node[above]{$a$}
+    ([xshift=4mm]i4.south west);
+    \draw[->] (i4.west |- i9.east) -- (i9.east) node[midway,below]{$X$};
+  \end{tikzpicture}
+\end{minipage}
+\section*{Step 3: Draw the LR(1) parsing table}
+\begin{enumerate}
+\item Start with $I_0$, see where it goto on what symbol:
+\item For each \mb{terminal} $t$ , shift $sn$ at $(I,t)$,  $n$ is target state
+\item For each \mb{non-terminal} $X$, goto $gn$ at $(I,t)$, $n$ is target state
+\item For state with a single prod $A\to \cdots \lrd$, (dot at the end)
+  \begin{itemize}
+  \item if item is the special one (like in $I_1$), $a$ at ($I, \$$)
+  \item if item has LA \$, reduce $n$ at $(I, \$)$, $n$ is the prod number
+  \item if item has LA $t_1,t_2,\cdots$, reduce $n$ at $(I, t_i)$ for each $t$
+  \end{itemize}
+\end{enumerate}
+\begin{minipage}{.5\linewidth}
+  \begin{tabular}{l|lll|ll}
+    $I$ & $a$  & $b$  & \$  & $S$  & $X$ \\
+    \hline
+    $0$ & $s4$ & $s3$ &     & $g1$ & $g2$ \\
+    $1$ &      &      & $a$ &      &      \\
+    $2$ & $s6$ & $s7$ &     &      & $g5$ \\
+    $3$ & $r3$ & $r3$ &   &   &  \\
+    $4$ & $s4$  & $s3$  &   &   & $g9$ \\
+    $5$ &   &   & $r1$  &   &  \\
+    $6$ & $s6$  & $s7$  &   &   & $g8$ \\
+    $7$ &   &   & $r3$  &   &  \\
+    $8$ &   &   & $r2$  &   &  \\
+    $9$ & $r2$  & $r2$   & &   &  \\
+    \hline
+  \end{tabular}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+  \begin{tabular}{l|lll|ll}
+    $I$ & $a$  & $b$  & \$  & $S$  & $X$ \\
+    \hline
+    $0$ & $s4$ & $s3$ &     & $g1$ & $g2$ \\
+    $1$ &      &      & $a$ &      &      \\
+    $2$ & $s6$ & $s7$ &  &      & $g5$ \\
+    $37$ & $r3$ & $r3$ & $r3$  &   &  \\
+    $46$ & $s46$  & $s37$  &   &   & $g89$ \\
+    $5$ &   &   & $r1$  &   &  \\
+    $89$ & $r2$  & $r2$  & $r2$ &   &  \\
+    \hline
+    \multicolumn{6}{l}{or just leave 1 state in a pair}\\
+    \multicolumn{6}{l}{e.g. in $(I_4, I_6)$, merge to $I_4$}  \\
+    \hline
+  \end{tabular}
+\end{minipage}
+\section*{LALR parsing table (see the right table in middle col)}
+\begin{itemize}
+\item In the LR(1) DFA, there're several states with same productions but diff LAs: $I_3$ and $I_7$; $I_8$ and $I_9$; $I_6$ and $I_4$
+\item merge such similar states into one: $I_{37}$, $I_{89}$, $I_{46}$
+\item update shifts so they shift to the merge states: e.g. $s4\to s46$
+\item \mb{only merge} \mo{shift} actions and \mo{goto}s can be merged
+\item \mb{copy} the reduce actions to the merge state (\mo{iff} no conflict)
+\item if any S/R or R/R conflicts, we can't build LALR table
+\end{itemize}
+\section*{Patterns for computing LAs of an item in LR(1) grammar}
+In a state $I$, given an item of the below form (parens dropped):
+  \[
+    A\to \alpha\lrd X\beta, z
+  \]
+\begin{itemize}
+\item where $X$ is \mb{non-terminal} and $z$ is LAs (might be $t_1\gor t_2\gor\ldots$)
+  \begin{itemize}[leftmargin=3em]
+  \item if $\beta$ is non empty (terminal or non-terminal)
+    \begin{enumerate}
+    \item compute $\mfn{first}(\beta z)$ as a set
+    \item Add all $X\to\lrd \ldots, w$ to $I$, where $w \in \mfn{first}(\beta z)$
+
+      \begin{minipage}{.3\linewidth}
+        \begin{align*}
+          S&\to \lrd V = E &&,\$ \\
+          V&\to \lrd x     &&,\mr{?}  \\
+          V&\to \lrd *E    &&,\mr{?}
+        \end{align*}
+      \end{minipage}
+      \begin{minipage}{.7\linewidth}
+        \begin{align*}
+          S&\to \lrd V = E& &,\$ \\
+          V&\to \lrd x    & &,\mfn{first}(=E)  \\
+          V&\to \lrd *E   & &,\mfn{first}(=E)
+        \end{align*}
+      \end{minipage}
+      \begin{minipage}{.2\linewidth}
+        \begin{align*}
+          S&\to \lrd XX &&,\$ \\
+          X&\to \lrd aX &&,\mr{?}  \\
+          X&\to \lrd b  &&,\mr{?}
+        \end{align*}
+      \end{minipage}
+      \begin{minipage}{.8\linewidth}
+        \begin{align*}
+          S&\to \lrd XX    &&,\$ \\
+          X&\to \lrd aX    &&,\mfn{first}((a\gor b)\cup\$)  \\
+          X&\to \lrd b     &&,\mfn{first}((a\gor b)\cup\$)
+        \end{align*}
+      \end{minipage}
+      \item $\mfn{first}((a\gor b)\cup\$) = a\gor b$ because \$ is considered only when $\mfn{first}(a\gor b)$ is empty, which is \mr{false}
+    \end{enumerate}
+  \item if $\beta$ is empty \textbf{BUT} $z$ is \mr{not} \$
+    \begin{enumerate}
+    \item compute $\mfn{first}(z)$ as a set ($z$ might be $t_1\gor t_2\gor\ldots$)
+    \item Add all $X\to\lrd \ldots, w$ to $I$, where $w \in \mfn{first}(z)$
+
+      \begin{minipage}{.3\linewidth}
+        \begin{align*}
+          X&\to a\lrd X & &, a\gor b \\
+          X&\to \lrd aX & &,\mr{?}  \\
+          V&\to \lrd b  & &,\mr{?}
+        \end{align*}
+      \end{minipage}
+      \begin{minipage}{.7\linewidth}
+        \begin{align*}
+          X&\to a\lrd X & &, a\gor b \\
+          X&\to \lrd aX & &,\mfn{first}(a\gor b) = a\gor b \\
+          V&\to \lrd b  & &,\mfn{first}(a\gor b) = a\gor b
+        \end{align*}
+      \end{minipage}
+    \end{enumerate}
+  \item if $\beta$ is empty \textbf{AND} $z$ \mr{is} \$
+    \begin{enumerate}
+    \item compute $\mfn{first}(\$)$
+    \item Add all $X\to\lrd \ldots, w$ to $I$, where $w =\$$
+
+      \begin{minipage}{.3\linewidth}
+        \begin{align*}
+          X&\to X\lrd X & &, \$ \\
+          X&\to \lrd aX & &,\mr{?}  \\
+          V&\to \lrd b  & &,\mr{?}
+        \end{align*}
+      \end{minipage}
+      \begin{minipage}{.7\linewidth}
+        \begin{align*}
+          X&\to a\lrd X & &, \$ \\
+          X&\to \lrd aX & &,\mfn{first}(\$) = \$ \\
+          V&\to \lrd b  & &,\mfn{first}(\$) = \$
+        \end{align*}
+      \end{minipage}
+    \end{enumerate}
+  \end{itemize}
+\item when $X$ is \mb{terminal}, this may lead to a new state with item $A\to \alpha X\lrd \beta, z$, where $z$ is simply copied over
+\end{itemize}
