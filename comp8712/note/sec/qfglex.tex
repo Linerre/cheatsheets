@@ -1,0 +1,227 @@
+\section*{Q1: if a given grammar $G$ is regular or not and why?}
+$G=(\Sigma,N,P,S)$ is regular \emph{only if} every prod rule has \emph{only one} of the following forms:
+\begin{enumerate}
+\item \mb{Right}-linear: non-terminals always on RHS of terminals
+  \begin{itemize}
+  \item $A\to aB$, where $A, B$ are non-terminals, $a$ is terminal
+  \item $A\to a$, where $A$ is a non-terminal, $a$ is a terminal
+  \item $A\to \varepsilon$, where $A$ is a non-terminal, $\varepsilon$ is empty string
+  \end{itemize}
+\item \mb{Left}-linear non-terminals always on LHS of terminals
+  \begin{itemize}
+  \item $A\to Ba$, where $A, B$ are non-terminals, $a$ is terminal
+  \item $A\to a$, where $A$ is a non-terminal, $a$ is a terminal
+  \item $A\to \varepsilon$, where $A$ is a non-terminal, $\varepsilon$ is empty string
+  \end{itemize}
+\end{enumerate}
+\section*{Example 1: regular grammar (right-linear)}
+\begin{align*}
+  S&\to aS \gor bA \gor \varepsilon\\
+  A&\to aA \gor b
+\end{align*}
+represented in regular expression: $a^+\gor ab(a^+b\gor b)\gor\varepsilon$
+\section*{Example 2: regular grammar (right-linear, Mid-exam)}
+\begin{align*}
+  S&\to bD \tag{0} \\
+  D&\to 0D \tag{1} \\
+  D&\to 1D \tag{2} \\
+  D&\to 0 \gor 1 \tag{3}
+\end{align*}
+regular exp: $b(0\gor 1)(0\gor 1)^+$ (binary numb with prefix $b$)
+
+\begin{minipage}{.5\linewidth}
+\section*{Example 3: not regular}
+\[
+  S\to aSb\gor \varepsilon
+\]
+The non-terminal $S$ has terminals on both sides: not right-/left-linear, thus \mr{not} regular.
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\section*{Example 4: not regular (2 non-terms on RHS)}
+\begin{align*}
+  S&\to AB \\
+  A&\to a\\
+  B&\to b
+\end{align*}
+\end{minipage}
+\section*{Q2: Construct context-free grammar}
+\begin{lstlisting}[language=c]
+  /* this is a comment /* with a nested comment */ */
+\end{lstlisting}
+Suppose tokens \texttt{/*}, \texttt{*/} and \texttt{c} for entire comment content
+\begin{itemize}
+\item construct a CFG production rules, terminals, non-terminals
+  \begin{enumerate}
+  \item Parse a string $S$ \mo{top down}: it's either a comment $C$ or $\varepsilon$
+    \begin{equation}
+      S\to C \gor \varepsilon
+    \end{equation}
+  \item A comment $C$ is enclosed in \texttt{/* T */}, $T$ is content
+    \begin{equation}
+      C\to /*\quad T\quad */
+    \end{equation}
+  \item Content $T$ can have zero (empty) or more items $I^*$
+    \begin{equation}
+      T\to I^*
+    \end{equation}
+  \item Item $I$ should be either a terminal or a comment $C$
+    \begin{equation}
+      T\to c \gor C
+    \end{equation}
+  \end{enumerate}
+\section*{Q3: if given $G$ is context-free grammar (CFG) and why?}
+\item The nested comment grammar is context-free because:
+  \begin{enumerate}
+  \item Each production has the form $A\to w$, where $A$ is non-terminal and $w$ is a string of terminals and non-terminals
+  \item No production rule depends on the context surrounding the non-terminal being replaced
+  \end{enumerate}
+\item In general, to check if $G$ is a context-free grammar:
+  \begin{enumerate}
+  \item Examine the \mb{left side} of each production rule
+    \begin{itemize}
+    \item Must contain \textbf{exactly one} non-terminal symbol
+    \item Cannot have terminals mixed with non-terminals
+    \item Cannot have multiple symbols
+    \end{itemize}
+  \item Check for context dependencies
+    \begin{itemize}
+    \item Rules should not depend on surrounding symbols
+    \item No conds like ``$A\to B$ only when $A$ appears after $C$''
+    \end{itemize}
+  \end{enumerate}
+\item \mr{cannot} convert the CFG to a regular grammar because:
+  \begin{enumerate}
+  \item cannot count opening \texttt{/*} in regular grammar
+  \item cannot match each with the paired \texttt{*/} in regular grammar
+  \item cannot maintain proper nesting order in regular grammar
+  \end{enumerate}
+\item In general, regular languages cannot handle the following:
+  \begin{itemize}[leftmargin=1em]
+  \item Arbitrary nesting depth
+  \item Matching pairs that require \textbf{memory} of previous symbols
+  \item Center-embedded recursion
+  \end{itemize}
+\end{itemize}
+
+\section*{Q4: if a given grammar $G$ is LL(1)}
+\begin{itemize}
+\item if it has any \mb{left-recursive} prod rule, it's \mr{not} LL(1): $E\to E+ T$ (need remove left-recursion first)
+\item if \mb{common prefix} shared among some prod rules, it's \mr{not} LL(1) (need left refactoring):
+  \begin{align*}
+    T\to (T) \\
+    E\to (E)
+  \end{align*}
+\item In general, for each non-terminal $A$ with prod $A\to \alpha_1\gor \alpha_2\gor\ldots\alpha_n$: $\mfn{first}(\alpha_1)\cup\mfn{first}(\alpha_2)\ldots\mfn{first}(\alpha_1) = \emptyset$
+\item In the above, $\mfn{first}(T)\cup\mfn{first}(E) = \mset(\textsf{left-paren})\neq \emptyset$
+\item In the below, $\mfn{first}(S)=\mfn{first}(a)\cup\mfn{first}(a)=\mset{a}\neq\emptyset$
+  \[
+    S\to aA \gor aB
+  \]
+\item if any $\alpha_i \overset{*}{\Rightarrow} \varepsilon$, then must $\mfn{first}(\alpha_i)\cup\mfn{follow}(A)=\emptyset$
+\item In general, to verify a LL(1) grammar $G$:
+  \begin{enumerate}
+  \item eliminate left recursion in $G$ (if any)
+  \item left refactor the grammar $G$ (if needed)
+  \item Compute FIRST sets for all productions in $G$
+  \item Compute FOLLOW sets for all non-terminals in $G$
+  \item for each non-term, FIRST sets of its prod are disjoint
+  \item For any nullable prod, verify FIRST and FOLLOW sets don't overlap
+  \end{enumerate}
+\end{itemize}
+\section*{Q5: if a given $G$ is LR(0)}
+\begin{minipage}{.5\linewidth}
+\begin{align*}
+  S&\to E\$ \\
+  E&\to T \gor E;T \\
+  T&\to \varepsilon \gor Ta
+\end{align*}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+  \centering
+  \begin{tikzpicture}
+    \node(i1)[lrst] {
+      $S'\to\lrd S\$$\\
+      $S\to\lrd E$\\
+      $E\to\lrd T$\\
+      $E\to\lrd E;T$\\
+      $T\to\lrd \varepsilon$\\
+      $T\to\lrd Ta$
+    };
+    \node[below right=0.1mm of i1.north east,font=\footnotesize\bf] {1};
+  \end{tikzpicture}
+\end{minipage}
+\begin{itemize}
+\item Add a new start symbol to the grammar: $S'\to S\$$
+\item use \textbf{closure} to build the DFA: move the dot in each item
+\end{itemize}
+\begin{itemize}
+\item use \textbf{goto} to create transition from $I$ to $I'$ on each shift
+  \begin{itemize}[leftmargin=1em]
+  \item for LR(0), reuse states with same items (prod, dot)
+  % \item for LR(1), reuse states with same items (prod, dot, Las)
+  \end{itemize}
+\item if any state $I$ has \mb{R/R} or \mb{R/S} conflict, \mr{not} LR(0) or LR(1)
+\item draw the parsing table that contains \mo{3} main parts
+  \begin{minipage}{\linewidth}
+    \centering
+    \begin{tabular}{l|l|l}
+      \hline
+      States ($I$) & Actions (s/r, terms) & Gotos (non-terms)\\
+      \hline
+    \end{tabular}
+  \end{minipage}
+\end{itemize}
+\section*{Q6: if a given $G$ is SLR(1) ($a.k.a$ SLR)}
+\begin{itemize}
+\item construct LR(0) parsing table (even there are conflicts)
+\item identify all states with reduce items ($A\to\alpha \lrd$)
+\item compute $\mfn{follow}(A)$ (get a set)
+\item for each token $X$ in above set, $rn$ at $(I,X, A\to\alpha)$ in table
+\item if still with conflict(s), \mr{not} SLR(1)
+\end{itemize}
+\section*{Q7: if a given $G$ is LR(1)}
+\begin{minipage}{.5\linewidth}
+\begin{align*}
+  S&\to E\$ \\
+  E&\to T \gor E;T \\
+  T&\to \varepsilon \gor Ta
+\end{align*}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+  \centering
+  \begin{tikzpicture}
+    \node(i1)[lrst] {
+      \begin{tabular}{ll}
+        $S'\to\lrd S\$$ &,\$ \\
+        $S\to\lrd E$    &,\$\\
+        $E\to\lrd T$    &,$\$\gor ;$\\
+        $E\to\lrd E;T$  &,$\$\gor ;$\\
+        $T\to\lrd \varepsilon$ &,\$\\
+        $T\to\lrd Ta$  &,\$
+      \end{tabular}
+    };
+    \node[below right=0.1mm of i1.north east,font=\footnotesize\bf] {1};
+  \end{tikzpicture}
+\end{minipage}
+\begin{itemize}
+\item LR(1) items LR(0) items plus LA(s): $A\to \lrd X, \text{LAs}$
+\item LAs can be a single token (e.g. $\$$) or a set of terminals $(a\gor b)$
+\item In LR(1) DFA, same items have \emph{exactly} same prod, dot, LAs
+\item In the above example, $S\to \lrd E$ intros 2 new items:
+  \begin{align*}
+    E&\to\lrd T   & &,\$\\
+    E&\to\lrd E;T & &,\$
+  \end{align*}
+\item Similarly, $E\to \lrd E;T$ intros 2 more new items:
+  \begin{align*}
+    E&\to\lrd T    &  &,;\\
+    E&\to\lrd E;T  &  &,;
+  \end{align*}
+\item drawing LR(1) parsing table is similar to that of LR(0)
+\end{itemize}
+\section*{Q8: if a given $G$ is LALR(1) ($a.k.a$ LALR)}
+\begin{itemize}
+\item follow the steps for creating the parsing table for LR(1)
+\item try to merge states with similar items (same prod and dot pos, but difference LAs)
+\item if no conflicts, it is LALR; otherwise, it is not
+\end{itemize}
