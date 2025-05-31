@@ -7,61 +7,241 @@
 
 % Each section goes into this env
 \begin{multicols*}{3}
-\section*{Access to non-local data (real gloabls)}
+\section*{Activation Recrod (AR) and Call Stack}
 \begin{itemize}
-\item visible \mo{everywhere}
-\item naming convention gives an address (a \mo{label})
-\item initialization requires cooperation
+\item Each procedure has its own AR (a chunk of memory)
+\item AR acts as a storage for all the necessary info about the function. It also corresponds to a scope of the function
+\item Call stack is data structure used to manage ARs in many imperative langs. In such cases, AR also called \mb{stack frame}
+\item Callee's \mb{dynamic link} \textbf{points back} to its caller
+\item Returned procedure (its AR) should \emph{not} appear on call stack
 \end{itemize}
-\section*{Access to non-local data (lexical nesting)}
+\section*{Dynamic Link vs Static Link}
 \begin{itemize}
-\item view variables as (\textsf{level,offset}) pairs (compile-time)
-\item chain of non-local access links (static chain)
-  \begin{itemize}
-  \item proc $P$ defines a local variable $v$
-  \item (nested) proc $Q$ can modify $v$ of $P$ and only be called by $P$
-  \item $P_0\overset{call}{\to}Q_0, Q_1\overset{call}{\to}P_1\overset{call}{\to}P_2\overset{call}{\to}Q_2,Q_3,Q_4$
-  \item $Q_{0,1}$ have context $P_0$ and see $v \in P_0$
-  \item $Q_{2,3,4}$ have context $P_2$ and see $v \in P_2$
-  \item at anytime, each proc needs a pointer to its outside context; each subclass needs a pointer to its parent (ctx) class
-  \end{itemize}
-\item more expensive find (run-time)
+\item Links are \mo{dynamic} because they are known only at runtime
+\item a procedure's \mo{dynamic link} points to its caller
+\item a procedure's \mb{static link} points to where it's \textbf{defined} (its immediate \mb{enclosing scope}, doesn't change during runtime)
 \end{itemize}
+\section*{Example 1: dynamic links and static links}
 \begin{itemize}
-\item How to map a name into a (level,offset) pair? (compile-time)
-  \begin{enumerate}[start=0]
-  \item use \mb{block-structure symbol table}
-  \item look up a name, wants its most recent declaration
-  \item declaration may be at current level or any lower level
-  \end{enumerate}
-\item Given a (level,offset) pair, what's the address? (run-time)
-  \begin{itemize}
-  \item access links (static links/chain explain above), or
-  \item displays (deprecated and less effective)
-  \end{itemize}
-\end{itemize}
-\section*{Find the value specified by ($l,o$)}
-\begin{itemize}
-\item need current procedure level $k$
-\item $k = l \Rightarrow$ local value
-\item $k > l \Rightarrow$ find $l$'s activation record (stack frame)
-\item $k < l$ cannot occur
-\end{itemize}
-\section*{Maintain access links (static links)}
-\begin{itemize}
-\item calling level k + 1 procedure
-  \begin{enumerate}
-  \item pass my \texttt{FP} as access link
-  \item my backward chain will work for lower levels
-  \end{enumerate}
-\item calling procedure at level $l < k$
-  \begin{enumerate}
-  \item find link to level $l - 1$ and pass it
-  \item its access link will work for lower levels
-  \end{enumerate}
-\end{itemize}
-\begin{minipage}{\linewidth}
-  \includegraphics*[width=\linewidth]{img/access_link}
+\item Suppose the following two \mr{globally} defined procedures
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c]
+int sqr(int x)
+{
+  return x * x;
+}
+\end{lstlisting}
 \end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt]
+int sos(int x, int y)
+{
+  return sqr(x) + sqr(y);
+}
+\end{lstlisting}
+\end{minipage}
+\item \texttt{main} calls \texttt{sos} which is being executed (all vars in memory)
+\begin{lstlisting}[language=c]
+int main(int x)
+{
+  int x = 3, y = 4; // assume vars stored in mem
+  sos(x, y); // <-- executing this procedure
+  return x * x;
+}
+\end{lstlisting}
+\item Draw the stack from for \texttt{main} (suppose stack \mr{grows upwards})
+\begin{minipage}{\linewidth}
+  \centering
+  \begin{tikzpicture}
+    % main
+    \node(main) [ar] {
+      static link \\
+      args for callee \\
+      prev frame ptr \\
+      return addr \\
+      locals: x, y
+    };
+    \node(global) [ar,below=0mm of main] { global };
+
+
+    % main's dynamic link points to null
+    \node(null) [right=4mm of main.east,font=\footnotesize]
+    {\texttt{null} (no caller for \texttt{main})};
+    \draw[->,color=red!80] (main.east) -- (null.west);
+
+    \node(dy) [below=1mm of null, font=\footnotesize, text width=4cm] {
+      \texttt{main} is outermost frame so its dynamic link points to null
+      (nothing calls main)
+    };
+
+    % main's static link points to global
+    \draw[->]
+    ([yshift=-1mm]main.north west) -- ([xshift=-2mm,yshift=-1mm]main.north west)
+    -- ([xshift=-2mm]global.west) -- (global.west);
+
+  \end{tikzpicture}
+\end{minipage}
+\item Call stack where \texttt{main} calls \texttt{sos} (which saved \texttt{main}'s RBP)
+\begin{minipage}{\linewidth}
+  \centering
+  \begin{tikzpicture}
+    % sos
+    \node(sos) [ar, fill=blue!50,fill=blue!20,above=0mm of main] {
+      static link \\
+      args for callee \\
+      main's frame ptr \\
+      return addr \\
+      local vars
+    };
+    \node(note1) [right=6mm of sos.east,text width=4cm,font=\footnotesize] {
+      \texttt{sos}'s dynamic link (saved frame pointer of \texttt{main}) points to \texttt{main}'s \texttt{RBP} location };
+    \draw[decorate,decoration={brace,mirror}]
+    ([xshift=-2mm]sos.north west) -- ([xshift=-2mm]sos.south west)
+    node[midway,sloped,below,font=\footnotesize]{\texttt{sos} AR};
+
+
+    % main
+    \node(main) [ar,below=0mm of sos] {
+      static link \\
+      args for callee \\
+      prev frame ptr \\
+      return addr \\
+      locals: x, y
+    };
+
+    \draw[->,color=blue!50] (sos.east) -- ([xshift=4mm]sos.east)
+    -- ([xshift=4mm]main.east) -- (main.east);
+
+    \draw[decorate,decoration={brace,mirror}]
+    ([xshift=-2mm]main.north west) -- ([xshift=-2mm]main.south west)
+    node[midway,sloped,below,font=\footnotesize]{\texttt{main} AR};
+  \end{tikzpicture}
+\end{minipage}
+\item Call stack where \texttt{sos} calls \texttt{sqr} (which saved \texttt{sos}'s RBP)
+\begin{minipage}{\linewidth}
+  % \centering
+  % \begin{tikzpicture}
+  %   % sqr
+  %   \node(local2) [ar, fill=green!50,fill=green!20,above=0mm of static1] {locals...};
+  %   \node(ret2) [ar, fill=green!50,fill=green!20, above=0mm of local2] {return addr};
+  %   \node(mfptr2) [ar, fill=green!50,fill=green!20,above=0mm of ret2]
+  %   {sos's frame ptr};
+  %   \node(args2) [ar,fill=green!50,fill=green!20,above=0mm of mfptr2]
+  %   {args for callee};
+  %   \node(static2) [ar,fill=green!50,fill=green!20,above=0mm of args2] {static link};
+  %   \node(note3) [right=6mm of ret2,text width=4cm,font=\footnotesize] {
+  %     \texttt{sqr}'s dynamic link (saved frame pointer of \texttt{sos}) points to \texttt{sos}'s \texttt{RBP} location };
+  %
+  %   % sos
+  %   \node(local1) [ar, fill=blue!20,fill=blue!20,above=0mm of static0] {locals...};
+  %   \node(ret1) [ar, fill=blue!50,fill=blue!20, above=0mm of local1] {return addr};
+  %   \node(mfptr1) [ar, fill=blue!50,fill=blue!20,above=0mm of ret1]
+  %   {main's frame ptr};
+  %   \node(args1) [ar,fill=blue!50,fill=blue!20,above=0mm of mfptr1]
+  %   {args for callee};
+  %   \node(static1) [ar,fill=blue!50,fill=blue!20,above=0mm of args1] {static link};
+  %   \node(note1) [right=6mm of ret1,text width=4cm,font=\footnotesize] {
+  %     \texttt{sos}'s dynamic link (saved frame pointer of \texttt{main}) points to \texttt{main}'s \texttt{RBP} location };
+  %
+  %   % main
+  %   \node(static0) [ar] {static link};
+  %   \node(args0) [ar,below=0mm of static0] {args for callee};
+  %   \node(rbpprev0) [ar, below=0mm of args0] {prev frame ptr};
+  %   \node(ret0) [ar, below=0mm of rbpprev0] {return addr};
+  %   \node(local0) [ar, below=0mm of ret0] {x,y};
+  %
+  %   \draw[->] (rbp0.west) -- (rbpprev0.north east);
+  %   \draw[->,color=blue!50]
+  %   (mfptr1.east) -- ([xshift=4mm]mfptr1.east)
+  %   -- ([xshift=4mm]rbpprev0.north east) -- (rbpprev0.north east);
+  %   \draw[->,color=green!60]
+  %   (mfptr2.east) -- ([xshift=4mm]mfptr2.east)
+  %   -- ([xshift=4mm]mfptr1.north east) -- (mfptr1.north east);
+  % \end{tikzpicture}
+\end{minipage}
+\end{itemize}
+% \begin{minipage}[b]{.33\linewidth}
+%   \begin{tikzpicture}
+%     %main
+%     \node(args) [ar] {arg 1...n};
+%     \node(rbp0) [ar, below=0mm of args] {frame ptr};
+%     \node(ret) [ar, below=0mm of rbp0] {return addr};
+%     \node(local) [ar, below=0mm of ret] {x,y};
+%
+%     %sqr
+%     \node(local1) [ar, above=0mm of args] {locals};
+%     \node(ret1) [ar, above=0mm of local1] {return addr};
+%     \node(rbp1) [ar, above=0mm of ret1] {frame ptr};
+%     \node(args1) [ar, above=0mm of rbp1] {arg 1...n};
+%   \end{tikzpicture}
+% \end{minipage}
+% \begin{minipage}[b]{.33\linewidth}
+%   \begin{tikzpicture}
+%     %main
+%     \node(rbp0) [ar] {frame ptr};
+%     \node(ret) [ar, below=0mm of rbp0] {return addr};
+%     \node(local) [ar, below=0mm of ret] {x,y};
+%   \end{tikzpicture}
+% \end{minipage}
+% MAIN's Frame:
+% ┌─────────────────────────┐
+% │    Parameters for A     │
+% ├─────────────────────────┤
+% │  Return addr to main    │
+% ├─────────────────────────┤ ← main's RBP points here
+% │   Previous RBP (null)   │
+% ├─────────────────────────┤
+% │   main's locals         │
+% └─────────────────────────┘
+% \section*{Access to non-local data (lexical nesting)}
+% \begin{itemize}
+% \item view variables as (\textsf{level,offset}) pairs (compile-time)
+% \item chain of non-local access links (static chain)
+%   \begin{itemize}
+%   \item proc $P$ defines a local variable $v$
+%   \item (nested) proc $Q$ can modify $v$ of $P$ and only be called by $P$
+%   \item $P_0\overset{call}{\to}Q_0, Q_1\overset{call}{\to}P_1\overset{call}{\to}P_2\overset{call}{\to}Q_2,Q_3,Q_4$
+%   \item $Q_{0,1}$ have context $P_0$ and see $v \in P_0$
+%   \item $Q_{2,3,4}$ have context $P_2$ and see $v \in P_2$
+%   \item at anytime, each proc needs a pointer to its outside context; each subclass needs a pointer to its parent (ctx) class
+%   \end{itemize}
+% \item more expensive find (run-time)
+% \end{itemize}
+% \begin{itemize}
+% \item How to map a name into a (level,offset) pair? (compile-time)
+%   \begin{enumerate}[start=0]
+%   \item use \mb{block-structure symbol table}
+%   \item look up a name, wants its most recent declaration
+%   \item declaration may be at current level or any lower level
+%   \end{enumerate}
+% \item Given a (level,offset) pair, what's the address? (run-time)
+%   \begin{itemize}
+%   \item access links (static links/chain explain above), or
+%   \item displays (deprecated and less effective)
+%   \end{itemize}
+% \end{itemize}
+% \section*{Find the value specified by ($l,o$)}
+% \begin{itemize}
+% \item need current procedure level $k$
+% \item $k = l \Rightarrow$ local value
+% \item $k > l \Rightarrow$ find $l$'s activation record (stack frame)
+% \item $k < l$ cannot occur
+% \end{itemize}
+% \section*{Maintain access links (static links)}
+% \begin{itemize}
+% \item calling level k + 1 procedure
+%   \begin{enumerate}
+%   \item pass my \texttt{FP} as access link
+%   \item my backward chain will work for lower levels
+%   \end{enumerate}
+% \item calling procedure at level $l < k$
+%   \begin{enumerate}
+%   \item find link to level $l - 1$ and pass it
+%   \item its access link will work for lower levels
+%   \end{enumerate}
+% \end{itemize}
+% \begin{minipage}{\linewidth}
+%   \includegraphics*[width=\linewidth]{img/access_link}
+% \end{minipage}
 \end{multicols*}
 \end{document}
