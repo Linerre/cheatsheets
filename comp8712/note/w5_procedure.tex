@@ -23,33 +23,44 @@
 \end{itemize}
 \section*{Example 1: dynamic links and static links}
 \begin{itemize}
-\item Suppose the following two \mr{globally} defined procedures
+\item Suppose the following two \mo{globally} defined procedures
 \begin{minipage}{.5\linewidth}
 \begin{lstlisting}[language=c]
-int sqr(int x)
-{
+int sqr(int x) {
   return x * x;
 }
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}{.5\linewidth}
 \begin{lstlisting}[language=c,xleftmargin=2pt]
-int sos(int x, int y)
-{
+int sos(int x, int y) {
   return sqr(x) + sqr(y);
 }
 \end{lstlisting}
 \end{minipage}
 \item \texttt{main} calls \texttt{sos} which is being executed (all vars in memory)
 \begin{lstlisting}[language=c]
-int main(int x)
-{
+int main(int x) {
   int x = 3, y = 4; // assume vars stored in mem
-  sos(x, y); // <-- executing this procedure
+  sos(x, y); // <-- executing sum of square
   return x * x;
 }
 \end{lstlisting}
-\item Draw the stack from for \texttt{main} (suppose stack \mr{grows upwards})
+\item box repr. a mem location, a ptr in it points to some other location. Ptrs in regs (\texttt{\%rbp}, \texttt{\%rsp}) may point to a location
+  \begin{minipage}{\linewidth}
+    \begin{tikzpicture}
+      \node(ptr)[ar] {a ptr stored in mem};
+      \node[right=5mm of ptr.north east,font=\footnotesize]{
+        location start is pointed by a ptr in reg
+      };
+      \node[right=5mm of ptr.east,font=\footnotesize]{
+        ptr stored in mem points to other location
+      };
+      \draw[->] (ptr.east) -- ([xshift=4mm]ptr.east) -- ([xshift=4mm]ptr.south east);
+      \draw[->,color=red!80] ([xshift=4mm]ptr.north east) -- (ptr.north east);
+    \end{tikzpicture}
+  \end{minipage}
+\item Draw the stack frame for \texttt{main} (stack \mr{grows upwards})
 \begin{minipage}{\linewidth}
   \centering
   \begin{tikzpicture}
@@ -61,13 +72,12 @@ int main(int x)
       return addr \\
       locals: x, y
     };
-    \node(global) [ar,below=0mm of main] { global };
-
+    \node(global) [ar,below=0mm of main] { global: main };
 
     % main's dynamic link points to null
     \node(null) [right=4mm of main.east,font=\footnotesize]
     {\texttt{null} (no caller for \texttt{main})};
-    \draw[->,color=red!80] (main.east) -- (null.west);
+    \draw[->,color=red!80] ([xshift=-3mm]main.east) -- (null.west);
 
     \node(dy) [below=1mm of null, font=\footnotesize, text width=4cm] {
       \texttt{main} is outermost frame so its dynamic link points to null
@@ -78,170 +88,145 @@ int main(int x)
     \draw[->]
     ([yshift=-1mm]main.north west) -- ([xshift=-2mm,yshift=-1mm]main.north west)
     -- ([xshift=-2mm]global.west) -- (global.west);
-
   \end{tikzpicture}
 \end{minipage}
-\item Call stack where \texttt{main} calls \texttt{sos} (which saved \texttt{main}'s RBP)
+\item Draw call stack where \texttt{main} calls \texttt{sos} (it saved \texttt{main}'s RBP)
 \begin{minipage}{\linewidth}
   \centering
   \begin{tikzpicture}
     % sos
     \node(sos) [ar, fill=blue!50,fill=blue!20,above=0mm of main] {
-      static link \\
+      \mb{static link} \\
       args for callee \\
       main's frame ptr \\
       return addr \\
       local vars
     };
-    \node(note1) [right=6mm of sos.east,text width=4cm,font=\footnotesize] {
-      \texttt{sos}'s dynamic link (saved frame pointer of \texttt{main}) points to \texttt{main}'s \texttt{RBP} location };
+    \node(note1) [right=6mm of sos.south east,text width=4cm,font=\footnotesize] {
+      \texttt{sos}'s \mo{dynamic link} (saved frame pointer of \texttt{main}) points to \texttt{main}'s \texttt{RBP} location };
     \draw[decorate,decoration={brace,mirror}]
-    ([xshift=-2mm]sos.north west) -- ([xshift=-2mm]sos.south west)
+    ([xshift=-6mm]sos.north west) -- ([xshift=-6mm]sos.south west)
     node[midway,sloped,below,font=\footnotesize]{\texttt{sos} AR};
 
+    \node(note2) [right=6mm of sos.east, yshift=2mm, text
+    width=4cm,font=\footnotesize] {
+      \texttt{sos}'s frame ptr (usu. in reg) points to the start of this location
+      (\texttt{main}'s frame ptr)
+    };
+    \draw[->,color=red!80]([yshift=-1mm]note2.west) -- ([yshift=1mm]sos.east);
 
     % main
     \node(main) [ar,below=0mm of sos] {
-      static link \\
+      \mb{static link} \\
       args for callee \\
       prev frame ptr \\
       return addr \\
       locals: x, y
     };
 
-    \draw[->,color=blue!50] (sos.east) -- ([xshift=4mm]sos.east)
-    -- ([xshift=4mm]main.east) -- (main.east);
+    % global
+    \node(global) [ar,below=0mm of main] { global: main,sos };
+
+    % dynamic link
+    \node[above=0mm of sos.north east,font=\footnotesize,color=red!80]
+    {dynamic links};
+    \draw[->,color=red!50] ([xshift=-3mm]sos.east) -- ([xshift=4mm]sos.east)
+    -- ([xshift=4mm,yshift=1mm]main.east) -- ([yshift=1mm]main.east);
 
     \draw[decorate,decoration={brace,mirror}]
-    ([xshift=-2mm]main.north west) -- ([xshift=-2mm]main.south west)
+    ([xshift=-6mm]main.north west) -- ([xshift=-6mm]main.south west)
     node[midway,sloped,below,font=\footnotesize]{\texttt{main} AR};
+
+    % static links
+    \node[above=0mm of sos.north west,font=\footnotesize,color=blue!50]
+    {static links};
+    \draw[->] ([xshift=4mm,yshift=-2mm]main.north west) --
+    ([yshift=-2mm]main.north west) -- ([xshift=-2mm,yshift=-2mm]main.north west)
+    -- ([xshift=-2mm]global.west) -- (global.west);
+
+    \draw[->,color=blue!50] ([xshift=4mm,yshift=-2mm]sos.north west) --
+    ([yshift=-2mm]sos.north west) -- ([xshift=-4mm,yshift=-2mm]sos.north west)
+    -- ([xshift=-4mm]global.west) -- (global.west);
   \end{tikzpicture}
 \end{minipage}
 \item Call stack where \texttt{sos} calls \texttt{sqr} (which saved \texttt{sos}'s RBP)
 \begin{minipage}{\linewidth}
-  % \centering
-  % \begin{tikzpicture}
-  %   % sqr
-  %   \node(local2) [ar, fill=green!50,fill=green!20,above=0mm of static1] {locals...};
-  %   \node(ret2) [ar, fill=green!50,fill=green!20, above=0mm of local2] {return addr};
-  %   \node(mfptr2) [ar, fill=green!50,fill=green!20,above=0mm of ret2]
-  %   {sos's frame ptr};
-  %   \node(args2) [ar,fill=green!50,fill=green!20,above=0mm of mfptr2]
-  %   {args for callee};
-  %   \node(static2) [ar,fill=green!50,fill=green!20,above=0mm of args2] {static link};
-  %   \node(note3) [right=6mm of ret2,text width=4cm,font=\footnotesize] {
-  %     \texttt{sqr}'s dynamic link (saved frame pointer of \texttt{sos}) points to \texttt{sos}'s \texttt{RBP} location };
-  %
-  %   % sos
-  %   \node(local1) [ar, fill=blue!20,fill=blue!20,above=0mm of static0] {locals...};
-  %   \node(ret1) [ar, fill=blue!50,fill=blue!20, above=0mm of local1] {return addr};
-  %   \node(mfptr1) [ar, fill=blue!50,fill=blue!20,above=0mm of ret1]
-  %   {main's frame ptr};
-  %   \node(args1) [ar,fill=blue!50,fill=blue!20,above=0mm of mfptr1]
-  %   {args for callee};
-  %   \node(static1) [ar,fill=blue!50,fill=blue!20,above=0mm of args1] {static link};
-  %   \node(note1) [right=6mm of ret1,text width=4cm,font=\footnotesize] {
-  %     \texttt{sos}'s dynamic link (saved frame pointer of \texttt{main}) points to \texttt{main}'s \texttt{RBP} location };
-  %
-  %   % main
-  %   \node(static0) [ar] {static link};
-  %   \node(args0) [ar,below=0mm of static0] {args for callee};
-  %   \node(rbpprev0) [ar, below=0mm of args0] {prev frame ptr};
-  %   \node(ret0) [ar, below=0mm of rbpprev0] {return addr};
-  %   \node(local0) [ar, below=0mm of ret0] {x,y};
-  %
-  %   \draw[->] (rbp0.west) -- (rbpprev0.north east);
-  %   \draw[->,color=blue!50]
-  %   (mfptr1.east) -- ([xshift=4mm]mfptr1.east)
-  %   -- ([xshift=4mm]rbpprev0.north east) -- (rbpprev0.north east);
-  %   \draw[->,color=green!60]
-  %   (mfptr2.east) -- ([xshift=4mm]mfptr2.east)
-  %   -- ([xshift=4mm]mfptr1.north east) -- (mfptr1.north east);
-  % \end{tikzpicture}
+  \centering
+  \begin{tikzpicture}
+    % sqr
+    \node(sqr) [ar,fill=green!50,fill=green!20,above=0mm of sos] {
+      \mb{static link} \\
+      args for callee \\
+      sos' frame ptr \\
+      return addr \\
+      local vars
+    };
+    \node(note0) [right=6mm of sqr.south east,text width=4cm,font=\footnotesize] {
+      \texttt{sqr}'s \mo{dynamic link} (saved frame pointer of \texttt{sos}) points to start of \texttt{sos}'s \texttt{RBP} location };
+    \draw[decorate,decoration={brace,mirror}]
+    ([xshift=-6mm]sqr.north west) -- ([xshift=-6mm]sqr.south west)
+    node[midway,sloped,below,font=\footnotesize]{\texttt{sqr} AR};
+
+    % sos
+    \node(sos) [ar, fill=blue!50,fill=blue!20,above=0mm of main] {
+      \mb{static link} \\
+      args for callee \\
+      main's frame ptr \\
+      return addr \\
+      local vars
+    };
+    \node(note1) [right=6mm of sos.south east,text width=4cm,font=\footnotesize] {
+      \texttt{sos}'s \mo{dynamic link} (saved frame pointer of \texttt{main}) points to start of \texttt{main}'s \texttt{RBP} location };
+    \draw[decorate,decoration={brace,mirror}]
+    ([xshift=-6mm]sos.north west) -- ([xshift=-6mm]sos.south west)
+    node[midway,sloped,below,font=\footnotesize]{\texttt{sos} AR};
+
+    % main
+    \node(main) [ar,below=0mm of sos] {
+      \mb{static link} \\
+      args for callee \\
+      prev frame ptr \\
+      return addr \\
+      locals: x, y
+    };
+    \draw[decorate,decoration={brace,mirror}]
+    ([xshift=-6mm]main.north west) -- ([xshift=-6mm]main.south west)
+    node[midway,sloped,below,font=\footnotesize]{\texttt{main} AR};
+
+    % global
+    \node(global) [ar,below=0mm of main] {
+      global:\\
+      main, sos, sqr
+    };
+
+    %dynamic links
+    \node[above=0mm of sqr.north east,font=\footnotesize,color=red!80]
+    {dynamic links};
+    \draw[->,color=red!50] ([xshift=-3mm]sos.east) -- ([xshift=4mm]sos.east)
+    -- ([xshift=4mm,yshift=1mm]main.east) -- ([yshift=1mm]main.east);
+    \draw[->,color=red!50] ([xshift=-3mm]sqr.east) -- ([xshift=4mm]sqr.east)
+    -- ([xshift=4mm,yshift=1mm]sos.east) -- ([yshift=1mm]sos.east);
+    \draw[->,color=red!50] ([xshift=-3mm]main.east) -- ([xshift=4mm]main.east)
+    -- ([xshift=4mm,yshift=2mm]main.south east);
+    \node[right=0mm of main.south east,font=\footnotesize]{\texttt{null}};
+
+    % static links
+    \node[above=0mm of sqr.north west,font=\footnotesize,color=blue!50]
+    {static links};
+    \draw[->] ([xshift=4mm,yshift=-2mm]main.north west) --
+    ([yshift=-2mm]main.north west) -- ([xshift=-2mm,yshift=-2mm]main.north west)
+    -- ([xshift=-2mm]global.west) -- (global.west);
+
+    \draw[->,color=blue!50] ([xshift=4mm,yshift=-2mm]sos.north west) --
+    ([yshift=-2mm]sos.north west) -- ([xshift=-4mm,yshift=-2mm]sos.north west)
+    -- ([xshift=-4mm]global.west) -- (global.west);
+
+    \draw[->,color=blue!50] ([xshift=4mm,yshift=-2mm]sqr.north west) --
+    ([yshift=-2mm]sqr.north west) -- ([xshift=-4mm,yshift=-2mm]sqr.north west)
+    -- ([xshift=-4mm]global.west) -- (global.west);
+  \end{tikzpicture}
 \end{minipage}
 \end{itemize}
-% \begin{minipage}[b]{.33\linewidth}
-%   \begin{tikzpicture}
-%     %main
-%     \node(args) [ar] {arg 1...n};
-%     \node(rbp0) [ar, below=0mm of args] {frame ptr};
-%     \node(ret) [ar, below=0mm of rbp0] {return addr};
-%     \node(local) [ar, below=0mm of ret] {x,y};
-%
-%     %sqr
-%     \node(local1) [ar, above=0mm of args] {locals};
-%     \node(ret1) [ar, above=0mm of local1] {return addr};
-%     \node(rbp1) [ar, above=0mm of ret1] {frame ptr};
-%     \node(args1) [ar, above=0mm of rbp1] {arg 1...n};
-%   \end{tikzpicture}
-% \end{minipage}
-% \begin{minipage}[b]{.33\linewidth}
-%   \begin{tikzpicture}
-%     %main
-%     \node(rbp0) [ar] {frame ptr};
-%     \node(ret) [ar, below=0mm of rbp0] {return addr};
-%     \node(local) [ar, below=0mm of ret] {x,y};
-%   \end{tikzpicture}
-% \end{minipage}
-% MAIN's Frame:
-% ┌─────────────────────────┐
-% │    Parameters for A     │
-% ├─────────────────────────┤
-% │  Return addr to main    │
-% ├─────────────────────────┤ ← main's RBP points here
-% │   Previous RBP (null)   │
-% ├─────────────────────────┤
-% │   main's locals         │
-% └─────────────────────────┘
-% \section*{Access to non-local data (lexical nesting)}
-% \begin{itemize}
-% \item view variables as (\textsf{level,offset}) pairs (compile-time)
-% \item chain of non-local access links (static chain)
-%   \begin{itemize}
-%   \item proc $P$ defines a local variable $v$
-%   \item (nested) proc $Q$ can modify $v$ of $P$ and only be called by $P$
-%   \item $P_0\overset{call}{\to}Q_0, Q_1\overset{call}{\to}P_1\overset{call}{\to}P_2\overset{call}{\to}Q_2,Q_3,Q_4$
-%   \item $Q_{0,1}$ have context $P_0$ and see $v \in P_0$
-%   \item $Q_{2,3,4}$ have context $P_2$ and see $v \in P_2$
-%   \item at anytime, each proc needs a pointer to its outside context; each subclass needs a pointer to its parent (ctx) class
-%   \end{itemize}
-% \item more expensive find (run-time)
-% \end{itemize}
-% \begin{itemize}
-% \item How to map a name into a (level,offset) pair? (compile-time)
-%   \begin{enumerate}[start=0]
-%   \item use \mb{block-structure symbol table}
-%   \item look up a name, wants its most recent declaration
-%   \item declaration may be at current level or any lower level
-%   \end{enumerate}
-% \item Given a (level,offset) pair, what's the address? (run-time)
-%   \begin{itemize}
-%   \item access links (static links/chain explain above), or
-%   \item displays (deprecated and less effective)
-%   \end{itemize}
-% \end{itemize}
-% \section*{Find the value specified by ($l,o$)}
-% \begin{itemize}
-% \item need current procedure level $k$
-% \item $k = l \Rightarrow$ local value
-% \item $k > l \Rightarrow$ find $l$'s activation record (stack frame)
-% \item $k < l$ cannot occur
-% \end{itemize}
-% \section*{Maintain access links (static links)}
-% \begin{itemize}
-% \item calling level k + 1 procedure
-%   \begin{enumerate}
-%   \item pass my \texttt{FP} as access link
-%   \item my backward chain will work for lower levels
-%   \end{enumerate}
-% \item calling procedure at level $l < k$
-%   \begin{enumerate}
-%   \item find link to level $l - 1$ and pass it
-%   \item its access link will work for lower levels
-%   \end{enumerate}
-% \end{itemize}
-% \begin{minipage}{\linewidth}
-%   \includegraphics*[width=\linewidth]{img/access_link}
-% \end{minipage}
+\section*{Example 2: dynamic and static links of nested procedure}
 \end{multicols*}
 \end{document}
