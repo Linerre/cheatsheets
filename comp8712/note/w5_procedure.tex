@@ -79,9 +79,8 @@ int main(int x) {
     {\texttt{null} (no caller for \texttt{main})};
     \draw[->,color=red!80] ([xshift=-3mm]main.east) -- (null.west);
 
-    \node(dy) [below=1mm of null, font=\footnotesize, text width=4cm] {
-      \texttt{main} is outermost frame so its dynamic link points to null
-      (nothing calls main)
+    \node(dy) [below=0mm of null, font=\footnotesize, text width=4cm] {
+      nothing calls \texttt{main} so its dynamic link points to \texttt{null}
     };
 
     % main's static link points to global
@@ -103,7 +102,7 @@ int main(int x) {
       local vars
     };
     \node(note1) [right=6mm of sos.south east,text width=4cm,font=\footnotesize] {
-      \texttt{sos}'s \mo{dynamic link} (saved frame pointer of \texttt{main}) points to \texttt{main}'s \texttt{RBP} location };
+      \texttt{sos}'s \mo{dynamic link} (saved frame ptr of \texttt{main}) points to \texttt{main}'s \texttt{RBP} location };
     \draw[decorate,decoration={brace,mirror}]
     ([xshift=-6mm]sos.north west) -- ([xshift=-6mm]sos.south west)
     node[midway,sloped,below,font=\footnotesize]{\texttt{sos} AR};
@@ -124,6 +123,11 @@ int main(int x) {
       locals: x, y
     };
 
+    \node(note3) [right=6mm of main.east, yshift=-6mm,font=\footnotesize,
+    text width=4cm] {
+      When control returns from \texttt{sos} to \texttt{main}, \texttt{return addr} tells CPU where to resume the execution in \texttt{main}
+    };
+
     % global
     \node(global) [ar,below=0mm of main] { global: main,sos };
 
@@ -140,12 +144,12 @@ int main(int x) {
     % static links
     \node[above=0mm of sos.north west,font=\footnotesize,color=blue!50]
     {static links};
-    \draw[->] ([xshift=4mm,yshift=-2mm]main.north west) --
-    ([yshift=-2mm]main.north west) -- ([xshift=-2mm,yshift=-2mm]main.north west)
+    \draw[->] ([xshift=4mm,yshift=-2mm]main.north west)
+    -- ([xshift=-2mm,yshift=-2mm]main.north west)
     -- ([xshift=-2mm]global.west) -- (global.west);
 
-    \draw[->,color=blue!50] ([xshift=4mm,yshift=-2mm]sos.north west) --
-    ([yshift=-2mm]sos.north west) -- ([xshift=-4mm,yshift=-2mm]sos.north west)
+    \draw[->,color=blue!50] ([xshift=4mm,yshift=-2mm]sos.north west)
+    -- ([xshift=-4mm,yshift=-2mm]sos.north west)
     -- ([xshift=-4mm]global.west) -- (global.west);
   \end{tikzpicture}
 \end{minipage}
@@ -162,7 +166,7 @@ int main(int x) {
       local vars
     };
     \node(note0) [right=6mm of sqr.south east,text width=4cm,font=\footnotesize] {
-      \texttt{sqr}'s \mo{dynamic link} (saved frame pointer of \texttt{sos}) points to start of \texttt{sos}'s \texttt{RBP} location };
+      \texttt{sqr}'s \mo{dynamic link} (saved frame ptr of \texttt{sos}) points to start of \texttt{sos}'s \texttt{RBP} location };
     \draw[decorate,decoration={brace,mirror}]
     ([xshift=-6mm]sqr.north west) -- ([xshift=-6mm]sqr.south west)
     node[midway,sloped,below,font=\footnotesize]{\texttt{sqr} AR};
@@ -176,7 +180,7 @@ int main(int x) {
       local vars
     };
     \node(note1) [right=6mm of sos.south east,text width=4cm,font=\footnotesize] {
-      \texttt{sos}'s \mo{dynamic link} (saved frame pointer of \texttt{main}) points to start of \texttt{main}'s \texttt{RBP} location };
+      \texttt{sos}'s \mo{dynamic link} (saved frame ptr of \texttt{main}) points to start of \texttt{main}'s \texttt{RBP} location };
     \draw[decorate,decoration={brace,mirror}]
     ([xshift=-6mm]sos.north west) -- ([xshift=-6mm]sos.south west)
     node[midway,sloped,below,font=\footnotesize]{\texttt{sos} AR};
@@ -200,7 +204,7 @@ int main(int x) {
     };
 
     %dynamic links
-    \node[above=0mm of sqr.north east,font=\footnotesize,color=red!80]
+    \node[above=0mm of sqr.north east,color=red!80,font=\footnotesize\bf]
     {dynamic links};
     \draw[->,color=red!50] ([xshift=-3mm]sos.east) -- ([xshift=4mm]sos.east)
     -- ([xshift=4mm,yshift=1mm]main.east) -- ([yshift=1mm]main.east);
@@ -211,22 +215,160 @@ int main(int x) {
     \node[right=0mm of main.south east,font=\footnotesize]{\texttt{null}};
 
     % static links
-    \node[above=0mm of sqr.north west,font=\footnotesize,color=blue!50]
+    \node[above=0mm of sqr.north west,color=blue!50,font=\footnotesize\bf]
     {static links};
-    \draw[->] ([xshift=4mm,yshift=-2mm]main.north west) --
-    ([yshift=-2mm]main.north west) -- ([xshift=-2mm,yshift=-2mm]main.north west)
+    \draw[->] ([xshift=4mm,yshift=-2mm]main.north west)
+    -- ([xshift=-2mm,yshift=-2mm]main.north west)
     -- ([xshift=-2mm]global.west) -- (global.west);
 
-    \draw[->,color=blue!50] ([xshift=4mm,yshift=-2mm]sos.north west) --
-    ([yshift=-2mm]sos.north west) -- ([xshift=-4mm,yshift=-2mm]sos.north west)
+    \draw[->,color=blue!50] ([xshift=4mm,yshift=-2mm]sos.north west)
+    -- ([xshift=-4mm,yshift=-2mm]sos.north west)
     -- ([xshift=-4mm]global.west) -- (global.west);
 
-    \draw[->,color=blue!50] ([xshift=4mm,yshift=-2mm]sqr.north west) --
-    ([yshift=-2mm]sqr.north west) -- ([xshift=-4mm,yshift=-2mm]sqr.north west)
+    \draw[->,color=blue!50] ([xshift=4mm,yshift=-2mm]sqr.north west)
+    -- ([xshift=-4mm,yshift=-2mm]sqr.north west)
     -- ([xshift=-4mm]global.west) -- (global.west);
   \end{tikzpicture}
 \end{minipage}
 \end{itemize}
 \section*{Example 2: dynamic and static links of nested procedure}
+\begin{minipage}{.45\linewidth}
+\begin{lstlisting}[language=c,xrightmargin=2pt]
+void foo(int i) {
+  int j = 3;
+  void bar() {
+    int j = 0, k;
+    k = i + j;
+  }
+  bar();
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=c,xleftmargin=2pt]
+int main() {
+   int x = 69;
+   void baz(int x) {
+     foo(x);
+   }
+   baz(x);
+   return 0;
+}
+\end{lstlisting}
+\end{minipage}
+\begin{itemize}
+\item Suppose the innermost \texttt{bar} is being executed
+\end{itemize}
+\begin{minipage}{\linewidth}
+  \centering
+  \begin{tikzpicture}
+    % global
+    \node(global) [ar] { global: \\ main,foo };
+
+    % main
+    \node(main) [ar,above=0mm of global] {
+      \mb{static link} of main\\
+      args for baz: x \\
+      prev frame ptr \\
+      return addr \\
+      locals: x, baz
+    };
+    \draw[decorate,decoration={brace,mirror}]
+    ([xshift=-6mm]main.north west) -- ([xshift=-6mm]main.south west)
+    node[midway,sloped,below,font=\footnotesize]{\texttt{main} AR};
+
+    % baz
+    \node(baz) [ar,fill=red!50,fill=red!20,above=0mm of main] {
+      \mb{static link} of baz\\
+      args for foo: i \\
+      main's frame ptr \\
+      return addr \\
+      locals
+    };
+    \node(note0) [right=6mm of baz.south east,yshift=1mm,
+    text width=4cm,font=\footnotesize] {
+      \texttt{baz}'s \mo{dynamic link} (saved frame ptr of \texttt{main}) points to start of \texttt{main}'s \texttt{RBP} location };
+    \draw[decorate,decoration={brace,mirror}]
+    ([xshift=-6mm]baz.north west) -- ([xshift=-6mm]baz.south west)
+    node[midway,sloped,below,font=\footnotesize]{\texttt{baz} AR};
+
+    % foo
+    \node(foo) [ar,fill=blue!50,fill=blue!20,above=0mm of baz] {
+      \mb{static link} of foo \\
+      args for bar \\
+      baz's frame ptr \\
+      return addr \\
+      locals: j
+    };
+    \node(note1) [right=6mm of foo.south east,yshift=1mm,
+    text width=4cm,font=\footnotesize] {
+      \texttt{foo}'s \mo{dynamic link} (saved frame ptr of \texttt{main}) points to start of \texttt{main}'s \texttt{RBP} location };
+    \draw[decorate,decoration={brace,mirror}]
+    ([xshift=-6mm]foo.north west) -- ([xshift=-6mm]foo.south west)
+    node[midway,sloped,below,font=\footnotesize]{\texttt{foo} AR};
+
+    % bar
+    \node(bar) [ar,fill=green!50,fill=green!20,above=0mm of foo] {
+      \mb{static link} of bar \\
+      args for next call \\
+      bar frame ptr \\
+      return addr \\
+      local: j, k
+    };
+    \node(note0) [right=6mm of bar.south east, yshift=1mm,
+    text width=4cm,font=\footnotesize] {
+      \texttt{bar}'s \mo{dynamic link} (saved frame ptr of \texttt{foo}) points to start of \texttt{foo}'s \texttt{RBP} location };
+    \draw[decorate,decoration={brace,mirror}]
+    ([xshift=-6mm]bar.north west) -- ([xshift=-6mm]bar.south west)
+    node[midway,sloped,below,font=\footnotesize]{\texttt{bar} AR};
+
+
+    %dynamic links
+    \node[above=0mm of bar.north east,color=red!80,font=\footnotesize\bf]
+    {dynamic links};
+    % bar -> foo
+    \draw[->,color=red!50] ([xshift=-3mm]bar.east) -- ([xshift=4mm]bar.east)
+    -- ([xshift=4mm,yshift=1mm]foo.east) -- ([yshift=1mm]foo.east);
+    % foo -> baz
+    \draw[->,color=red!50] ([xshift=-3mm]foo.east) -- ([xshift=4mm]foo.east)
+    -- ([xshift=4mm,yshift=1mm]baz.east) -- ([yshift=1mm]baz.east);
+    % baz -> main
+    \draw[->,color=red!50] ([xshift=-3mm]baz.east) -- ([xshift=4mm]baz.east)
+    -- ([xshift=4mm,yshift=1mm]main.east) -- ([yshift=1mm]main.east);
+    % main -> null
+    \draw[->,color=red!50] ([xshift=-3mm]main.east) -- ([xshift=4mm]main.east)
+    -- ([xshift=4mm,yshift=2mm]main.south east);
+    \node[right=0mm of main.south east,font=\footnotesize]{\texttt{null}};
+
+    % static links
+    \node[above=0mm of bar.north west,color=blue!50,font=\footnotesize\bf]
+    {static links};
+    % bar -> foo (as bar defined in foo)
+    \draw[->,color=blue!50]
+    ([xshift=2mm,yshift=-2mm]bar.north west)
+    -- ([xshift=-2mm,yshift=-2mm]bar.north west)
+    -- ([xshift=-2mm]foo.west)
+    -- (foo.west);
+    % foo -> global
+    \draw[->,color=blue!50]
+    ([xshift=2mm,yshift=-2mm]foo.north west)
+    -- ([xshift=-4mm,yshift=-2mm]foo.north west)
+    -- ([xshift=-4mm]global.west)
+    -- (global.west);
+    % baz -> main
+    \draw[->,color=blue!50]
+    ([xshift=2mm,yshift=-2mm]baz.north west)
+    -- ([xshift=-2mm,yshift=-2mm]baz.north west)
+    -- ([xshift=-2mm]main.west)
+    -- (main.west);
+    % main -> global
+    \draw[->,color=blue!50]
+    ([xshift=2mm,yshift=-2mm]main.north west)
+    -- ([xshift=-4mm,yshift=-2mm]main.north west)
+    -- ([xshift=-4mm]global.west)
+    -- (global.west);
+  \end{tikzpicture}
+\end{minipage}
+\section*{Example 3: nested proc, returned proc, debugging closure}
 \end{multicols*}
 \end{document}
