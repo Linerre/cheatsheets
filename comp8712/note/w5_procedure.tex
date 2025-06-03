@@ -89,7 +89,8 @@ int main(int x) {
   \centering
   \begin{tikzpicture}
     % global
-    \node(global) [ar] {
+    \node(gdy) [ar] {dynamic link: NULL};
+    \node(global) [ar,below=0mm of gdy] {
       global: main,sqr,sos \\
       params for main
     };
@@ -133,22 +134,23 @@ int main(int x) {
     {\mb{static link}};
 
     % RBP (FP) and RSP
-    \node(rbp)[arl,left=4mm of sqdy.south west]{FP};
-    \draw[->] (rbp) -- (sqdy.south west);
-    \node(rsp)[arl,left=4mm of sqrstat.south west]{SP};
-    \draw[->] (rsp) -- (sqrstat.south west);
+    \node(rbp)[arl,right=4mm of sqdy.south east]{FP};
+    \draw[->] (rbp) -- (sqdy.south east);
+    \node(rsp)[arl,right=4mm of sqrstat.south east]{SP};
+    \draw[->] (rsp) -- (sqrstat.south east);
 
+    % dynamic links
     \fill[color=red!80] ([xshift=-3mm]mdy.east) circle (2pt);
     \draw[->,color=red!80] ([xshift=-3mm]mdy.east) -- ([xshift=3mm]mdy.east)
-    -- ([xshift=3mm]global.south east) -- (global.south east);
+    -- ([xshift=3mm]gdy.south east) -- (gdy.south east);
 
     \fill[color=red!80] ([xshift=-3mm]sody.east) circle (2pt);
     \draw[->,color=red!80] ([xshift=-3mm]sody.east) -- ([xshift=3mm]sody.east)
-    -- ([xshift=3mm]main.south east) -- (main.south east);
+    -- ([xshift=3mm]main.north east) -- (main.north east);
 
     \fill[color=red!80] ([xshift=-3mm]sqdy.east) circle (2pt);
     \draw[->,color=red!80] ([xshift=-3mm]sqdy.east) -- ([xshift=3mm]sqdy.east)
-    -- ([xshift=3mm]sos.south east) -- (sos.south east);
+    -- ([xshift=3mm]sos.north east) -- (sos.north east);
 
     % main's static link points to global
     \fill[color=blue!70] ([xshift=3mm]mstat.west) circle (2pt);
@@ -168,11 +170,14 @@ int main(int x) {
     -- (global.south west);
 
     % notes
-    \node(leaf)[arn,right=5mm of sqr.east] {
+    \node(leaf)[arn,right=8mm of sqr.east] {
       leaf callee need not to prepare any args
     };
-    \node(ret)[arn,right=5mm of mret.south east] {
+    \node(ret)[arn,right=8mm of mret.south east] {
       return addr is drawn in callee's frame in this diagram
+    };
+    \node(fp)[arn,right=8mm of sos.south east] {
+      when sqr returns, its frame deaalocated, FP points back to sos's original frame pointer (immediately after dynamic link in this diagram)
     };
 
     \draw[->] ([xshift=-12mm]global.north west) -- ([xshift=-12mm]sqr.south west);
@@ -181,12 +186,13 @@ int main(int x) {
 \begin{itemize}
 \item caller passes its \mb{static link} as an (extra) arg to its callee
 \item it points to where callee is \textbf{defined} (immediate lexical scope)
-\item global's \mb{static link} points to \texttt{NULL} because it is the outermost lexical scope and no caller passes its static link to global
+\item global's \mb{static link} points to \texttt{NULL} because it is the outermost lexical scope and has no caller (thus no static link)
 \item static links of \texttt{main},\texttt{sos},\texttt{sqr} all point back to global's frame and they can access variables defined in global
+\item \texttt{global}'s \mo{dynamic link} is \texttt{NULL} because nothing calls it
 \end{itemize}
 
 \section*{Example 2: dynamic and static links of nested procedure}
-\begin{minipage}{.45\linewidth}
+\begin{minipage}{.5\linewidth}
 \begin{lstlisting}[language=c,xrightmargin=2pt]
 void foo(int i) {
   int j = 3;
@@ -195,7 +201,7 @@ void foo(int i) {
     k = i + j;
   }
   bar();
-}
+}// foo defined globally
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}{.5\linewidth}
@@ -207,17 +213,22 @@ int main() {
    }
    baz(x);
    return 0;
-}
+}// main defined globally
 \end{lstlisting}
 \end{minipage}
 \begin{itemize}
 \item Suppose the innermost \texttt{bar} is being executed
+\item when drawing the call stack, focus on who calls whom
+\item a dynamic link connects the path from callee to caller
+\item when drawing static links, focus on who is defined in whom
+\item a static link points from callee to its immediate lexical scope
 \end{itemize}
 \begin{minipage}{\linewidth}
   \centering
   \begin{tikzpicture}
     % global
-    \node(global) [ar] {
+    \node(gdy) [ar] {dynamic link: NULL};
+    \node(global) [ar,below=0mm of gdy] {
       global: main,foo \\
       params for main (NONE)
     };
@@ -283,19 +294,19 @@ int main() {
 
     \fill[color=red!80] ([xshift=-3mm]mdy.east) circle (2pt);
     \draw[->,color=red!80] ([xshift=-3mm]mdy.east) -- ([xshift=3mm]mdy.east)
-    -- ([xshift=3mm]global.south east) -- (global.south east);
+    -- ([xshift=3mm]gdy.south east) -- (gdy.south east);
 
     \fill[color=red!80] ([xshift=-3mm]bazdy.east) circle (2pt);
     \draw[->,color=red!80] ([xshift=-3mm]bazdy.east) -- ([xshift=3mm]bazdy.east)
-    -- ([xshift=3mm]main.south east) -- (main.south east);
+    -- ([xshift=3mm]main.north east) -- (main.north east);
 
     \fill[color=red!80] ([xshift=-3mm]foody.east) circle (2pt);
     \draw[->,color=red!80] ([xshift=-3mm]foody.east) -- ([xshift=3mm]foody.east)
-    -- ([xshift=3mm]baz.south east) -- (baz.south east);
+    -- ([xshift=3mm]baz.north east) -- (baz.north east);
 
     \fill[color=red!80] ([xshift=-3mm]bardy.east) circle (2pt);
     \draw[->,color=red!80] ([xshift=-3mm]bardy.east) -- ([xshift=3mm]bardy.east)
-    -- ([xshift=3mm]foo.south east) -- (foo.south east);
+    -- ([xshift=3mm]foo.north east) -- (foo.north east);
 
     % main's static link points to global
     \fill[color=blue!70] ([xshift=3mm]mstat.west) circle (2pt);
@@ -461,8 +472,8 @@ int main() {
 \section*{Example 3: nested proc, returned proc, closure}
 \begin{minipage}{.58\linewidth}
   \begin{lstlisting}[language=java,xleftmargin=-2em,frame=none]
-proc sort(var a: []int) {}
-  proc show(i: int) { print(a[i];
+proc sort(var a: []int) {
+  proc show(i: int) { print(a[i]) };
   proc quick(l,r: int) {
     proc swap(i,j: int) {var t; ...}
     proc partition(
@@ -477,8 +488,7 @@ proc sort(var a: []int) {}
     }
     // some code ...
   }
-quick(First(a), Last(a));
-}
+quick(First(a), Last(a)); }
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}{.42\linewidth}
@@ -493,8 +503,7 @@ proc write_array(var nums: []int);
   \item \texttt{quick} has called \texttt{partition}, which has returned (destroyed)
   \item then \texttt{quick} has called \texttt{quick} (quick2)
   \item \texttt{quick} has called \texttt{partition}
-  \item \texttt{partition} has called \texttt{swap}
-  \item \texttt{swap} is executing
+  \item \texttt{partition} has called \texttt{swap} which is executing
   \end{itemize}
 \end{minipage}
 \begin{minipage}{\linewidth}
@@ -638,6 +647,24 @@ proc write_array(var nums: []int);
     -- ([xshift=-6mm,yshift=-2mm]sort.north west)
     -- ([xshift=-6mm]global.west)
     -- (global.west);
+
+    \node[arn,right=5mm of quick2.east] {
+      In the diagram, \mb{static link}s point from callee to where it's defined, not a specific memory location
+    };
+    \node[arn,right=5mm of quick1.east] {
+      In the diagram, \mo{dynamic link}s point from a callee to its caller's frame, at the location where the caller's frame point points
+    };
+    \node[arn,right=5mm of sort.east] {
+      In the diagram, ret addr is stored in the middle of a frame, similar to MIPS
+    };
+
+    % TODO: debug closure
+    \node(debug)[arn,right=5mm of part.north east] {
+      debug closure contains: code to show function and static link to sort frame\\
+      it \mr{can} access j, a[], and any vars in sort's frame \\
+      it \mr{can't} access i, v, local vars in any quick, local vars in partition
+    };
+    \draw[->] ([xshift=-15mm]global.west) -- ([xshift=-15mm]swap.west);
   \end{tikzpicture}
 \end{minipage}
 
