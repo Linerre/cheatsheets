@@ -1,0 +1,301 @@
+\section*{IR for binary operations}
+\begin{tabular}{>{\ttfamily}l|>{\ttfamily}l>{\ttfamily}l>{\ttfamily}l }
+  \hline
+  Op & Absyn & IR & n op const      \\
+  \hline
+  +     & Op.Add & Tree.Exp.ADD & ADD(TEMP n, CONST 2) \\
+  -     & Op.Sub & Tree.Exp.SUB & SUB(TEMP n, CONST 2) \\
+  *     & Op.Mul & Tree.Exp.MUL & MUL(TEMP n, CONST 2) \\
+  /     & Op.Div & Tree.Exp.DIV & DIV(TEMP n, CONST 2) \\
+  \%    & Op.Mod & Tree.Exp.MOD & MOD(TEMP n, CONST 2) \\
+  \hline
+\end{tabular}
+\section*{Simple assignments}
+\begin{lstlisting}[frame=single]
+var x = 1;    MOVE(TEMP x, CONST 1)
+x = x + 1;    MOVE(TEMP x, ADD(TEMP x, CONST 1))
+\end{lstlisting}
+
+\section*{Struct and its fields}
+\begin{lstlisting}[frame=none,language=Java]
+var a: struct { x,y: int }; // declare a struct globally
+\end{lstlisting}
+\begin{lstlisting}[frame=single, language=Python]
+	.data          # alloc global a in data section
+	.balign 8      # 8-byte align
+AssignRecord.a:    # a's label name
+	.zero 16       # init 16 bytes to 0: 8-byte int in Mojo
+\end{lstlisting}
+\begin{lstlisting}[frame=none,language=Java,morekeywords={struct, var},
+numbers=right,firstnumber=2,numbersep=-2pt,numberstyle=\ttfamily\footnotesize]
+{ // No IR for block delimiter
+  var b: struct { x,y: int};// declare a local struct;
+  a.x = 1;
+  a.y = 2;
+  b = a;
+} // No IR for block delimiter
+\end{lstlisting}
+  % \flushleft
+  % \begin{itemize}
+  % \item For line \mo{1}
+  % \item global var alloc in data sec
+  % \item no IR for line \mo{2} (i.e. block)
+  % \end{itemize}
+\begin{lstlisting}[frame=single,language=Python]
+MOVE( # allocate and init b.x to 0
+ MEM( # NO field name, only offset
+  TEMP %rbp,
+  CONST -16, 8, true, false),
+ CONST 0),
+MOVE( # allocate and init b.y to 0
+ MEM( # NO field name, only offset
+  TEMP %rbp,
+  CONST -8, 8, true, false),
+ CONST 0),
+\end{lstlisting}
+\begin{lstlisting}[frame=single, language=Python]
+MOVE(MEM( # a.x = 1;
+       NAME a,
+       CONST 0, 8, true, false), # &a.x == &a
+     CONST 1),
+MOVE(MEM( # a.y = 2;
+       NAME a,
+       CONST 8, 8, true, false), # &a.y == (int)&a.x + 1
+     CONST 2),
+\end{lstlisting}
+\begin{lstlisting}[frame=single, language=Python]
+EXP( # assign a to b (line 7)
+ CALL(
+  NAME memmove,
+  CONST 0, # no nested procedure
+  ADD(TEMP %rbp, CONST -16), # arg1 for CALL
+  NAME a,                    # arg2 for CALL
+  CONST 16))                 # arg3 for CALL
+\end{lstlisting}
+
+\begin{tabular}{>{\ttfamily}l|>{\ttfamily}l>{\ttfamily}c}
+  \hline
+  Op & Absyn & IR       \\
+  \hline
+  <     & Op.LT & Tree.Stm.CJUMP.BLT(l, r, Lt, Lf) \\
+  >     & Op.GT & Tree.Stm.CJUMP.BGT(l, r, Lt, Lf) \\
+  ==    & Op.EQ & Tree.Stm.CJUMP.BEQ(l, r, Lt, Lf) \\
+  !=    & Op.NE & Tree.Stm.CJUMP.BNE(l, r, Lt, Lf) \\
+  <=    & Op.LE & Tree.Stm.CJUMP.BLE(l, r, Lt, Lf) \\
+  >=    & Op.GE & Tree.Stm.CJUMP.BGE(l, r, Lt, Lf) \\
+  \hline
+\end{tabular}
+\begin{itemize}
+\item Label \mr{true} usually \emph{immediately} follows the BOp
+\item \mr{true} is \texttt{CONST 1} and \mr{false} is \texttt{CONST 0}
+\end{itemize}
+% \begin{minipage}{.4\linewidth}
+% \begin{lstlisting}[frame=none,language=Java]
+% {
+%   loop {} until true;
+% }
+% \end{lstlisting}
+% \end{minipage}
+% \begin{minipage}{.6\linewidth}
+% \begin{lstlisting}[frame=none,language=Python]
+% LABEL L.0,
+% LABEL L.1,
+% BEQ(CONST 1, CONST 0, L.0, L.2),
+% LABEL L.2
+% \end{lstlisting}
+% \end{minipage}
+
+\section*{if else}
+\begin{lstlisting}[frame=none,language=Java,morekeywords={then}]
+{
+  var x = 0;            MOVE(TEMP x, CONST 0)
+  if x == 1 then        BEQ(TEMP x, CONST 1, L.0, L.1)
+                        LABEL L.0
+      x = 10;           MOVE(TEMP x, CONST 10)
+                        JUMP(NAME L.2)
+                        LABEL L.1
+  else if x < 4 then    BLT(TEMP x, CONST 4, L.3, L.4)
+                        LABEL L.3
+      x = 20;           MOVE(TEMP x, CONST 20)
+                        JUMP(NAME L.5)
+  else                  LABEL L.4
+      x = 30;           MOVE(TEMP x, CONST 30)
+                        LABEL L.5
+}                       LABEL L.2
+\end{lstlisting}
+\begin{itemize}
+\item Each branch has its own label for fall-through to jump-to
+\item When cond meets, fall-through; when not, jump-to
+\end{itemize}
+\section*{while, loop, break, until}
+\begin{minipage}{.4\linewidth}
+\begin{lstlisting}[language=Java, morekeywords={loop, then},
+frame=none,xleftmargin=-6pt]
+{
+  var x = 0;
+  while x < 100 loop {
+    x = x + 1;
+    if x == 42 then
+      break;
+  }
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.6\linewidth}
+\begin{lstlisting}[language=Python,frame=none,xleftmargin=-8pt]
+MOVE(TEMP x, CONST 0)
+LABEL L.0
+BLT(TEMP x, CONST 100, L.1, L.2)
+LABEL L.1
+MOVE(TEMP x, ADD(TEMP x, CONST 1))
+BEQ(TEMP x, CONST 42, L.3, L.4)
+LABEL L.3
+JUMP(NAME L.2)
+LABEL L.4
+JUMP(NAME L.0)
+LABEL L.2
+\end{lstlisting}
+\end{minipage}
+\begin{itemize}
+\item Label loop start and end (\texttt{LABEL L.0}, \texttt{LABEL L.2})
+\item When cond meets, jump back to start, else jump to end
+\end{itemize}
+\begin{minipage}{.4\linewidth}
+\begin{lstlisting}[language=Java,morekeywords={loop,then,until,var},
+frame=none,xleftmargin=-6pt]
+{
+  var x = 0;
+  var y = 1;
+  while x < 16 loop {
+      x = x + 1;
+      y = y + y;
+      if y == 42 then break;
+  } until y == 512;
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.6\linewidth}
+\begin{lstlisting}[language=Python,frame=none,xleftmargin=-8pt]
+MOVE(TEMP x, CONST 0)
+MOVE(TEMP y, CONST 1)
+LABEL L.0
+BLT(TEMP x, CONST 16, L.1, L.2)
+LABEL L.1
+MOVE(TEMP x, ADD(TEMP x, CONST 1))
+MOVE(TEMP y, ADD(TEMP y, TEMP y))
+BEQ(TEMP y, CONST 42, L.3, L.4)
+LABEL L.3,
+JUMP(NAME L.2)
+LABEL L.4
+BEQ(TEMP y, CONST 512, L.2, L.0)
+LABEL L.2
+\end{lstlisting}
+\end{minipage}
+\begin{itemize}
+\item \texttt{until} is like a normal \texttt{Tree.Stm.CJUMP.BOp} node
+\item When \texttt{until} cond is \mr{true}, go to end; otherwise, jump back
+\end{itemize}
+
+\section*{for loop through an array}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=Java,morekeywords={proc, type, loop, var, Last},
+frame=none,xleftmargin=-1em]
+// global declartions
+proc putchar(x: int): int;
+// array has bounds
+type A = [0..2]int;
+proc foo(): A {
+  var a: A;
+  for i = 0 to Last(a) loop
+    a[i] = i;
+  return a;
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=Java,morekeywords={var},frame=none,xleftmargin=-.5em]
+// code block
+{
+  var a = foo();
+  putchar(Ord('0') + a[0]);
+  putchar(Ord('\n'));
+  putchar(Ord('0') + a[1]);
+  putchar(Ord('\n'));
+  putchar(Ord('0') + a[2]);
+  putchar(Ord('\n'));
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=Python,frame=none,xleftmargin=-1em]
+# create high bounds
+MOVE(TEMP t.1, CONST 3)
+# k = 0
+MOVE(TEMP t.0, CONST 0)
+# alloca for array type A
+# if k >= 3, init done
+BGE(TEMP t.0, TEMP t.1,
+  L.2, L.1)
+LABEL L.1 # start init
+# -24(rbp, k, 8) = 0
+MOVE(MEM(
+  ADD(TEMP %rbp,
+      MUL(TEMP t.0, CONST 8)),
+  CONST -24, 8, true, false),
+ CONST 0)
+# k += 1
+MOVE(TEMP t.0,
+     ADD(TEMP t.0, CONST 1))
+# if k < 3, keep init
+BLT(TEMP t.0, TEMP t.1,
+  L.1, L.2)
+# init A done here
+LABEL L.2
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=Python,frame=none,xleftmargin=-0.5em]
+LABEL L.2
+# init low/high loop bounds
+MOVE(TEMP t.2, CONST 0)
+MOVE(TEMP t.3, CONST 2)
+MOVE(TEMP t.4, CONST 1)
+LABEL L.3
+MOVE(TEMP i, TEMP t.2)# i = 0
+MOVE(  # a[i] = i, or
+ MEM(  # a(rbp, i, 8) = i
+  ADD(
+   TEMP %rbp,
+   MUL(TEMP i, CONST 8)),
+  CONST -24, 8,true,false),
+ TEMP i)
+MOVE( # i += 1
+ TEMP t.2,
+ ADD(TEMP t.2, TEMP t.4))
+LABEL L.4
+# if i < 3, loop, else end
+BLE(TEMP t.2, TEMP t.3,
+  L.3, L.5)
+LABEL L.5
+# putchar not shown here
+\end{lstlisting}
+\end{minipage}
+% MOVE(
+%  TEMP t.5,
+%  MEM(
+%   TEMP %rbp,
+%   CONST 16, 8, false, false))
+
+% EXP(
+%  CALL(
+%   NAME memmove,
+%   CONST 0,
+%   TEMP t.5,
+%   ADD(
+%    TEMP %rbp,
+%    CONST -24),
+%   CONST 24))
+% MOVE(TEMP %rax, TEMP t.5)
+% JUMP(NAME L.0)
+% LABEL L.0
+\
