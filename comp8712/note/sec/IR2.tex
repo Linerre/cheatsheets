@@ -1,0 +1,163 @@
+% Need column 2 layout
+\section*{Empty array}
+\begin{minipage}{.45\linewidth}
+\begin{lstlisting}[language=Java,morekeywords={var},frame=none]
+// declare an empty array globally
+// no IR tree, only a .data section
+var v: [0..-1]int;
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.55\linewidth}
+\begin{lstlisting}[language=bash,frame=none]
+    .data
+    .balign 8
+emtyarry.v:
+    .zero 0
+\end{lstlisting}
+\end{minipage}
+
+\section*{Array index fixed (known at compile time) and variable (known at runtime)}
+\begin{minipage}{.45\linewidth}
+\begin{lstlisting}[language=Java,morekeywords={var},frame=none]
+// global array into .data
+var x: [0..9]int;
+{
+  var v = x[5];
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.55\linewidth}
+\begin{lstlisting}[language=Python,frame=none]
+    .data
+    .balign 8
+fixedarray.x:
+	.zero 80
+MOVE(     # v = x[5]
+ TEMP v, # x[5] = x(,idx,8) = x(,5,8)
+ MEM(NAME x, CONST 40, 8, true, false))
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{.45\linewidth}
+\begin{lstlisting}[language=Java,morekeywords={proc,var},frame=none]
+var x: [0..9]int;
+proc get(n: int): int {
+  return x[n];
+}
+// global array alloc-ed as
+//    .data
+//    .balign 8
+// x:
+//   .zero 80
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.55\linewidth}
+\begin{lstlisting}[language=Python,frame=none]
+MOVE(TEMP t.0, TEMP n) # t.0 will be %rdi
+BLT(TEMP t.0, CONST 0, badSub, L.1)
+LABEL L.1 # i >= 0, low bound fine
+BGT(TEMP t.0, CONST 9, badSub, L.2)
+LABEL L.2 # i < 8, high bound fine
+MOVE(TEMP %rax, # for return value
+ MEM( # x[n] = x(,idx,8) = x(,n,8)
+  ADD(NAME x, MUL(TEMP t.0, CONST 8)),
+  CONST 0, 8, true, false))
+JUMP(NAME L.0)
+LABEL L.0
+\end{lstlisting}
+\end{minipage}
+
+\section*{Array of records}
+\begin{minipage}{.45\linewidth}
+\begin{lstlisting}[language=Java,frame=none,morekeywords={New, struct}]
+{
+  var a = New(^[0..9] struct {
+             x, y: int
+  });
+}
+// a has 10 structs, each 16 bytes
+// L1-2: malloc for a at mem t.0
+// L3-4: set up low/high bounds
+// L5: i = t.1
+// L7-9: a[i] = t.0(,i,16) in t.3
+// L10-12: init a[0].x to 0
+// L13-15: init a[0].y to 0
+// L16: i += 1 (t.1 += 1)
+// L17: if t.1 < t.2, jump to L.0
+// L18: else init done
+// L19: make a points to MEM[t.0]
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.55\linewidth}
+\begin{lstlisting}[language=Python,frame=none,numbers=left,numbersep=4pt]
+MOVE(TEMP t.0,
+ CALL(NAME malloc, CONST 0, CONST 160))
+MOVE(TEMP t.2, CONST 10)
+MOVE(TEMP t.1, CONST 0)
+BGE(TEMP t.1, TEMP t.2, L.1, L.0)
+LABEL L.0
+MOVE(
+ TEMP t.3,
+ ADD(TEMP t.0, MUL(TEMP t.1, CONST 16)))
+MOVE(
+ MEM(TEMP t.3, CONST 0, 8, true, false),
+ CONST 0)
+MOVE(
+ MEM(TEMP t.3, CONST 8, 8, true, false),
+ CONST 0)
+MOVE(TEMP t.1, ADD(TEMP t.1, CONST 1))
+BLT(TEMP t.1, TEMP t.2, L.0, L.1)
+LABEL L.1
+MOVE(TEMP a, TEMP t.0)
+\end{lstlisting}
+\end{minipage}
+\begin{itemize}
+\item When there is an array in use, set up its \mb{low} (0) and \mb{high} (\texttt{array.len + 1}) bounds
+\item \mb{low} bound \emph{may} be used as the loop variant \texttt{i}, or a new temp is set up as \texttt{i}:
+  \begin{enumerate}
+  \item at start, \texttt{BLT(idx, high, body, end)} (\texttt{idx} may be \texttt{low})
+  \item in body, \texttt{BLT(idx, high, start, end)} (after increased \texttt{i})
+  \end{enumerate}
+\end{itemize}
+
+\section*{1st byte of char array (string) stores the array's length}
+\begin{minipage}{.45\linewidth}
+\begin{lstlisting}[language=Java,frame=none,
+morekeywords={proc,var,to,loop,Text,Ord,Address,Number,Loophole,}]
+proc puts(s: Address): int;
+proc println(t: Text) {
+  var a = Loophole(t, ^[]byte);
+  puts(&a[0]);
+}
+MOVE(TEMP println.a, TEMP println.t)
+MOVE(TEMP t.1, TEMP println.a)
+//  check array low bound
+BEQ(TEMP t.1, CONST 0,
+  println.badPtr, L.3)
+LABEL L.3
+// array header in t.3 now
+MOVE(TEMP t.3, TEMP t.1)
+MOVE(TEMP t.2, CONST 0) // idx in t.2
+BLT(TEMP t.2, CONST 0,
+ println.badSub, L.4)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.6\linewidth}
+\begin{lstlisting}[language=Python,frame=none,xleftmargin=-1em]
+LABEL L.4
+# MEM(t.3+8) stores array.length
+BGE( # ensure idx <= array.length
+ TEMP t.2,
+ MEM(TEMP t.3, CONST 8, 8, false, false),
+ println.badSub, L.5)
+# offset t.2 will change each time puts called
+LABEL L.5
+EXP(
+ CALL(
+  NAME puts,
+  CONST 0,
+  ADD( # t.2(t.3,0,8)
+   MEM(TEMP t.3, CONST 0, 8, false, false),
+   TEMP t.2)))
+\end{lstlisting}
+\end{minipage}
