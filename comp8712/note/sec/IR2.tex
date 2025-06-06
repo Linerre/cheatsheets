@@ -161,3 +161,95 @@ EXP(
    TEMP t.2)))
 \end{lstlisting}
 \end{minipage}
+\begin{minipage}{.45\linewidth}
+\begin{lstlisting}[language=Java,morekeywords={Number,var,to,loop,Ord,Loophole},
+frame=none,xleftmargin=-1em]
+  proc append (t1, t2: Text): Text {
+  var a1 = Loophole(t1, ^[]byte);
+  var a2 = Loophole(t2, ^[]byte);
+  // drop '\0' terminator
+  var n1 = Number(a1^)-1;
+  var n2 = Number(a2^)-1;
+  var result = New(^[]byte, n1+n2+1);
+  for i = 0 to n1-1 loop
+    result[i] = a1[i];
+  for i = 0 to n2-1 loop
+    result[n1+i] = a2[i];
+  // Add '\0' terminator
+  result[n1+n2] = Ord('\000');
+  return Loophole(result, Text);
+}
+MOVE(TEMP t.4, TEMP a1)
+BEQ(TEMP t.4, CONST 0,badPtr, L.7)
+LABEL L.7
+MOVE(TEMP n1, // n1 := a1.len - 1
+     SUB(MEM(TEMP t.4, // a1 == t.4
+         CONST 8, 8, false, false),
+     CONST 1))
+MOVE(TEMP t.5, TEMP a2)
+BEQ(TEMP t.5, CONST 0, badPtr, L.8)
+LABEL L.8
+MOVE(TEMP n2, // n2 := a2.len - 1
+     SUB(MEM(TEMP t.5, // t.5 == a2
+         CONST 8, 8, false, false),
+     CONST 1))
+MOVE(TEMP t.6, // ret = n1+n2+1
+     ADD(ADD(TEMP n1, TEMP n2),
+         CONST 1))
+BLT(TEMP t.6, CONST 0, badSub, L.9)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.6\linewidth}
+\begin{lstlisting}[language=Python,frame=none,xleftmargin=-1em]
+LABEL L.9
+MOVE(TEMP t.7, TEMP t.6) # keep orig. ret in t.6
+MOVE(TEMP t.8, CONST 16) # |head ptr| len | ret |
+MOVE(TEMP t.8, ADD(TEMP t.8, TEMP t.7))
+MOVE(TEMP t.9,
+ CALL(NAME malloc, CONST 0, TEMP t.8))
+MOVE(MEM(TEMP t.9, CONST 0, 8, false, false),
+     ADD(TEMP t.9, CONST 16)) # store metadata
+MOVE(MEM(TEMP t.9, CONST 8, 8, false, false),
+     TEMP t.6) # update t.6 (ret) with metadata
+MOVE(TEMP t.11, # ret length in t.11
+     MEM(TEMP t.9, CONST 8, 8, false, false))
+MOVE(TEMP t.12, # ret head ptr in t.12
+     MEM(TEMP t.9, CONST 0, 8, false, false))
+MOVE(TEMP t.10, CONST 0) # i = 0
+BGE(TEMP t.10, TEMP t.11, L.12, L.10)
+LABEL L.10
+MOVE(MEM(ADD(TEMP t.12, TEMP t.10),
+         CONST 0, 1, true, false),
+     CONST 0) 0(ret,)
+MOVE(TEMP t.10, ADD(TEMP t.10, CONST 1))
+MOVE(TEMP result, TEMP t.9)
+MOVE(TEMP t.13, CONST 0) #i=0
+MOVE(TEMP t.14, SUB(TEMP n1, CONST 1)) # n-1
+MOVE(TEMP t.15, CONST 1) # step = 1
+JUMP(NAME L.14) # loop init done got L14
+# LABEL L.13 - L.21 is loop body (see back)
+\end{lstlisting}
+% LABEL L.MOVE(TEMP i, TEMP t.13)
+% MOVE(TEMP t.16, TEMP result)
+% BEQ(TEMP t.16, CONST 0, badPtr, L.16)
+% LABEL L.16
+% MOVE(TEMP t.18, TEMP t.16)
+% MOVE(TEMP t.17, TEMP i)
+% BLT(TEMP t.17, CONST 0, badSub, L.17)
+% LABEL L.17
+% BGE(TEMP t.17,
+%  MEM(TEMP t.18, CONST 8, 8, false, false),
+%  badSub, L.18)
+% LABEL L.18
+% MOVE(TEMP t.19, TEMP a1)
+% BEQ(TEMP t.19, CONST 0, badPtr, L.19)
+% LABEL L.19
+% MOVE(TEMP t.21, TEMP t.19)
+% MOVE(TEMP t.20, TEMP i)
+% BLT(TEMP t.20, CONST 0, badSub, L.20)
+% LABEL L.20
+% BGE(TEMP t.20, MEM(TEMP t.21,
+%                CONST 8, 8, false, false),
+%  badSub, L.21)
+% LABEL L.21
+\end{minipage}

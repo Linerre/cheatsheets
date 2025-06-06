@@ -1,0 +1,68 @@
+\begin{itemize}
+\item Split code into basic blks: each blk has only 1 entry and exit
+\item In \mr{reverse order}, pick the \mb{last block}
+  \begin{enumerate}
+  \item collect its use and def
+  \item collect its out (usually this will be given)
+  \item calculate its in = use $\cup$ (out - def)
+  \end{enumerate}
+\item Use above info to find use, def, in, out for the 2nd last blk
+\item Repeat until all blocks done and draw the table:
+\item \mr{loop} block \mb{belongs to both its own in and out}
+% \item vars of \mo{same def} may interfere or be move-related (see code)
+\item vars of \mb{same in} or \mb{out} interfere with each other
+\item if $a$ interferes with $b$, then $b$ interferes with $a$
+\end{itemize}
+\begin{minipage}{.54\linewidth}
+\begin{tabular}{l|cc||cc}
+  blk  & use & def  & out & in \\
+  \hline
+  3    & dc  & r1r3 & r1r3   & dc     \\
+  2    & dbe & de   & cbde  & cbde    \\
+  1    & a,r1-3 & abdec & dbec & r1-3 \\
+  \hline
+\end{tabular}
+\flushleft
+\begin{itemize}
+\item use$_3$ = dc, def$_3$=r1r3
+\item out$_3$ = r1r3
+\item in$_3$ = dc + (r1r3 - r1r3) = dc
+\item use$_2$ = dbe, def$_2$ = de
+\item out$_2$ = in$_3$+in$_2$ = cbde
+\item in$_2$ = dbe + (cbde - de) = cbde
+\item do same for other block1
+\end{itemize}
+\end{minipage}
+\begin{minipage}{.46\linewidth}
+  \begin{tikzpicture}
+    \node(b1)[lrst]{
+      \begin{tabular}{ll}
+    enter: & $c \leftarrow r_3$ \\
+           & $a \leftarrow r_1$ \\
+           & $b \leftarrow r_2$ \\
+           & $d \leftarrow 0$ \\
+           & $e \leftarrow a$
+      \end{tabular}
+    };
+    \node[arl,right=1mm of b1.north east] {1};
+
+    \node(b2)[lrst, below=4mm of b1] {
+      \begin{tabular}{ll}
+     loop: & $d \leftarrow d+b$ \\
+           & $e \leftarrow e-1$ \\
+           & if $e > 0$ goto loop
+      \end{tabular}
+    };
+    \node[arl,above=1mm of b2.north east] {2};
+
+    \node(b3)[lrst, below=4mm of b2] {
+      $r_1 \leftarrow d$ \\
+      $r_3 \leftarrow c$
+    };
+    \node[arl,right=1mm of b3.north east] {3};
+
+    \draw[->] (b1) -- (b2);
+    \draw[->] (b2) -- (b3);
+    \draw[->] ([yshift=2mm]b2.south east) to [bend right=60] ([yshift=-2mm]b2.north east);
+  \end{tikzpicture}
+\end{minipage}

@@ -1,0 +1,209 @@
+\section*{Common patterns for live (may be used later) and dead}
+\begin{itemize}
+\item \texttt{a := ...}: \texttt{a} is \mb{live after} and \mr{dead before} the def
+\item \texttt{x := x + 1}: \texttt{x} \emph{must} be \mb{live before} the def
+\item \texttt{x := a + 1}: \texttt{a} \emph{must} be \mb{live before} the def, as for \texttt{x}:
+  \begin{itemize}[leftmargin=1em]
+  \item if \texttt{a} \emph{does not} refer to \texttt{x}, \texttt{x} can be dead before the def
+  \item if \texttt{a} \emph{refers} to \texttt{x}, \texttt{x} \emph{must} be \mb{live before} the def
+  \end{itemize}
+\end{itemize}
+
+\section*{Liveness analysis and reg allocation}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}[language=C,frame=none]
+int f(int a, int b) {
+   int d = 0;
+   int e = a;
+   do {
+     d = d + b;
+     e = e - 1;
+   } while (e > 0);
+   return d;
+}
+// suppose only 3 registers
+// r3:    callee save
+// r1,r2: caller-save
+// r1,r2: arg, ret(r1)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+  \begin{align*}
+    \text{enter:}\quad & c \leftarrow r_3 \\
+                       & a \leftarrow r_1 \\
+                       & b \leftarrow r_2 \\
+                       & d \leftarrow 0 \\
+                       & e \leftarrow a \\
+     \text{loop:}\quad & d \leftarrow d+b \\
+                       & e \leftarrow e-1 \\
+                       & \text{if}\; e > 0\; \text{goto}\;\text{loop}\\
+                       & r_1 \leftarrow d \\
+                       & r_3 \leftarrow c\quad (r_1,r_3\; \text{live out})
+  \end{align*}
+\end{minipage}
+
+\section*{Step 1: do liveness analysis for each var in reverse order}
+\begin{itemize}
+\item In \mr{reverse} order, pick up a var in last block's last line ($c$)
+\item check backwards on which edges c is \mb{live} and mark $c$ there
+\item repeat for other variables: $d,e,b,a,r_3,r_1,r_2$
+\end{itemize}
+\begin{minipage}{.5\linewidth}
+  \begin{tikzpicture}
+  \node(l1)[la] {c := r3};
+  \node[arl,above=0mm of l1.north west]{1};
+  \node[left=2mm of l1.west,font=\footnotesize\ttfamily]{enter:};
+
+  \node(l2)[la, below=5mm of l1] {a := r1};
+  \node[arl,above=0mm of l2.north west]{2};
+
+  \node(l3)[la, below=5mm of l2] {b := r2};
+  \node[arl,above=0mm of l3.north west]{3};
+
+  \node(l4)[la, below=5mm of l3] {d := 0};
+  \node[arl,above=0mm of l4.north west]{4};
+
+  \node(l5)[la, below=5mm of l4] {e := a};
+  \node[arl,above=0mm of l5.north west]{5};
+
+  \node(l6)[la, below=5mm of l5] {d := d + b};
+  \node[arl,above=0mm of l6.north west]{6};
+  \node[left=2mm of l6.west,font=\footnotesize\ttfamily]{loop:};
+
+  \node(l7)[la, below=5mm of l6] {e := e - 1};
+  \node[arl,above=0mm of l7.north west]{7};
+
+  \node(l8)[la, below=5mm of l7] {if e > 0 goto loop};
+  \node[arl,above=0mm of l8.north west]{8};
+
+  \node(l9)[la, below=5mm of l8] {r1 := d};
+  \node[arl,above=0mm of l9.north west]{9};
+
+  \node(l10)[la, below=5mm of l9] {r3 := c};
+  \node[arl,above=0mm of l10.north west]{10};
+
+  \draw[->] ([yshift=4mm]l1.north) -- (l1.north)
+  node[arl,midway,right]{r1,r2,r3};
+  \draw[->] (l1) -- (l2) node[arl, midway,right]{c,r1,r2};
+  \draw[->] (l2) -- (l3)  node[arl,midway,right]{c,a,r2};
+  \draw[->] (l3) -- (l4)  node[arl,midway,right]{a,c,b};
+  \draw[->] (l4) -- (l5)  node[arl,midway,right]{a,c,d,b};
+  \draw[->] (l5) -- (l6)  node[arl,midway,right]{d,c,e,b};
+  \draw[->] (l6) -- (l7)  node[arl,midway,right]{c,d,e};
+  \draw[->] (l7) -- (l8)  node[arl,midway,right]{c,d,e};
+  \draw[->] (l8) -- (l9)  node[arl,midway,right]{c,d};
+  \draw[->] (l9) -- (l10) node[arl,midway,right]{c,r1};
+  \draw[->] (l8.east) to [bend right=70] node[arl,right]{c,d,e,b} (l6.east);
+  \draw[->] (l10.east) -- ([xshift=4mm]l10.east) node[right]{r1,r3};
+\end{tikzpicture}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+  \includegraphics*[width=\linewidth,height=9cm]{img/regalloc}
+\end{minipage}
+\begin{tabular}{l|p{1cm}p{1cm}p{2cm}p{2cm}}
+  \hline
+  ix &use & def & in & out \\
+  \hline
+  1 &r3 &c &r1,r2,r3&c,r1,r2 \\
+  2 &r1 &a &c,r1,r2&c,a,r2 \\
+  3 &r2 &b &c,a,r2&a,c,b \\
+  4 &   &d  &a,c,b&a,c,d,b \\
+  5 &a  &e  &a,c,d,b&d,c,e,b \\
+  6 &d,b&d  &d,c,e,b&c,d,e \\
+  7 &e  &e  &c,d,e&c,d,e \\
+  8 &e  &   &c,d,e &c,d,e \\
+  9 &d  &r1 &c,d&c,r1 \\
+  10 &c &r3 & c,r1 & r1,r3 \\
+\hline
+\end{tabular}
+\section*{Step 2: draw adjacency table for the initial state}
+\begin{tabular}{l|lllll|lll|l}
+  \hline
+  & $a$ & $b$ & $c$ & $d$ & $e$ & $r_1$ & $r_2$ & $r_3$ & degree\\
+  \hline
+  $a$ &   & X & X & X & O & O  & X &   & 4 \\
+  $b$ & X &   & X & X & X &   & O &   & 4\\
+  $c$ & X & X &   & X & X & X & X & O & 6\\
+  $d$ & X & X & X &   & X & O  &   &   & 4\\
+  $e$ & O & X & X & X &  &  &  &      & 3\\
+  % $r_1$  & O &   &  &  &  &   & X & X \\
+  % $r_2$  & ? & O &  &  &  & X &   & X \\
+  % $r_3$  & ?  & ?  & O & &  & X & X &  \\
+    \hline
+    \multicolumn{9}{l}{X: row interferes with col}\\
+    \hline
+    \multicolumn{9}{l}{O: row move-related with col}\\
+  \hline
+\end{tabular}
+\section*{Step 3: Consider simlify, coalesce, freeze or spill}
+\begin{itemize}
+\item because all \mb{non-precolored} nodes have degree $\geq K=3$, \emph{cannot} simplify or freeze; use heuristic to (potential) spill $c$
+\end{itemize}
+\begin{tabular}{l|lllll|lll|l}
+  \hline
+  & $a$ & $b$ & \dm{$c$} & $d$ & $e$ & $r_1$ & $r_2$ & $r_3$ & degree\\
+  \hline
+  $a$ &   & X &  & X & O & O & X &   & 3 \\
+  $b$ & X &   &  & X & X &   & O &   & 3\\
+  $d$ & X & X &  &   & X & O  &   &   & 3\\
+  $e$ & O & X &  & X &  &  &  &      & 2\\
+  \hline
+\end{tabular}
+\section*{Step 4: After spill, try to simply, coalesce or freeze again}
+\begin{itemize}
+\item $b,d$ are significant neighbors of $a$ and they already interfere with $e$, using \mo{George} heuristic, coalesce $ae$ (move-related)
+\end{itemize}
+\begin{tabular}{l|lllll|lll|l}
+  \hline
+  & $ae$ & $b$ & \dm{$c$} & $d$ & $\dm{e}$ & $r_1$ & $r_2$ & $r_3$ & degree\\
+  \hline
+  $ae$ &   & X &  & X & & O & X & & 3 \\
+  $b$ & X &   &  & X &  &   & O &   & 2\\
+  $d$ & X & X &  &   &  & O &   &   & 2\\
+  \hline
+\end{tabular}
+\section*{Step 5: repeat coalescing or simplifying until nodes < K}
+\begin{itemize}
+\item coalesce $ae,r1$ or $b,r2$, choose $b,r2$
+\end{itemize}
+\begin{tabular}{l|lllll|lll|l}
+  \hline
+  & $ae$ & \dm{$b$} & \dm{$c$} & $d$ & $\dm{e}$ & $r_1$ & $br_2$ & $r_3$ & degree\\
+  \hline
+  $ae$   &   &   &  & X &  & O & X &   & 2 \\
+  $br_2$ & X &   &  & X &  & X &   & X & 4\\
+  $d$    & X &   &  &   &  & O & X &   & 2\\
+  \hline
+\end{tabular}
+\begin{itemize}
+\item $ae,r1$ or $d,r1$, choose $ae,r1$
+\end{itemize}
+\begin{tabular}{l|lllll|lll|l}
+  \hline
+  & \dm{$ae$} & $\dm{b}$ & \dm{$c$} & $d$ & $\dm{e}$ & $aer_1$ & $br_2$ & $r_3$ & degree\\
+  \hline
+  $aer_1$   &   &   &  & X &  &   & X & X & 3 \\
+  $br_2$    &   &   &  & X &  & X &   & X & 3 \\
+  $d$       & X &   &  &   &  & O & X &   & 2 \\
+  \hline
+\end{tabular}
+\begin{itemize}
+\item $aer_1$ and $d$ are move \mr{constrained}: move-related + interfere
+\item try to simplify $d$
+\end{itemize}
+\begin{tabular}{l|lllll|lll|l}
+  \hline
+  & \dm{$ae$} & $\dm{b}$ & \dm{$c$} & \dm{$d$} & $\dm{e}$ & $aer_1$ & $br_2$ & $r_3$ & degree\\
+  \hline
+  $aer_1$   &   &   &  &  &  &   & X & X & 2 \\
+  $br_2$    &   &   &  &  &  & X &   & X & 2 \\
+  \hline
+\end{tabular}
+\section*{Color nodes}
+\begin{itemize}
+\item $a,e$ already colored with $r_1$
+\item $b$ already colored with $r_2$
+\item thus put $d$ back with color $r_3$
+\item $c$ turns out to be actual spill; need to \mb{rewrite} the program
+\end{itemize}
+See textbook for the remaining progress
